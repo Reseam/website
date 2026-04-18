@@ -19,6 +19,8 @@ jobs:
         - /var/run/docker.sock:/var/run/docker.sock
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.FORGEJO_TOKEN }}
 
       - name: install docker cli
         run: |
