@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+
+@font-face {
+	font-family: 'InterVariable';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/InterVariable.woff2') format('woff2');
+}
+
+:root {
+	--background: #0a0a0a;
+	--foreground: #ededed;
+
+	--card: #121212;
+	--card-foreground: #ededed;
+
+	--popover: #121212;
+	--popover-foreground: #ededed;
+
+	--primary: oklch(0.8808 0.0969 156.04);
+	--primary-foreground: #000000;
+
+	--secondary: #262626;
+	--secondary-foreground: #ededed;
+
+	--muted: #171717;
+	--muted-foreground: #a3a3a3;
+
+	--accent: #171717;
+	--accent-foreground: #ededed;
+
+	--destructive: #7f1d1d;
+	--destructive-foreground: #ededed;
+
+	--border: #262626;
+	--input: #262626;
+	--ring: oklch(0.8808 0.0969 156.04);
+
+	--radius: 0.75rem;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-amber-500: oklch(0.8 0.17 80);
+	--color-blue-500: oklch(0.64 0.18 260);
+	--color-zinc-50: oklch(0.98 0.002 260);
+	--color-zinc-100: oklch(0.96 0.003 260);
+	--color-zinc-200: oklch(0.9 0.004 260);
+	--color-zinc-800: oklch(0.28 0.006 260);
+	--color-zinc-900: oklch(0.22 0.006 260);
+	--color-zinc-950: oklch(0.17 0.006 260);
+	--font-sans:
+		'InterVariable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+	*,
+	::before,
+	::after {
+		border-color: var(--border);
+	}
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+	body {
+		background: var(--background);
+		color: var(--foreground);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+	}
+	:focus-visible {
+		outline: none;
+	}
+}
