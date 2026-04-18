@@ -4,7 +4,7 @@
 
 	let {
 		class: className,
-		children
+		children,
 	}: {
 		class?: string;
 		children?: Snippet;

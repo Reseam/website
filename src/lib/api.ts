@@ -1,8 +1,6 @@
 import type { Announcement, ReleaseResponse } from '$lib/types';
 
-export type ApiResult<T> =
-	| { ok: true; data: T }
-	| { ok: false; message: string };
+export type ApiResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
 export async function fetchLatestPatches(
 	apiUrl: string,
@@ -39,13 +37,13 @@ export async function fetchAnnouncement(
 async function fetchJson<T>(url: string, fetcher: typeof fetch): Promise<ApiResult<T>> {
 	try {
 		const response = await fetcher(url, {
-			headers: { Accept: 'application/json' }
+			headers: { Accept: 'application/json' },
 		});
 
 		if (!response.ok) {
 			return {
 				ok: false,
-				message: `API returned ${response.status} ${response.statusText || 'error'}`
+				message: `API returned ${response.status} ${response.statusText || 'error'}`,
 			};
 		}
 
@@ -53,7 +51,7 @@ async function fetchJson<T>(url: string, fetcher: typeof fetch): Promise<ApiResu
 	} catch (error) {
 		return {
 			ok: false,
-			message: error instanceof Error ? error.message : 'Unable to reach API'
+			message: error instanceof Error ? error.message : 'Unable to reach API',
 		};
 	}
 }

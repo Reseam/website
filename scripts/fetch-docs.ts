@@ -126,9 +126,7 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 		console.log(`  ${source.repo}: cache hit but assets missing — refetching`);
 	}
 
-	const entries = await api<ForgejoEntry[]>(
-		`/repos/${source.repo}/contents/${path}?ref=${branch}`
-	);
+	const entries = await api<ForgejoEntry[]>(`/repos/${source.repo}/contents/${path}?ref=${branch}`);
 	if (!entries) return null;
 	const mdFiles = entries.filter((e) => e.type === 'file' && e.name.endsWith('.md'));
 	const imageFiles = entries.filter((e) => e.type === 'file' && IMAGE_EXT.test(e.name));
@@ -147,14 +145,16 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 	for (const file of mdFiles) {
 		const src = await raw(file.download_url);
 		const { data, body } = parseFrontmatter(src);
-		const rewritten = rewriteImagePaths(body, source.slug);
+		const title = data.title || titleFromHeading(body) || titleFromFilename(file.name);
+		const strippedBody = body.replace(/^\s*#\s+.+\n?/, '');
+		const rewritten = rewriteImagePaths(strippedBody, source.slug);
 		const html = await marked.parse(rewritten, { async: true });
 
 		if (source.hub && file.name === 'index.md') {
 			hub = {
 				html,
-				title: data.title || titleFromHeading(body),
-				description: data.description
+				title,
+				description: data.description,
 			};
 			continue;
 		}
@@ -162,8 +162,7 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 		const fileSlug = slugFromFilename(file.name);
 		const section = sectionFromFilename(file.name);
 		const orderMatch = file.name.match(/^(\d+)_(\d+)?/);
-		const order = orderMatch?.[2] ? Number(orderMatch[2]) : section ?? Infinity;
-		const title = data.title || titleFromHeading(body) || titleFromFilename(file.name);
+		const order = orderMatch?.[2] ? Number(orderMatch[2]) : (section ?? Infinity);
 		pages.push({
 			slug: `${source.slug}/${fileSlug}`,
 			sourceSlug: source.slug,
@@ -173,7 +172,7 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 			title,
 			description: data.description,
 			html,
-			editUrl: `${FORGE_BASE}/${source.repo}/_edit/${branch}/${file.path}`
+			editUrl: `${FORGE_BASE}/${source.repo}/_edit/${branch}/${file.path}`,
 		});
 	}
 
@@ -220,8 +219,8 @@ function buildIndex(results: Map<string, CacheEntry>): DocsIndex {
 			sections: sectionEntries.map(([key, pages]) => ({
 				key,
 				label: key === 'standalone' ? 'Reference' : `Part ${key}`,
-				pages
-			}))
+				pages,
+			})),
 		});
 	}
 	return { groups, pages: allPages, hub, generatedAt: new Date().toISOString() };

@@ -4,7 +4,7 @@ import {
 	clearApiUrlOverride,
 	normalizeApiUrl,
 	readApiUrlOverride,
-	saveApiUrlOverride
+	saveApiUrlOverride,
 } from '$lib/api-url';
 
 function createSettingsStore() {
@@ -61,7 +61,7 @@ function createSettingsStore() {
 		},
 		load,
 		setApiUrl,
-		resetApiUrl
+		resetApiUrl,
 	};
 }
 

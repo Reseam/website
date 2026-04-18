@@ -13,26 +13,26 @@ const META: Record<AnnouncementLevel, LevelMeta> = {
 		label: 'News',
 		icon: Sparkles,
 		color: 'text-primary bg-primary/10',
-		dotColor: 'bg-primary'
+		dotColor: 'bg-primary',
 	},
 	1: {
 		label: 'Notice',
 		icon: Info,
 		color: 'text-sky-400 bg-sky-400/10',
-		dotColor: 'bg-sky-400'
+		dotColor: 'bg-sky-400',
 	},
 	2: {
 		label: 'Warning',
 		icon: TriangleAlert,
 		color: 'text-amber-500 bg-amber-500/10',
-		dotColor: 'bg-amber-500'
+		dotColor: 'bg-amber-500',
 	},
 	3: {
 		label: 'Critical',
 		icon: CircleAlert,
 		color: 'text-destructive bg-destructive/10',
-		dotColor: 'bg-destructive'
-	}
+		dotColor: 'bg-destructive',
+	},
 };
 
 export function levelMeta(level: AnnouncementLevel): LevelMeta {

@@ -3,7 +3,7 @@ import {
 	fetchAnnouncements,
 	fetchLatestManager,
 	fetchLatestPatches,
-	type ApiResult
+	type ApiResult,
 } from '$lib/api';
 import type { Announcement, ReleaseResponse } from '$lib/types';
 import { settings } from './settings.svelte';
@@ -131,7 +131,7 @@ function createApiStore() {
 		loadManager,
 		loadAnnouncements,
 		loadAnnouncement,
-		reload
+		reload,
 	};
 }
 

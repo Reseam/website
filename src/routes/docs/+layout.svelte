@@ -33,8 +33,8 @@
 		<div class="sticky top-28 space-y-2 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
 			{#if docs.groups.length === 0}
 				<p class="text-sm text-muted-foreground">
-					No docs published yet. Add markdown files under <code class="text-xs">docs/</code> in any
-					source repo.
+					No docs published yet. Add markdown files under <code class="text-xs">docs/</code> in any source
+					repo.
 				</p>
 			{/if}
 			{#each docs.groups as group (group.slug)}
@@ -62,10 +62,7 @@
 						/>
 					</button>
 					{#if open}
-						<div
-							transition:slide={{ duration: 180, easing: cubicOut }}
-							class="space-y-4 pb-3"
-						>
+						<div transition:slide={{ duration: 180, easing: cubicOut }} class="space-y-4 pb-3">
 							{#each group.sections as section (section.key)}
 								<div>
 									{#if section.key !== 'standalone'}

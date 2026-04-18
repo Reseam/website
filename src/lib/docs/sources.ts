@@ -14,5 +14,5 @@ export const sources: DocSource[] = [
 	{ slug: 'website', repo: 'reseam/website', label: 'Website', hub: true },
 	{ slug: 'engine', repo: 'reseam/reseam', label: 'Engine' },
 	{ slug: 'api', repo: 'reseam/api', label: 'API' },
-	{ slug: 'patches', repo: 'reseam/patches', label: 'Patches' }
+	{ slug: 'patches', repo: 'reseam/patches', label: 'Patches' },
 ];

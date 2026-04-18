@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
-	import { formatDistanceToNow } from 'date-fns';
 	import { Megaphone, CircleAlert as AlertCircle, X } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { api } from '$lib/stores/api.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { levelMeta } from '$lib/announcement-meta';
+	import { relTime } from '$lib/format';
 
 	let activeTag = $state('');
 
@@ -21,14 +21,6 @@
 	});
 
 	const resource = $derived(api.announcements);
-
-	function relTime(iso: string) {
-		try {
-			return formatDistanceToNow(new Date(iso), { addSuffix: true });
-		} catch {
-			return '';
-		}
-	}
 </script>
 
 <svelte:head>
@@ -110,7 +102,9 @@
 			<div class="text-center py-20 text-muted-foreground flex flex-col items-center">
 				<Megaphone size={40} class="mb-4 opacity-20" />
 				<p>
-					{activeTag ? `No announcements tagged "${activeTag}".` : 'No new announcements at this time.'}
+					{activeTag
+						? `No announcements tagged "${activeTag}".`
+						: 'No new announcements at this time.'}
 				</p>
 			</div>
 		{/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { formatDistanceToNow, format } from 'date-fns';
 	import { ArrowLeft, Archive, User } from 'lucide-svelte';
 	import { levelMeta } from '$lib/announcement-meta';
+	import { relTime, fullTime } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -10,22 +10,6 @@
 	const item = $derived(data.announcement);
 	const meta = $derived(levelMeta(item.level));
 	const LevelIcon = $derived(meta.icon);
-
-	function relTime(iso: string) {
-		try {
-			return formatDistanceToNow(new Date(iso), { addSuffix: true });
-		} catch {
-			return '';
-		}
-	}
-
-	function fullTime(iso: string) {
-		try {
-			return format(new Date(iso), 'PPP');
-		} catch {
-			return '';
-		}
-	}
 </script>
 
 <svelte:head>
