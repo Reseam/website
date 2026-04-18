@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-	<rect width="32" height="32" rx="8" fill="oklch(0.87 0.09 180)" />
-	<path
-		d="M9 24V8h9.2c3.3 0 5.8 2.3 5.8 5.5 0 2.4-1.4 4.3-3.6 5.1L24 24h-3.4l-3.3-5.2h-5v5.2Zm3.3-8h5.7c1.7 0 2.9-1 2.9-2.5S19.7 11 18 11h-5.7Z"
-		fill="oklch(0.22 0.055 180)"
-	/>
-</svg>

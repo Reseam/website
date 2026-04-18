@@ -2,16 +2,23 @@
 	import '../app.css';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Plus, Megaphone, Settings } from 'lucide-svelte';
+	import { Megaphone, Settings, Menu, X } from 'lucide-svelte';
 	import { cn } from '$lib/cn';
 	import { settings } from '$lib/stores/settings.svelte';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
+	import Logo from '$lib/components/Logo.svelte';
 
 	let { children } = $props();
 
 	let settingsOpen = $state(false);
+	let mobileNavOpen = $state(false);
+
+	$effect(() => {
+		page.url.pathname;
+		mobileNavOpen = false;
+	});
 
 	const navLinks = [
 		{ name: 'Home', path: '/' },
@@ -35,15 +42,8 @@
 >
 	<header class="sticky top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border">
 		<div class="container mx-auto px-6 h-20 flex items-center justify-between">
-			<a href="/" class="flex items-center gap-2 group">
-				<div
-					class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center relative overflow-hidden"
-				>
-					<Plus class="text-primary z-10" size={16} />
-					<div
-						class="absolute inset-0 bg-primary/10 scale-0 group-hover:scale-100 transition-transform rounded-lg"
-					></div>
-				</div>
+			<a href="/" class="flex items-center gap-1.5 group">
+				<Logo size={28} class="transition-transform group-hover:scale-105" />
 				<span class="font-semibold text-lg tracking-tight">Reseam</span>
 			</a>
 
@@ -76,8 +76,43 @@
 				>
 					<Settings size={18} />
 				</button>
+				<button
+					onclick={() => (mobileNavOpen = !mobileNavOpen)}
+					class="md:hidden p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary"
+					aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+					aria-expanded={mobileNavOpen}
+					aria-controls="mobile-nav"
+				>
+					{#if mobileNavOpen}
+						<X size={18} />
+					{:else}
+						<Menu size={18} />
+					{/if}
+				</button>
 			</div>
 		</div>
+
+		{#if mobileNavOpen}
+			<nav
+				id="mobile-nav"
+				transition:slide={{ duration: 180, easing: cubicOut }}
+				class="md:hidden border-t border-border bg-background/95 backdrop-blur-md overflow-hidden"
+			>
+				<div class="container mx-auto px-6 py-2 flex flex-col">
+					{#each navLinks as link (link.path)}
+						<a
+							href={link.path}
+							class={cn(
+								'py-3 text-sm font-medium transition-colors hover:text-primary',
+								isActive(link.path) ? 'text-foreground' : 'text-muted-foreground'
+							)}
+						>
+							{link.name}
+						</a>
+					{/each}
+				</div>
+			</nav>
+		{/if}
 	</header>
 
 	<main class="flex-1 flex flex-col">
@@ -88,8 +123,8 @@
 		<div
 			class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6"
 		>
-			<div class="flex items-center gap-2 text-muted-foreground">
-				<Plus size={16} />
+			<div class="flex items-center gap-1.5 text-muted-foreground">
+				<Logo size={24} />
 				<span class="font-medium text-sm">Reseam</span>
 				<span class="text-xs ml-2 opacity-60">
 					© {new Date().getFullYear()} Reseam Team
