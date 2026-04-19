@@ -6,7 +6,7 @@ const config = {
 		runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true),
 	},
 	kit: {
-		adapter: adapter({ strict: true, fallback: '200.html' }),
+		adapter: adapter({ strict: true, fallback: '404.html' }),
 	},
 };
 
