@@ -7,7 +7,7 @@ import { settings } from '$lib/stores/settings.svelte';
 import type { Announcement } from '$lib/types';
 import type { EntryGenerator, PageLoad } from './$types';
 
-export const prerender = true;
+export const prerender = 'auto';
 export const trailingSlash = 'always';
 
 let buildListPromise: Promise<Announcement[]> | null = null;
