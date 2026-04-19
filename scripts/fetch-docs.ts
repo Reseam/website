@@ -90,7 +90,7 @@ function parseFrontmatter(src: string): { data: Record<string, string>; body: st
 
 function titleFromFilename(name: string): string {
 	return name
-		.replace(/^\d+_/, '')
+		.replace(/^\d+_(\d+_)?/, '')
 		.replace(/\.md$/, '')
 		.replace(/[-_]+/g, ' ')
 		.replace(/\b\w/g, (c) => c.toUpperCase());
@@ -102,7 +102,7 @@ function titleFromHeading(md: string): string | null {
 }
 
 function slugFromFilename(name: string): string {
-	return name.replace(/^\d+_/, '').replace(/\.md$/, '');
+	return name.replace(/^\d+_(\d+_)?/, '').replace(/\.md$/, '');
 }
 
 function sectionFromFilename(name: string): number | null {
