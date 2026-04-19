@@ -55,6 +55,16 @@ function rewriteImagePaths(md: string, sourceSlug: string): string {
 	});
 }
 
+function rewriteDocLinks(md: string, sourceSlug: string): string {
+	return md.replace(/(?<!!)\[([^\]]+)\]\(\s*([^)\s#]+)(#[^)\s]+)?(\s+"[^"]*")?\s*\)/g, (_m, text, url, hash, title) => {
+		if (/^(https?:|mailto:|data:|\/|#)/i.test(url)) return _m;
+		if (!/\.md$/i.test(url)) return _m;
+		const file = url.replace(/^\.?\//, '').split('/').pop() ?? url;
+		const slug = slugFromFilename(file);
+		return `[${text}](/docs/${sourceSlug}/${slug}${hash ?? ''}${title ?? ''})`;
+	});
+}
+
 async function readCache(): Promise<Cache> {
 	if (!existsSync(cacheFile)) return {};
 	try {
@@ -147,8 +157,9 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 		const { data, body } = parseFrontmatter(src);
 		const title = data.title || titleFromHeading(body) || titleFromFilename(file.name);
 		const strippedBody = body.replace(/^\s*#\s+.+\n?/, '');
-		const rewritten = rewriteImagePaths(strippedBody, source.slug);
-		const html = await marked.parse(rewritten, { async: true });
+		const withImages = rewriteImagePaths(strippedBody, source.slug);
+		const withLinks = rewriteDocLinks(withImages, source.slug);
+		const html = await marked.parse(withLinks, { async: true });
 
 		if (source.hub && file.name === 'index.md') {
 			hub = {
