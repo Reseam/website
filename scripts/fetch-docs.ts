@@ -4,8 +4,46 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
+import markedShiki from 'marked-shiki';
+import { createHighlighter } from 'shiki';
 import { FORGE_API, FORGE_BASE, sources, type DocSource } from '../src/lib/docs/sources.ts';
 import type { DocGroup, DocPage, DocsIndex } from '../src/lib/docs/types.ts';
+
+const SHIKI_THEME = 'vitesse-dark';
+const SHIKI_LANGS = [
+	'bash',
+	'css',
+	'diff',
+	'dockerfile',
+	'go',
+	'html',
+	'ini',
+	'json',
+	'jsonc',
+	'markdown',
+	'nginx',
+	'python',
+	'rust',
+	'shell',
+	'sql',
+	'svelte',
+	'toml',
+	'tsx',
+	'typescript',
+	'yaml',
+];
+
+const highlighter = await createHighlighter({ themes: [SHIKI_THEME], langs: SHIKI_LANGS });
+const supportedLangs = new Set(highlighter.getLoadedLanguages());
+
+marked.use(
+	markedShiki({
+		highlight(code, lang) {
+			const resolved = supportedLangs.has(lang) ? lang : 'text';
+			return highlighter.codeToHtml(code, { lang: resolved, theme: SHIKI_THEME });
+		},
+	})
+);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outFile = resolve(here, '../src/lib/docs/generated/docs.json');
@@ -119,21 +157,21 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 	);
 	const sha = commits?.[0]?.sha;
 	if (!sha) {
-		console.log(`  ${source.repo}: no ${path}/ yet — skipping`);
+		console.log(`  ${source.slug} (${source.repo}): no ${path}/ yet — skipping`);
 		return null;
 	}
 
 	const sourceAssetDir = resolve(assetsRoot, source.slug);
-	const cached = cache[source.repo];
+	const cached = cache[source.slug];
 	if (cached && cached.sha === sha) {
 		const imagesPresent = (cached.images ?? []).every((name) =>
 			existsSync(resolve(sourceAssetDir, name))
 		);
 		if (imagesPresent) {
-			console.log(`  ${source.repo}: up to date (${sha.slice(0, 7)})`);
+			console.log(`  ${source.slug} (${source.repo}): up to date (${sha.slice(0, 7)})`);
 			return cached;
 		}
-		console.log(`  ${source.repo}: cache hit but assets missing — refetching`);
+		console.log(`  ${source.slug} (${source.repo}): cache hit but assets missing — refetching`);
 	}
 
 	const entries = await api<ForgejoEntry[]>(`/repos/${source.repo}/contents/${path}?ref=${branch}`);
@@ -197,7 +235,7 @@ async function fetchSource(source: DocSource, cache: Cache): Promise<CacheEntry 
 
 	const imgLabel = imageNames.length > 0 ? ` + ${imageNames.length} image(s)` : '';
 	console.log(
-		`  ${source.repo}: ${pages.length} page(s)${hub ? ' + hub' : ''}${imgLabel} @ ${sha.slice(0, 7)}`
+		`  ${source.slug} (${source.repo}): ${pages.length} page(s)${hub ? ' + hub' : ''}${imgLabel} @ ${sha.slice(0, 7)}`
 	);
 	return { sha, pages, hub, images: imageNames };
 }
@@ -207,7 +245,7 @@ function buildIndex(results: Map<string, CacheEntry>): DocsIndex {
 	const allPages: DocPage[] = [];
 	let hub: HubEntry | undefined;
 	for (const source of sources) {
-		const entry = results.get(source.repo);
+		const entry = results.get(source.slug);
 		if (!entry) continue;
 		if (source.hub && entry.hub) hub = entry.hub;
 		if (entry.pages.length === 0) continue;
@@ -246,8 +284,8 @@ async function main() {
 	for (const source of sources) {
 		const entry = await fetchSource(source, cache);
 		if (entry) {
-			results.set(source.repo, entry);
-			nextCache[source.repo] = entry;
+			results.set(source.slug, entry);
+			nextCache[source.slug] = entry;
 		}
 	}
 

@@ -12,7 +12,8 @@ export type DocSource = {
 
 export const sources: DocSource[] = [
 	{ slug: 'website', repo: 'reseam/website', label: 'Website', hub: true },
-	{ slug: 'engine', repo: 'reseam/reseam', label: 'Engine', path: 'crates/cli/docs' },
+	{ slug: 'engine', repo: 'reseam/reseam', label: 'Engine' },
+	{ slug: 'cli', repo: 'reseam/reseam', label: 'CLI', path: 'crates/cli/docs' },
 	{ slug: 'api', repo: 'reseam/api', label: 'API' },
 	{ slug: 'patches', repo: 'reseam/patches', label: 'Patches' },
 ];
