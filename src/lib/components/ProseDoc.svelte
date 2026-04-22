@@ -105,4 +105,11 @@
 		border-top: 1px solid var(--border);
 		margin: 2rem 0;
 	}
+	.prose-doc :global(img),
+	.prose-doc :global(svg) {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		margin: 1.5rem auto;
+	}
 </style>
