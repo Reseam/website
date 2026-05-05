@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
+import { gfmHeadingId } from 'marked-gfm-heading-id';
 import markedShiki from 'marked-shiki';
 import { createHighlighter } from 'shiki';
 import { FORGE_API, FORGE_BASE, sources, type DocSource } from '../src/lib/docs/sources.ts';
@@ -36,6 +37,7 @@ const SHIKI_LANGS = [
 const highlighter = await createHighlighter({ themes: [SHIKI_THEME], langs: SHIKI_LANGS });
 const supportedLangs = new Set(highlighter.getLoadedLanguages());
 
+marked.use(gfmHeadingId());
 marked.use(
 	markedShiki({
 		highlight(code, lang) {
