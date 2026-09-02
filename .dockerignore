@@ -1,0 +1,8 @@
+.git
+.claude
+.docs-cache
+.svelte-kit
+build
+node_modules
+src/lib/docs/generated
+static/docs-assets
