@@ -90,6 +90,7 @@
 		-webkit-font-smoothing: antialiased;
 	}
 	:focus-visible {
-		outline: none;
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
 	}
 }

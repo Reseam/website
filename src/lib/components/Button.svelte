@@ -1,28 +1,30 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 	import { cn } from '$lib/cn';
 
 	type Variant = 'default' | 'ghost' | 'outlined';
 	type Size = 'default' | 'sm' | 'lg' | 'icon';
 
-	type Props = HTMLButtonAttributes & {
-		variant?: Variant;
-		size?: Size;
-		class?: string;
-		children?: Snippet;
-	};
+	type Props = HTMLButtonAttributes &
+		HTMLAnchorAttributes & {
+			variant?: Variant;
+			size?: Size;
+			class?: string;
+			children?: Snippet;
+		};
 
 	let {
 		variant = 'default',
 		size = 'default',
 		class: className,
 		children,
+		href,
 		...rest
 	}: Props = $props();
 
 	const base =
-		'inline-flex items-center justify-center whitespace-nowrap rounded-[var(--radius)] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
+		'inline-flex items-center justify-center whitespace-nowrap rounded-[var(--radius)] text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50';
 
 	const variants = {
 		default: 'bg-primary text-primary-foreground hover:bg-primary/90',
@@ -36,8 +38,16 @@
 		lg: 'h-12 px-8 text-base',
 		icon: 'h-10 w-10',
 	};
+
+	const classes = $derived(cn(base, variants[variant], sizes[size], className));
 </script>
 
-<button class={cn(base, variants[variant], sizes[size], className)} {...rest}>
-	{@render children?.()}
-</button>
+{#if href}
+	<a {href} class={classes} {...rest}>
+		{@render children?.()}
+	</a>
+{:else}
+	<button class={classes} {...rest}>
+		{@render children?.()}
+	</button>
+{/if}

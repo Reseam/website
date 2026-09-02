@@ -1,5 +1,5 @@
 import { fetchAnnouncements } from '$lib/api';
-import { DEFAULT_API_URL } from '$lib/api-url';
+import { DEFAULT_API_URL } from '$lib/settings.svelte';
 
 export const prerender = true;
 
@@ -8,11 +8,16 @@ const staticPages = ['/', '/download/', '/docs/', '/announcements/'];
 export async function GET() {
 	const today = new Date().toISOString().slice(0, 10);
 
-	const result = await fetchAnnouncements(DEFAULT_API_URL);
-	const announcementPaths = result.ok ? result.data.map((a) => `/announcements/${a.id}/`) : [];
+	const announcementPages = (await fetchAnnouncements(DEFAULT_API_URL)).map((a) => ({
+		path: `/announcements/${a.id}/`,
+		lastmod: a.created_at.slice(0, 10),
+	}));
 
-	const urls = [...staticPages, ...announcementPaths]
-		.map((path) => `  <url><loc>https://reseam.app${path}</loc><lastmod>${today}</lastmod></url>`)
+	const urls = [...staticPages.map((path) => ({ path, lastmod: today })), ...announcementPages]
+		.map(
+			({ path, lastmod }) =>
+				`  <url><loc>https://reseam.app${path}</loc><lastmod>${lastmod}</lastmod></url>`
+		)
 		.join('\n');
 
 	const body = `<?xml version="1.0" encoding="UTF-8"?>

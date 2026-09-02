@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { ArrowRight, GitBranch } from 'lucide-svelte';
@@ -9,21 +8,17 @@
 
 	const totalSteps = 6;
 	let step = $state(0);
-	let timer: ReturnType<typeof setInterval> | null = null;
 
-	onMount(() => {
-		timer = setInterval(() => {
+	$effect(() => {
+		const timer = setInterval(() => {
 			step = (step + 1) % totalSteps;
 		}, 2200);
-	});
-
-	onDestroy(() => {
-		if (timer) clearInterval(timer);
+		return () => clearInterval(timer);
 	});
 </script>
 
 <svelte:head>
-	<title>Reseam — A better way to use your apps</title>
+	<title>Reseam: a better way to use your apps</title>
 	<meta
 		name="description"
 		content="Easily add helpful new features or remove common annoyances from the apps you use every day."
@@ -45,12 +40,14 @@
 				</p>
 
 				<div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-					<a href="/download/" class="w-full sm:w-auto">
-						<Button size="lg" class="w-full sm:w-auto text-base rounded-[1rem] shadow-sm py-6 px-8">
-							Get Reseam
-							<ArrowRight class="ml-2" size={18} />
-						</Button>
-					</a>
+					<Button
+						href="/download/"
+						size="lg"
+						class="w-full sm:w-auto text-base rounded-[1rem] shadow-sm py-6 px-8"
+					>
+						Get Reseam
+						<ArrowRight class="ml-2" size={18} />
+					</Button>
 					<a
 						href="https://git.reseam.app"
 						target="_blank"

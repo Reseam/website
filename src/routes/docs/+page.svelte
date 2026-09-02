@@ -9,7 +9,7 @@
 	<meta
 		name="description"
 		content={docs.hub?.description ??
-			"Reseam documentation — engine, API, and patches, pulled from each repo's docs folder."}
+			"Reseam documentation: engine, API, and patches, pulled from each repo's docs folder."}
 	/>
 </svelte:head>
 

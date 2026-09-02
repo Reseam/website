@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { ArrowLeft, Archive, User } from 'lucide-svelte';
-	import { levelMeta } from '$lib/announcement-meta';
+	import { LEVELS } from '$lib/announcement-meta';
 	import { relTime, fullTime } from '$lib/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	const item = $derived(data.announcement);
-	const meta = $derived(levelMeta(item.level));
-	const LevelIcon = $derived(meta.icon);
+	const level = $derived(LEVELS[item.level]);
 </script>
 
 <svelte:head>
@@ -18,7 +17,6 @@
 		<meta name="description" content={item.content.slice(0, 160)} />
 	{/if}
 	<meta property="og:title" content={item.title} />
-	<meta property="og:type" content="article" />
 	{#if item.content}
 		<meta property="og:description" content={item.content.slice(0, 200)} />
 	{/if}
@@ -35,10 +33,10 @@
 		</a>
 
 		<div
-			class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide mb-5 {meta.color}"
+			class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide mb-5 {level.color}"
 		>
-			<LevelIcon size={14} />
-			{meta.label}
+			<level.icon size={14} />
+			{level.label}
 		</div>
 
 		<h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">{item.title}</h1>
@@ -68,7 +66,7 @@
 			</div>
 		{/if}
 
-		{#if item.tags && item.tags.length > 0}
+		{#if item.tags.length > 0}
 			<div class="flex gap-2 mt-10 flex-wrap">
 				{#each item.tags as tag (tag)}
 					<a

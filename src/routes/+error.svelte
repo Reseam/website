@@ -17,7 +17,5 @@
 	<p class="text-muted-foreground mb-8">
 		{page.error?.message || "The page you're looking for doesn't exist."}
 	</p>
-	<a href="/">
-		<Button size="lg">Back home</Button>
-	</a>
+	<Button href="/" size="lg">Back home</Button>
 </div>
