@@ -1,42 +1,29 @@
-# sv
+# Reseam website
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.15.1 create --template minimal --types ts --no-install .
-```
+The static site at [reseam.app](https://reseam.app): landing page, patch downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit with `adapter-static`, served by nginx.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun install
+bun run dev
 ```
+
+`dev` and `build` first run `docs:fetch`, which pulls the documentation sources from the engine, CLI, and API repositories and renders them into `src/lib/docs/generated/`. To render docs from sibling checkouts on disk instead, run `bun run docs:local`.
+
+The site reads the Reseam API at `PUBLIC_API_URL` (default `https://api.reseam.app`). Set it in `.env` to build against another instance; visitors can also override it at runtime from the settings dialog.
 
 ## Building
 
-To create a production version of your app:
-
 ```sh
-npm run build
+bun run build
+bun run preview
 ```
 
-You can preview the production build with `npm run preview`.
+`Dockerfile` builds the site and serves it with the `nginx.conf` beside it.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Checks
+
+```sh
+bun run check
+```
