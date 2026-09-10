@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import markedAlert from 'marked-alert';
 import { gfmHeadingId } from 'marked-gfm-heading-id';
 import markedShiki from 'marked-shiki';
 import { createHighlighter } from 'shiki';
@@ -34,6 +35,7 @@ const highlighter = await createHighlighter({ themes: [SHIKI_THEME], langs: SHIK
 const supportedLangs = new Set(highlighter.getLoadedLanguages());
 
 marked.use(gfmHeadingId());
+marked.use(markedAlert());
 marked.use(
 	markedShiki({
 		highlight(code, lang) {

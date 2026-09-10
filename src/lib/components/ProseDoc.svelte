@@ -80,6 +80,44 @@
 		color: var(--muted-foreground);
 		margin: 1rem 0;
 	}
+	.prose-doc :global(.markdown-alert) {
+		border-left: 3px solid var(--border);
+		border-radius: 0 0.5rem 0.5rem 0;
+		background: var(--muted);
+		padding: 0.75rem 1rem;
+		margin: 1.25rem 0;
+	}
+	.prose-doc :global(.markdown-alert > p) {
+		margin-bottom: 0.5rem;
+	}
+	.prose-doc :global(.markdown-alert > p:last-child) {
+		margin-bottom: 0;
+	}
+	.prose-doc :global(.markdown-alert-title) {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 600;
+		color: var(--foreground);
+	}
+	.prose-doc :global(.markdown-alert-title svg) {
+		display: inline;
+		width: 1em;
+		height: 1em;
+		margin: 0;
+		fill: currentColor;
+	}
+	.prose-doc :global(.markdown-alert-note) {
+		border-left-color: var(--primary);
+	}
+	.prose-doc :global(.markdown-alert-warning),
+	.prose-doc :global(.markdown-alert-caution) {
+		border-left-color: oklch(0.8 0.15 75);
+	}
+	.prose-doc :global(.markdown-alert-warning .markdown-alert-title),
+	.prose-doc :global(.markdown-alert-caution .markdown-alert-title) {
+		color: oklch(0.8 0.15 75);
+	}
 	.prose-doc :global(table) {
 		width: 100%;
 		border-collapse: collapse;
