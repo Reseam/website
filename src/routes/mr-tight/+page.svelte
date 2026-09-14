@@ -16,9 +16,9 @@
 		},
 		{
 			src: confirmed,
-			alt: "FreakGPT 6.7 XHigh, replying to cocobo1: and I'm tight it seems. Followed by a cat sticker.",
+			alt: "FreakGPT 6.7 XHigh: and I'm tight it seems. Followed by a cat sticker.",
 			width: 1400,
-			height: 693,
+			height: 546,
 		},
 	]}
 	next={{ href: '/mr-loose/', label: 'Meet Mr. Loose' }}
