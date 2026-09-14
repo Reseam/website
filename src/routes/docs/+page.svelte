@@ -2,16 +2,14 @@
 	import { fly } from 'svelte/transition';
 	import { docs } from '$lib/docs';
 	import ProseDoc from '$lib/components/ProseDoc.svelte';
+	import PageMeta from '$lib/components/PageMeta.svelte';
 </script>
 
-<svelte:head>
-	<title>{docs.hub?.title ?? 'Docs'} · Reseam</title>
-	<meta
-		name="description"
-		content={docs.hub?.description ??
-			"Reseam documentation: engine, API, and patches, pulled from each repo's docs folder."}
-	/>
-</svelte:head>
+<PageMeta
+	title="{docs.hub?.title ?? 'Docs'} · Reseam"
+	description={docs.hub?.description ??
+		"Reseam documentation: engine, API, and patches, pulled from each repo's docs folder."}
+/>
 
 <article in:fly={{ y: 10, duration: 400 }}>
 	{#if docs.hub}

@@ -1,5 +1,6 @@
 import { fetchAnnouncements } from '$lib/api';
 import { DEFAULT_API_URL } from '$lib/settings.svelte';
+import { SITE_URL } from '$lib/site';
 
 export const prerender = true;
 
@@ -16,7 +17,7 @@ export async function GET() {
 	const urls = [...staticPages.map((path) => ({ path, lastmod: today })), ...announcementPages]
 		.map(
 			({ path, lastmod }) =>
-				`  <url><loc>https://reseam.app${path}</loc><lastmod>${lastmod}</lastmod></url>`
+				`  <url><loc>${SITE_URL}${path}</loc><lastmod>${lastmod}</lastmod></url>`
 		)
 		.join('\n');
 

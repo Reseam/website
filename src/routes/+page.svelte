@@ -5,6 +5,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import HeroPhone from '$lib/components/HeroPhone.svelte';
 	import HowItWorks from '$lib/components/HowItWorks.svelte';
+	import PageMeta from '$lib/components/PageMeta.svelte';
 
 	const totalSteps = 6;
 	let step = $state(0);
@@ -17,13 +18,10 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Reseam: a better way to use your apps</title>
-	<meta
-		name="description"
-		content="Easily add helpful new features or remove common annoyances from the apps you use every day."
-	/>
-</svelte:head>
+<PageMeta
+	title="Reseam: a better way to use your apps"
+	description="Easily add helpful new features or remove common annoyances from the apps you use every day."
+/>
 
 <div class="px-6 py-16 lg:py-24">
 	<div in:fly={{ y: 20, duration: 600, easing: cubicOut }} class="max-w-6xl mx-auto w-full">

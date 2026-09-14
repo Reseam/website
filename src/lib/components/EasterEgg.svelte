@@ -3,8 +3,8 @@
 	import { cubicOut } from 'svelte/easing';
 	import { ArrowRight } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
-
-	type Screenshot = { src: string; alt: string; width: number; height: number };
+	import PageMeta from '$lib/components/PageMeta.svelte';
+	import type { ImageAsset } from '$lib/site';
 
 	let {
 		title,
@@ -14,15 +14,12 @@
 	}: {
 		title: string;
 		tagline: string;
-		screenshots: Screenshot[];
+		screenshots: ImageAsset[];
 		next: { href: string; label: string };
 	} = $props();
 </script>
 
-<svelte:head>
-	<title>{title} · Reseam</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<PageMeta title="{title} · Reseam" description={tagline} image={screenshots[0]} noindex />
 
 <div class="container mx-auto px-6 py-20 max-w-2xl">
 	<div in:fly={{ y: 10, duration: 400, easing: cubicOut }}>

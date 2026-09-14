@@ -2,6 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { ArrowLeft, Archive, User } from 'lucide-svelte';
 	import { LEVELS } from '$lib/announcement-meta';
+	import PageMeta from '$lib/components/PageMeta.svelte';
 	import { relTime, fullTime } from '$lib/format';
 	import type { PageData } from './$types';
 
@@ -11,16 +12,11 @@
 	const level = $derived(LEVELS[item.level]);
 </script>
 
-<svelte:head>
-	<title>{item.title} · Announcements · Reseam</title>
-	{#if item.content}
-		<meta name="description" content={item.content.slice(0, 160)} />
-	{/if}
-	<meta property="og:title" content={item.title} />
-	{#if item.content}
-		<meta property="og:description" content={item.content.slice(0, 200)} />
-	{/if}
-</svelte:head>
+<PageMeta
+	title="{item.title} · Announcements · Reseam"
+	description={item.content?.slice(0, 160) ?? 'A Reseam announcement.'}
+	type="article"
+/>
 
 <div class="container mx-auto px-6 py-20 max-w-3xl min-h-[60vh]">
 	<div in:fly={{ y: 10, duration: 400 }}>

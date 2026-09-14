@@ -2,16 +2,16 @@
 	import { fly } from 'svelte/transition';
 	import { ArrowLeft, ArrowRight, Pencil } from 'lucide-svelte';
 	import ProseDoc from '$lib/components/ProseDoc.svelte';
+	import PageMeta from '$lib/components/PageMeta.svelte';
 
 	let { data } = $props();
 </script>
 
-<svelte:head>
-	<title>{data.page.title} · Reseam Docs</title>
-	{#if data.page.description}
-		<meta name="description" content={data.page.description} />
-	{/if}
-</svelte:head>
+<PageMeta
+	title="{data.page.title} · Reseam Docs"
+	description={data.page.description ?? `${data.page.title} in the Reseam documentation.`}
+	type="article"
+/>
 
 <article in:fly={{ y: 10, duration: 400 }}>
 	<p class="text-xs uppercase tracking-wider text-muted-foreground mb-3">
