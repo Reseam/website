@@ -20,6 +20,7 @@
 
 	const navLinks = [
 		{ name: 'Home', path: '/' },
+		{ name: 'Patches', path: '/patches/' },
 		{ name: 'Download', path: '/download/' },
 		{ name: 'Docs', path: '/docs/' },
 	];

@@ -4,7 +4,7 @@ import { SITE_URL } from '$lib/site';
 
 export const prerender = true;
 
-const staticPages = ['/', '/download/', '/docs/', '/announcements/'];
+const staticPages = ['/', '/patches/', '/download/', '/docs/', '/announcements/'];
 
 export async function GET() {
 	const today = new Date().toISOString().slice(0, 10);

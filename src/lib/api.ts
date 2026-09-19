@@ -5,6 +5,10 @@ export function fetchLatestManager(apiUrl: string) {
 	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/manager`);
 }
 
+export function fetchLatestPatches(apiUrl: string, fetcher = fetch) {
+	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/patches`, fetcher);
+}
+
 export function fetchAnnouncements(apiUrl: string, tag = '') {
 	const params = new URLSearchParams({ archived: 'false' });
 	if (tag) params.set('tag', tag);
