@@ -26,3 +26,6 @@ vite.config.ts.timestamp-*
 /src/lib/docs/generated/docs.json
 /.docs-cache
 /static/docs-assets
+
+# Patch runtime copied from @reseam/browser
+/static/runtime

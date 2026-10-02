@@ -6,3 +6,4 @@ build
 node_modules
 src/lib/docs/generated
 static/docs-assets
+static/runtime

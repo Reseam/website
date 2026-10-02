@@ -32,6 +32,7 @@
 
 	--destructive: #7f1d1d;
 	--destructive-foreground: #ededed;
+	--error: oklch(0.72 0.17 25);
 
 	--border: #262626;
 	--input: #262626;
@@ -57,6 +58,7 @@
 	--color-accent-foreground: var(--accent-foreground);
 	--color-destructive: var(--destructive);
 	--color-destructive-foreground: var(--destructive-foreground);
+	--color-error: var(--error);
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);

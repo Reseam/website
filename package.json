@@ -4,11 +4,12 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "bun run docs:fetch && vite dev",
-		"build": "bun run docs:fetch && vite build",
+		"dev": "bun run docs:fetch && bun run runtime:copy && vite dev",
+		"build": "bun run docs:fetch && bun run runtime:copy && vite build",
 		"preview": "vite preview",
 		"docs:fetch": "bun run scripts/fetch-docs.ts",
 		"docs:local": "bun run scripts/build-docs-local.ts",
+		"runtime:copy": "bun run scripts/copy-runtime.ts",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -19,6 +20,7 @@
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.2",
+		"@types/node": "^26.6.4",
 		"marked-shiki": "^1.2.1",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^3.5.1",
@@ -30,7 +32,9 @@
 		"vite": "^8.0.7"
 	},
 	"dependencies": {
+		"@reseam/browser": "0.17.1",
 		"date-fns": "^4.1.0",
+		"fflate": "^0.8.3",
 		"lucide-svelte": "^1.0.1",
 		"marked": "^14.1.3",
 		"marked-alert": "^2.1.2",

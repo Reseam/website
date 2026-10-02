@@ -1,6 +1,6 @@
 # Reseam website
 
-The static site at [reseam.app](https://reseam.app): landing page, patch downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit with `adapter-static`, served by nginx.
+The static site at [reseam.app](https://reseam.app): landing page, in-browser patcher, patch downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit with `adapter-static`, served by nginx.
 
 ## Developing
 

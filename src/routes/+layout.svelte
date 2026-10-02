@@ -21,9 +21,14 @@
 	const navLinks = [
 		{ name: 'Home', path: '/' },
 		{ name: 'Patches', path: '/patches/' },
+		{ name: 'Patch online', path: '/patch/' },
 		{ name: 'Download', path: '/download/' },
 		{ name: 'Docs', path: '/docs/' },
 	];
+
+	// The patcher page is cross-origin isolated, which only a full page load can switch on or off.
+	const isolated = $derived(page.url.pathname.startsWith('/patch/'));
+	const reload = (path: string) => (path === '/patch/' ? '' : undefined);
 
 	function isActive(path: string) {
 		const current = page.url.pathname;
@@ -34,6 +39,7 @@
 
 <div
 	class="min-h-screen flex flex-col bg-background text-foreground transition-colors font-sans relative"
+	data-sveltekit-reload={isolated ? '' : undefined}
 >
 	<header class="sticky top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border">
 		<div class="container mx-auto px-6 h-20 flex items-center justify-between">
@@ -46,6 +52,7 @@
 				{#each navLinks as link (link.path)}
 					<a
 						href={link.path}
+						data-sveltekit-reload={reload(link.path)}
 						class={cn(
 							'text-sm font-medium transition-colors hover:text-primary',
 							isActive(link.path) ? 'text-foreground' : 'text-muted-foreground'
@@ -97,6 +104,7 @@
 					{#each navLinks as link (link.path)}
 						<a
 							href={link.path}
+							data-sveltekit-reload={reload(link.path)}
 							class={cn(
 								'py-3 text-sm font-medium transition-colors hover:text-primary',
 								isActive(link.path) ? 'text-foreground' : 'text-muted-foreground'
