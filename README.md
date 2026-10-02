@@ -13,6 +13,8 @@ bun run dev
 
 The site reads the Reseam API at `PUBLIC_API_URL` (default `https://api.reseam.app`). Set it in `.env` to build against another instance; visitors can also override it at runtime from the settings dialog.
 
+The Download page fetches the latest stable CLI release from Forgejo at build time and links its available Linux and Windows binaries through the CDN. Rebuild the website after a CLI release to refresh the displayed version and downloads; the page also links to the full release history on Forgejo.
+
 ## Building
 
 ```sh

@@ -1,6 +1,10 @@
 export type AndroidAbi = 'arm64-v8a' | 'armeabi-v7a' | 'x86_64' | 'x86';
 
-export type Platform = { os: 'android'; abi: AndroidAbi } | { os: 'linux' } | { os: 'other' };
+export type Platform =
+	| { os: 'android'; abi: AndroidAbi }
+	| { os: 'linux' }
+	| { os: 'windows' }
+	| { os: 'other' };
 
 export type ManagerDownload = { name: string; detail: string; url: string };
 
@@ -37,7 +41,12 @@ export function managerDownloads(apiUrl: string, version: string) {
 			url: file(`app.reseam.manager-${version}-1-x86_64.pkg.tar.zst`),
 		},
 	];
-	return { android, linux };
+	const windows: ManagerDownload = {
+		name: 'Windows',
+		detail: '64-bit x86 installer (.exe)',
+		url: file(`reseam-manager-${version}-windows-x64.exe`),
+	};
+	return { android, linux, windows };
 }
 
 type UserAgentData = {
@@ -47,6 +56,7 @@ type UserAgentData = {
 export async function detectPlatform(): Promise<Platform> {
 	const ua = navigator.userAgent;
 	if (/Android/i.test(ua)) return { os: 'android', abi: await androidAbi(ua) };
+	if (/Windows NT/i.test(ua)) return { os: 'windows' };
 	if (/Linux/.test(ua) && !/CrOS/.test(ua)) return { os: 'linux' };
 	return { os: 'other' };
 }
