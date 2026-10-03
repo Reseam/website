@@ -459,7 +459,8 @@ export class Patcher {
 				return;
 			case 'patch_started':
 				this.reach('applying');
-				if (this.phase.name === 'patching') this.phase.current = this.patchName(event.patch);
+				if (this.phase.name === 'patching' && !this.isHidden(event.patch))
+					this.phase.current = this.patchName(event.patch);
 				return;
 			case 'patch_finished': {
 				// The engine reports every patch in its bundles; only this run's listed patches matter,
