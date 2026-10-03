@@ -10,7 +10,7 @@
 	import Panel from '#lib/components/ui/Panel.svelte';
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
 	import PanelSection from '#lib/components/ui/PanelSection.svelte';
-	import { managerBuilds, preferredBuild } from '#lib/downloads.ts';
+	import { managerBuilds, suggestedBuilds, type Suggestion } from '#lib/downloads.ts';
 	import { fresh } from '#lib/fresh.svelte.ts';
 	import { shortDate } from '#lib/format.ts';
 	import { settings } from '#lib/settings.svelte.ts';
@@ -22,11 +22,14 @@
 	const builds = $derived(managerBuilds(settings.apiUrl, version));
 
 	// Prerendered pages suggest the common phone build until the browser says what it runs on.
-	let preferred = $state('android-arm64-v8a');
-	onMount(async () => (preferred = await preferredBuild()));
+	let suggestion = $state<Suggestion>({
+		ids: ['android-arm64-v8a'],
+		highlight: 'android-arm64-v8a',
+	});
+	onMount(async () => (suggestion = await suggestedBuilds()));
 
-	const main = $derived(builds.find((build) => build.id === preferred)!);
-	const others = $derived(builds.filter((build) => build !== main));
+	const main = $derived(suggestion.ids.map((id) => builds.find((build) => build.id === id)!));
+	const others = $derived(builds.filter((build) => !suggestion.ids.includes(build.id)));
 </script>
 
 <PageMeta
@@ -47,14 +50,19 @@
 				subtitle="Version {version} · Released {shortDate(manager.value.release.created_at)}"
 			/>
 			<PanelSection class="grid gap-3">
-				<div class="flex flex-wrap items-center gap-4">
-					<div class="min-w-48 flex-1">
-						<p class="font-semibold">{main.platform}</p>
-						<p class="text-sm text-muted-foreground">{main.detail}</p>
+				<p class="font-semibold">{main[0].platform}</p>
+				{#each main as build (build.id)}
+					<div class="flex flex-wrap items-center gap-4">
+						<p class="min-w-48 flex-1 text-sm text-muted-foreground">{build.detail}</p>
+						<Button
+							href={build.url}
+							size="lg"
+							variant={build.id === suggestion.highlight ? 'primary' : 'outline'}
+							><Download size={17} /> Download</Button
+						>
 					</div>
-					<Button href={main.url} size="lg"><Download size={17} /> Download</Button>
-				</div>
-				{#if main.platform === 'Android'}
+				{/each}
+				{#if main[0].platform === 'Android'}
 					<p class="text-sm text-muted-foreground">
 						Your phone may ask you to allow installs from your browser.
 					</p>
