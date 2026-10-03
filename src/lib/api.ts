@@ -1,26 +1,21 @@
-import { error } from '@sveltejs/kit';
-import type { Announcement, ReleaseResponse } from '$lib/types';
+import type { Announcement, ReleaseResponse } from '#lib/types.ts';
 
-export function fetchLatestManager(apiUrl: string) {
-	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/manager`);
+type Fetch = typeof fetch;
+
+export function fetchManager(apiUrl: string, fetcher: Fetch = fetch) {
+	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/manager`, fetcher);
 }
 
-export function fetchLatestPatches(apiUrl: string, fetcher = fetch) {
+export function fetchLatestPatches(apiUrl: string, fetcher: Fetch = fetch) {
 	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/patches`, fetcher);
 }
 
-export function fetchAnnouncements(apiUrl: string, tag = '') {
-	const params = new URLSearchParams({ archived: 'false' });
-	if (tag) params.set('tag', tag);
-	return fetchJson<Announcement[]>(`${apiUrl}/v1/announcements?${params}`);
+export function fetchAnnouncements(apiUrl: string, fetcher: Fetch = fetch) {
+	return fetchJson<Announcement[]>(`${apiUrl}/v1/announcements?archived=false`, fetcher);
 }
 
-export function fetchAnnouncement(apiUrl: string, id: number, fetcher = fetch) {
-	return fetchJson<Announcement>(`${apiUrl}/v1/announcements/${id}`, fetcher);
-}
-
-async function fetchJson<T>(url: string, fetcher = fetch): Promise<T> {
+async function fetchJson<T>(url: string, fetcher: Fetch): Promise<T> {
 	const response = await fetcher(url, { headers: { Accept: 'application/json' } });
-	if (!response.ok) error(response.status, `API returned ${response.status}`);
+	if (!response.ok) throw new Error(`${url} returned ${response.status}`);
 	return response.json();
 }

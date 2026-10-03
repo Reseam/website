@@ -1,6 +1,6 @@
 # Reseam website
 
-The static site at [reseam.app](https://reseam.app): landing page, in-browser patcher, patch downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit with `adapter-static`, served by nginx.
+The static site at [reseam.app](https://reseam.app): home page, patch catalog, in-browser patcher, downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit 3 with `adapter-static`, Tailwind 4 and Bits UI, served by nginx.
 
 ## Developing
 
@@ -9,11 +9,22 @@ bun install
 bun run dev
 ```
 
-`dev` and `build` first run `docs:fetch`, which pulls the documentation sources from the engine, CLI, and API repositories and renders them into `src/lib/docs/generated/`. To render docs from sibling checkouts on disk instead, run `bun run docs:local`.
+`dev` and `build` first run `docs:fetch`, which pulls the documentation from the engine, CLI, and API repositories and renders it into `src/lib/server/docs.json`. The hub text at `/docs/` comes from `docs/index.md` in this repository. To render docs from sibling checkouts on disk instead, run `bun run docs:local`. The build fails when two docs files map to the same URL.
 
-The site reads the Reseam API at `PUBLIC_API_URL` (default `https://api.reseam.app`). Set it in `.env` to build against another instance; visitors can also override it at runtime from the settings dialog.
+`vite dev` cannot run the patcher's workers. Test `/patch/` with `bun run build && bun run preview`.
 
-The Download page fetches the latest stable CLI release from Forgejo at build time and links its available Linux and Windows binaries through the CDN. Rebuild the website after a CLI release to refresh the displayed version and downloads; the page also links to the full release history on Forgejo.
+## Data
+
+Every page is prerendered. Pages that show API data (patches, announcements, Reseam Manager downloads) are built with the API at `API_URL` (default `https://api.reseam.app`) and refresh from the visitor's configured API in the browser. Visitors can change that address in the settings dialog.
+
+The Download page reads the latest CLI release from Forgejo at build time. Rebuild the site after a CLI release to update it.
+
+## Layout
+
+- `src/lib/components/ui`: design system components on Bits UI. Tokens live in `src/app.css`.
+- `src/lib/components/<area>`: components for one page or section.
+- `src/lib/patcher`: the in-browser patcher state and helpers around `@reseam/browser`.
+- `src/lib/server`: build-time data for prerendering.
 
 ## Building
 

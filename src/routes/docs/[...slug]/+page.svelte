@@ -1,65 +1,37 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
-	import { ArrowLeft, ArrowRight, Pencil } from 'lucide-svelte';
-	import ProseDoc from '$lib/components/ProseDoc.svelte';
-	import PageMeta from '$lib/components/PageMeta.svelte';
+	import Pencil from '@lucide/svelte/icons/pencil';
+	import DocContent from '#lib/components/docs/DocContent.svelte';
+	import PageNav from '#lib/components/docs/PageNav.svelte';
+	import Toc from '#lib/components/docs/Toc.svelte';
+	import PageMeta from '#lib/components/layout/PageMeta.svelte';
 
 	let { data } = $props();
+	const page = $derived(data.page);
+	const group = $derived(data.groups.find(({ slug }) => slug === page.source));
 </script>
 
 <PageMeta
-	title="{data.page.title} · Reseam Docs"
-	description={data.page.description ?? `${data.page.title} in the Reseam documentation.`}
+	title="{page.title} · {group?.label ?? 'Docs'} · Reseam"
+	description={page.description ?? group?.summary ?? page.title}
 	type="article"
 />
 
-<article in:fly={{ y: 10, duration: 400 }}>
-	<p class="text-xs uppercase tracking-wider text-muted-foreground mb-3">
-		{data.page.sourceLabel}
-	</p>
-	<h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-6">{data.page.title}</h1>
-
-	<ProseDoc>
-		{@html data.page.html}
-	</ProseDoc>
-
-	<div class="mt-12 pt-6 border-t border-border flex items-center justify-between text-sm">
+<div class="grid grid-cols-1 items-start gap-16 xl:grid-cols-[minmax(0,1fr)_15rem]">
+	<article class="grid grid-cols-1 gap-6">
+		<header>
+			<p class="text-sm font-semibold text-primary">{group?.label}</p>
+			<h1 class="mt-1 text-title font-bold">{page.title}</h1>
+		</header>
+		<DocContent html={page.html} />
 		<a
-			href={data.page.editUrl}
-			target="_blank"
-			rel="noopener noreferrer"
-			class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+			href={page.editUrl}
+			class="inline-flex items-center gap-1.5 justify-self-start text-sm text-muted-foreground transition-colors hover:text-foreground"
 		>
 			<Pencil size={14} /> Edit this page
 		</a>
-	</div>
-
-	{#if data.prev || data.next}
-		<nav class="mt-6 grid grid-cols-2 gap-3">
-			{#if data.prev}
-				<a
-					href="/docs/{data.prev.slug}/"
-					class="border border-border rounded-xl p-4 hover:border-primary/50 hover:bg-muted transition-colors"
-				>
-					<span class="inline-flex items-center gap-1 text-xs text-muted-foreground">
-						<ArrowLeft size={12} /> Previous
-					</span>
-					<span class="block font-medium mt-1">{data.prev.title}</span>
-				</a>
-			{:else}
-				<span></span>
-			{/if}
-			{#if data.next}
-				<a
-					href="/docs/{data.next.slug}/"
-					class="border border-border rounded-xl p-4 hover:border-primary/50 hover:bg-muted transition-colors text-right"
-				>
-					<span class="inline-flex items-center gap-1 text-xs text-muted-foreground">
-						Next <ArrowRight size={12} />
-					</span>
-					<span class="block font-medium mt-1">{data.next.title}</span>
-				</a>
-			{/if}
-		</nav>
+		<PageNav previous={data.previous} next={data.next} />
+	</article>
+	{#if page.headings.length > 1}
+		<aside class="hidden xl:block"><Toc headings={page.headings} /></aside>
 	{/if}
-</article>
+</div>

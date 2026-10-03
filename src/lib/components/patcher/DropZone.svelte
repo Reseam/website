@@ -1,30 +1,18 @@
 <script lang="ts">
-	import { Upload } from 'lucide-svelte';
-	import Button from '$lib/components/Button.svelte';
-	import { cn } from '$lib/cn';
+	import Upload from '@lucide/svelte/icons/upload';
+	import { buttonClass } from '#lib/components/ui/button.ts';
 
 	let { onfiles }: { onfiles: (files: File[]) => void } = $props();
 
-	let input: HTMLInputElement;
 	let dragging = $state(false);
 
-	function drop(event: DragEvent) {
-		event.preventDefault();
-		dragging = false;
-		const files = [...(event.dataTransfer?.files ?? [])];
-		if (files.length > 0) onfiles(files);
-	}
-
-	function picked() {
-		const files = [...(input.files ?? [])];
-		input.value = '';
-		if (files.length > 0) onfiles(files);
+	function take(files: FileList | null | undefined) {
+		const list = [...(files ?? [])];
+		if (list.length > 0) onfiles(list);
 	}
 </script>
 
-<div
-	role="region"
-	aria-label="Choose an app"
+<label
 	ondragover={(event) => {
 		event.preventDefault();
 		dragging = true;
@@ -32,28 +20,37 @@
 	ondragleave={(event) => {
 		if (!event.currentTarget.contains(event.relatedTarget as Node)) dragging = false;
 	}}
-	ondrop={drop}
-	class={cn(
-		'flex flex-col items-center rounded-[1.25rem] border border-dashed px-6 py-14 text-center transition-colors sm:py-20',
-		dragging ? 'border-primary bg-primary/5' : 'border-border bg-card'
-	)}
+	ondrop={(event) => {
+		event.preventDefault();
+		dragging = false;
+		take(event.dataTransfer?.files);
+	}}
+	class={[
+		'grid cursor-pointer justify-items-center gap-2 rounded-xl border-2 border-dashed px-6 py-14 text-center transition-colors duration-200 has-focus-visible:border-primary sm:py-16',
+		dragging
+			? 'border-primary bg-primary/5'
+			: 'border-border hover:border-primary/50 hover:bg-primary/[0.03]',
+	]}
 >
-	<div class="mb-5 flex size-14 items-center justify-center rounded-full bg-muted">
-		<Upload size={24} class={dragging ? 'text-primary' : 'text-muted-foreground'} />
-	</div>
-	<p class="text-lg font-semibold">Drop your app here</p>
-	<p class="mt-1.5 max-w-sm text-sm text-muted-foreground">
-		An APK, APKM or XAPK file. Split APKs and patch bundles can come along.
-	</p>
-	<Button class="mt-6" onclick={() => input.click()}>Choose file</Button>
+	<Upload
+		size={34}
+		strokeWidth={1.8}
+		class={[
+			'mb-2 text-primary transition-transform duration-300 ease-spring',
+			dragging && '-translate-y-1 scale-110',
+		]}
+	/>
+	<span class="text-lg font-semibold">Drop an APK, APKM or XAPK</span>
+	<span class="text-sm text-muted-foreground">Split APKs and patch bundles can come along.</span>
+	<span class="mt-3 {buttonClass('outline', 'sm')}">Choose file</span>
 	<input
-		bind:this={input}
 		type="file"
 		multiple
 		accept=".apk,.apkm,.xapk,.reseam"
 		class="sr-only"
-		tabindex="-1"
-		aria-hidden="true"
-		onchange={picked}
+		onchange={(event) => {
+			take(event.currentTarget.files);
+			event.currentTarget.value = '';
+		}}
 	/>
-</div>
+</label>

@@ -1,30 +1,25 @@
 <script lang="ts">
-	import { Wand2 } from 'lucide-svelte';
-	import Button from '$lib/components/Button.svelte';
-	import type { Patcher } from '$lib/patcher/patcher.svelte';
-	import { reference } from '$lib/patcher/selection';
+	import WandSparkles from '@lucide/svelte/icons/wand-sparkles';
+	import Button from '#lib/components/ui/Button.svelte';
+	import { plural } from '#lib/format.ts';
+	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
+	import { reference } from '#lib/patcher/selection.ts';
 
 	let { patcher }: { patcher: Patcher } = $props();
 
-	const label = $derived(
-		patcher.inspection?.apk?.application_label ?? patcher.inspection?.apk?.package_name ?? 'app'
-	);
+	const apk = $derived(patcher.inspection?.apk);
 	const selected = $derived(
 		patcher.listed.filter((patch) => patcher.running.has(reference(patch))).length
 	);
 </script>
 
 <div
-	class="sticky bottom-4 z-10 mt-4 flex flex-col gap-3 rounded-[1.25rem] border border-border bg-card/90 px-5 py-4 shadow-lg backdrop-blur-md sm:flex-row sm:items-center sm:px-6"
+	class="sticky bottom-4 z-10 flex flex-col gap-3 rounded-xl border border-border bg-card/90 py-3 pr-3 pl-5 shadow-float backdrop-blur-lg sm:flex-row sm:items-center"
 >
 	<p class="flex-1 text-sm text-muted-foreground" aria-live="polite">
-		{patcher.blocker ?? `${selected} ${selected === 1 ? 'patch' : 'patches'} selected`}
+		{patcher.blocker ?? `${plural(selected, 'patch', 'patches')} selected`}
 	</p>
-	<Button
-		class="w-full gap-2 sm:w-auto"
-		disabled={patcher.blocker !== null}
-		onclick={() => patcher.patch()}
-	>
-		<Wand2 size={16} /> Patch {label}
+	<Button size="lg" disabled={patcher.blocker !== null} onclick={() => patcher.patch()}>
+		<WandSparkles size={17} /> Patch {apk?.application_label ?? apk?.package_name ?? 'app'}
 	</Button>
 </div>

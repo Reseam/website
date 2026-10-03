@@ -5,15 +5,35 @@ export type DocSource = {
 	slug: string;
 	repo: string;
 	label: string;
-	branch?: string;
-	path?: string;
-	hub?: boolean;
+	summary: string;
+	path: string;
+	branch: string;
 };
 
 export const sources: DocSource[] = [
-	{ slug: 'website', repo: 'reseam/website', label: 'Website', hub: true },
-	{ slug: 'engine', repo: 'reseam/reseam', label: 'Engine' },
-	{ slug: 'cli', repo: 'reseam/reseam', label: 'CLI', path: 'crates/cli/docs' },
-	{ slug: 'api', repo: 'reseam/api', label: 'API' },
-	{ slug: 'patches', repo: 'reseam/patches', label: 'Patches' },
+	{
+		slug: 'engine',
+		repo: 'reseam/reseam',
+		label: 'Engine',
+		summary: 'Write patches in Kotlin, build them into a signed bundle, and publish it.',
+		path: 'docs',
+		branch: 'main',
+	},
+	{
+		slug: 'cli',
+		repo: 'reseam/reseam',
+		label: 'CLI',
+		summary: 'Patch APKs, build bundles, and publish them from a terminal.',
+		path: 'crates/cli/docs',
+		branch: 'main',
+	},
+	{
+		slug: 'api',
+		repo: 'reseam/api',
+		label: 'API',
+		summary:
+			'The server behind api.reseam.app: the patch index, release downloads, and announcements.',
+		path: 'docs',
+		branch: 'main',
+	},
 ];

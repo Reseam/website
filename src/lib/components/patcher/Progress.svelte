@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { Check, LoaderCircle } from 'lucide-svelte';
-	import Button from '$lib/components/Button.svelte';
-	import { cn } from '$lib/cn';
-	import { duration } from '$lib/format';
-	import { STAGES, type Patcher, type Stage } from '$lib/patcher/patcher.svelte';
-	import Panel from './Panel.svelte';
-	import PanelHeader from './PanelHeader.svelte';
-	import PanelSection from './PanelSection.svelte';
+	import Check from '@lucide/svelte/icons/check';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import Button from '#lib/components/ui/Button.svelte';
+	import Panel from '#lib/components/ui/Panel.svelte';
+	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
+	import PanelSection from '#lib/components/ui/PanelSection.svelte';
+	import ProgressBar from '#lib/components/ui/Progress.svelte';
+	import { duration, plural } from '#lib/format.ts';
+	import { STAGES, type Patcher, type Stage } from '#lib/patcher/patcher.svelte.ts';
 
 	let {
 		patcher,
@@ -25,7 +26,6 @@
 	} = $props();
 
 	const apk = $derived(patcher.inspection?.apk);
-	const label = $derived(apk?.application_label ?? apk?.package_name ?? 'app');
 	const index = $derived(STAGES.findIndex((entry) => entry.stage === stage));
 	const percent = $derived(stage === 'applying' && total > 0 ? (finished / total) * 100 : null);
 
@@ -50,100 +50,55 @@
 		id="progress-title"
 		icon={LoaderCircle}
 		spinning
-		tone="primary"
-		title="Patching {label}"
+		title="Patching {apk?.application_label ?? apk?.package_name ?? 'app'}"
 		subtitle={[
 			apk?.version_name && `Version ${apk.version_name}`,
-			`${total} ${total === 1 ? 'patch' : 'patches'}`,
+			plural(total, 'patch', 'patches'),
 		]
 			.filter(Boolean)
 			.join(' · ')}
 	>
-		{#snippet actions()}
-			<span class="font-mono text-sm tabular-nums text-muted-foreground" aria-hidden="true"
-				>{duration(now)}</span
-			>
-		{/snippet}
+		{#snippet aside()}<span
+				class="font-mono text-sm text-muted-foreground tabular-nums"
+				aria-hidden="true">{duration(now)}</span
+			>{/snippet}
 	</PanelHeader>
-
-	<PanelSection>
-		<div
-			class="h-1.5 overflow-hidden rounded-full bg-muted"
-			role="progressbar"
-			aria-label="Patching progress"
-			aria-valuemin={0}
-			aria-valuemax={100}
-			aria-valuenow={percent === null ? undefined : Math.round(percent)}
-		>
-			{#if percent === null}
-				<div class="indeterminate h-full w-1/3 rounded-full bg-primary"></div>
-			{:else}
-				<div
-					class="h-full rounded-full bg-primary transition-[width] duration-300"
-					style:width="{percent}%"
-				></div>
-			{/if}
-		</div>
-
-		<ol class="mt-5 space-y-3 text-sm" aria-live="polite">
+	<PanelSection class="grid gap-5">
+		<ProgressBar value={percent} label="Patching progress" />
+		<ol class="grid gap-3.5 text-[0.95rem]" aria-live="polite">
 			{#each STAGES as entry, position (entry.stage)}
 				{@const time = spent(position)}
-				<li class="flex items-start gap-3">
-					<span class="flex size-5 shrink-0 items-center justify-center">
-						{#if position < index}
-							<Check size={16} class="text-primary" />
-						{:else if position === index}
-							<LoaderCircle size={16} class="animate-spin text-primary" />
-						{:else}
-							<span class="size-1.5 rounded-full bg-border"></span>
-						{/if}
+				<li class="grid grid-cols-[1.25rem_1fr_auto] items-start gap-3.5">
+					<span class="grid h-6 place-items-center">
+						{#if position < index}<Check size={16} strokeWidth={2.8} class="text-primary" />
+						{:else if position === index}<LoaderCircle
+								size={16}
+								class="animate-spin text-primary"
+							/>
+						{:else}<span class="size-1.5 rounded-full bg-border"></span>{/if}
 					</span>
-					<span class="min-w-0 flex-1">
+					<span class="min-w-0">
 						<span class={position > index ? 'text-muted-foreground' : undefined}>{entry.label}</span
 						>
 						{#if entry.stage === 'applying' && position === index}
-							<span class="block truncate text-xs text-muted-foreground">
-								{finished} of {total}{current ? ` · ${current}` : ''}
-							</span>
+							<span class="block truncate text-sm text-muted-foreground"
+								>{finished} of {total}{current ? ` · ${current}` : ''}</span
+							>
 						{/if}
 					</span>
 					{#if time !== null && (position === index || time >= 100)}
 						<span
-							class={cn(
-								'shrink-0 tabular-nums',
-								position === index ? 'text-foreground' : 'text-muted-foreground'
-							)}>{duration(time)}</span
+							class={[
+								'text-sm tabular-nums',
+								position === index ? 'text-foreground' : 'text-muted-foreground',
+							]}>{duration(time)}</span
 						>
 					{/if}
 				</li>
 			{/each}
 		</ol>
 	</PanelSection>
-
-	<PanelSection class="flex justify-end">
-		<Button variant="outlined" class="w-full sm:w-auto" onclick={() => patcher.cancel()}
-			>Cancel</Button
-		>
+	<PanelSection class="flex justify-end py-4">
+		<Button variant="outline" size="lg" onclick={() => patcher.cancel()}>Cancel</Button>
 	</PanelSection>
 </Panel>
-
-<style>
-	.indeterminate {
-		animation: slide 1.4s ease-in-out infinite;
-	}
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(300%);
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.indeterminate {
-			animation: none;
-			width: 100%;
-			opacity: 0.4;
-		}
-	}
-</style>

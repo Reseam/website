@@ -1,192 +1,163 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import markedAlert from 'marked-alert';
-import { gfmHeadingId } from 'marked-gfm-heading-id';
+import { getHeadingList, gfmHeadingId, resetHeadings } from 'marked-gfm-heading-id';
 import markedShiki from 'marked-shiki';
 import { createHighlighter } from 'shiki';
 import { sources, type DocSource } from '../src/lib/docs/sources.ts';
-import type { DocGroup, DocPage, DocsIndex } from '../src/lib/docs/types.ts';
+import type { DocHub, DocPage, Docs } from '../src/lib/docs/types.ts';
 
-const SHIKI_THEME = 'vitesse-dark';
-const SHIKI_LANGS = [
+const THEME = 'vitesse-dark';
+const LANGS = [
 	'bash',
-	'css',
 	'diff',
 	'dockerfile',
-	'go',
-	'html',
 	'ini',
 	'json',
-	'jsonc',
 	'kotlin',
-	'markdown',
 	'nginx',
-	'python',
 	'rust',
 	'shell',
-	'sql',
-	'svelte',
 	'toml',
-	'tsx',
 	'typescript',
 	'yaml',
 ];
 
-const highlighter = await createHighlighter({ themes: [SHIKI_THEME], langs: SHIKI_LANGS });
-const supportedLangs = new Set(highlighter.getLoadedLanguages());
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+export const ASSETS_ROOT = resolve(root, 'static/docs-assets');
+export const IMAGE_EXT = /\.(svg|png|jpe?g|gif|webp|avif)$/i;
 
-marked.use(gfmHeadingId());
-marked.use(markedAlert());
+export type MarkdownFile = { name: string; src: string; editUrl: string };
+
+const highlighter = await createHighlighter({ themes: [THEME], langs: LANGS });
+const loaded = new Set(highlighter.getLoadedLanguages());
+
 marked.use(
+	gfmHeadingId(),
+	markedAlert(),
 	markedShiki({
-		highlight(code, lang) {
-			const resolved = supportedLangs.has(lang) ? lang : 'text';
-			return highlighter.codeToHtml(code, { lang: resolved, theme: SHIKI_THEME });
-		},
+		highlight: (code, lang) =>
+			highlighter.codeToHtml(code, { lang: loaded.has(lang) ? lang : 'text', theme: THEME }),
 	})
 );
 
-export const IMAGE_EXT = /\.(svg|png|jpe?g|gif|webp|avif)$/i;
-
-export type HubEntry = { html: string; title?: string; description?: string };
-export type SourceDocs = { pages: DocPage[]; hub?: HubEntry };
-export type MarkdownFile = { name: string; src: string; editUrl: string };
-
-function parseFrontmatter(src: string): { data: Record<string, string>; body: string } {
-	if (!src.startsWith('---\n')) return { data: {}, body: src };
-	const end = src.indexOf('\n---', 4);
-	if (end === -1) return { data: {}, body: src };
-	const block = src.slice(4, end);
-	const body = src.slice(end + 4).replace(/^\n/, '');
-	const data: Record<string, string> = {};
-	for (const line of block.split('\n')) {
-		const m = line.match(/^([\w-]+)\s*:\s*(.*)$/);
-		if (m) data[m[1]] = m[2].replace(/^["']|["']$/g, '').trim();
-	}
-	return { data, body };
-}
-
-function titleFromFilename(name: string): string {
-	return name
-		.replace(/^\d+_(\d+_)?/, '')
-		.replace(/\.md$/, '')
-		.replace(/[-_]+/g, ' ')
-		.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function titleFromHeading(md: string): string | null {
-	const m = md.match(/^\s*#\s+(.+)$/m);
-	return m ? m[1].trim() : null;
-}
-
-function slugFromFilename(name: string): string {
-	return name.replace(/^\d+_(\d+_)?/, '').replace(/\.md$/, '');
-}
-
-function sectionFromFilename(name: string): number | null {
-	const m = name.match(/^(\d+)_/);
-	return m ? Number(m[1]) : null;
-}
-
-function rewriteImagePaths(md: string, sourceSlug: string): string {
-	return md.replace(/!\[([^\]]*)\]\(\s*([^)\s]+)(\s+"[^"]*")?\s*\)/g, (_m, alt, url, title) => {
-		if (/^(https?:|data:|\/|#)/i.test(url)) return `![${alt}](${url}${title ?? ''})`;
-		const clean = url.replace(/^\.?\//, '');
-		return `![${alt}](/docs-assets/${sourceSlug}/${clean}${title ?? ''})`;
-	});
-}
-
-function rewriteDocLinks(md: string, sourceSlug: string): string {
-	return md.replace(
-		/(?<!!)\[([^\]]+)\]\(\s*([^)\s#]+)(#[^)\s]+)?(\s+"[^"]*")?\s*\)/g,
-		(_m, text, url, hash, title) => {
-			if (/^(https?:|mailto:|data:|\/|#)/i.test(url)) return _m;
-			if (!/\.md$/i.test(url)) return _m;
-			const file =
-				url
-					.replace(/^\.?\//, '')
-					.split('/')
-					.pop() ?? url;
-			const slug = slugFromFilename(file);
-			return `[${text}](/docs/${sourceSlug}/${slug}${hash ?? ''}${title ?? ''})`;
-		}
+function frontmatter(src: string): { data: Record<string, string>; body: string } {
+	const match = src.match(/^---\n([\s\S]*?)\n---\n?/);
+	if (!match) return { data: {}, body: src };
+	const data = Object.fromEntries(
+		match[1]
+			.split('\n')
+			.map((line) => line.match(/^([\w-]+)\s*:\s*(.*)$/))
+			.filter((entry) => entry !== null)
+			.map(([, key, value]) => [key, value.replace(/^["']|["']$/g, '').trim()])
 	);
+	return { data, body: src.slice(match[0].length) };
 }
 
-export async function renderSource(source: DocSource, files: MarkdownFile[]): Promise<SourceDocs> {
-	const pages: DocPage[] = [];
-	let hub: HubEntry | undefined;
+const slugOf = (name: string) => name.replace(/^\d+_(\d+_)?/, '').replace(/\.md$/, '');
 
-	for (const file of files) {
-		const { data, body } = parseFrontmatter(file.src);
-		const title = data.title || titleFromHeading(body) || titleFromFilename(file.name);
-		const strippedBody = body.replace(/^\s*#\s+.+\n?/, '');
-		const withImages = rewriteImagePaths(strippedBody, source.slug);
-		const withLinks = rewriteDocLinks(withImages, source.slug);
-		const html = await marked.parse(withLinks, { async: true });
+/** `3_name.md` is the third page of the guide, `2_5_name.md` sits after `2_0_`, unnumbered files are reference. */
+function position(name: string): [number, number] | null {
+	const match = name.match(/^(\d+)_(?:(\d+)_)?/);
+	return match ? [Number(match[1]), Number(match[2] ?? 0)] : null;
+}
 
-		if (source.hub && file.name === 'index.md') {
-			hub = { html, title, description: data.description };
-			continue;
-		}
+function rewriteLinks(md: string, source: string): string {
+	return md
+		.replace(
+			/!\[([^\]]*)\]\(\s*(?!https?:|data:|\/|#)\.?\/?([^)\s]+)/g,
+			`![$1](/docs-assets/${source}/$2`
+		)
+		.replace(
+			/(?<!!)\[([^\]]+)\]\(\s*(?!https?:|mailto:|\/|#)(?:[^)\s]*\/)?([^)\s/#]+)\.md(#[^)\s]*)?/g,
+			(_, text, file, hash = '') =>
+				// Each folder's README is its index, which the hub's section for that source replaces.
+				file === 'README'
+					? `[${text}](/docs/#group-${source}`
+					: `[${text}](/docs/${source}/${slugOf(file)}/${hash}`
+		);
+}
 
-		const section = sectionFromFilename(file.name);
-		const orderMatch = file.name.match(/^(\d+)_(\d+)?/);
-		const order = orderMatch?.[2] ? Number(orderMatch[2]) : (section ?? Infinity);
+async function render(markdown: string) {
+	resetHeadings();
+	const html = await marked.parse(markdown, { async: true });
+	const headings = getHeadingList()
+		.filter((heading) => heading.level === 2 || heading.level === 3)
+		.map(({ id, text, level }) => ({ id, level, text: text.replace(/<[^>]+>/g, '') }));
+	return { html, headings };
+}
+
+export async function renderSource(source: DocSource, files: MarkdownFile[]): Promise<DocPage[]> {
+	const pages: (DocPage & { position: [number, number] | null })[] = [];
+	for (const file of files.filter((file) => file.name !== 'README.md')) {
+		const { data, body } = frontmatter(file.src);
+		const title = data.title ?? body.match(/^#\s+(.+)$/m)?.[1].trim() ?? slugOf(file.name);
+		const markdown = rewriteLinks(body.replace(/^\s*#\s+.+\n?/, ''), source.slug);
 		pages.push({
-			slug: `${source.slug}/${slugFromFilename(file.name)}`,
-			sourceSlug: source.slug,
-			sourceLabel: source.label,
-			section,
-			order: Number.isFinite(order) ? order : 999,
+			slug: `${source.slug}/${slugOf(file.name)}`,
+			source: source.slug,
+			section: position(file.name) ? 'Guide' : 'Reference',
 			title,
 			description: data.description,
-			html,
+			...(await render(markdown)),
 			editUrl: file.editUrl,
+			position: position(file.name),
 		});
 	}
-
-	pages.sort((a, b) => {
-		const sa = a.section ?? Infinity;
-		const sb = b.section ?? Infinity;
-		if (sa !== sb) return sa - sb;
-		if (a.order !== b.order) return a.order - b.order;
-		return a.title.localeCompare(b.title);
-	});
-
-	return { pages, hub };
+	const rank = (page: (typeof pages)[number]) => page.position ?? [Infinity, 0];
+	return pages
+		.toSorted(
+			(a, b) => rank(a)[0] - rank(b)[0] || rank(a)[1] - rank(b)[1] || a.title.localeCompare(b.title)
+		)
+		.map(({ position: _, ...page }) => page);
 }
 
-export function buildIndex(results: Map<string, SourceDocs>): DocsIndex {
-	const groups: DocGroup[] = [];
-	const allPages: DocPage[] = [];
-	let hub: HubEntry | undefined;
-	for (const source of sources) {
-		const entry = results.get(source.slug);
-		if (!entry) continue;
-		if (source.hub && entry.hub) hub = entry.hub;
-		if (entry.pages.length === 0) continue;
-		const bySection = new Map<string, DocPage[]>();
-		for (const page of entry.pages) {
-			const key = page.section === null ? 'standalone' : String(page.section);
-			const list = bySection.get(key) ?? [];
-			list.push(page);
-			bySection.set(key, list);
-			allPages.push(page);
-		}
-		const sectionEntries = Array.from(bySection.entries()).sort(([a], [b]) => {
-			if (a === 'standalone') return 1;
-			if (b === 'standalone') return -1;
-			return Number(a) - Number(b);
-		});
-		groups.push({
-			slug: source.slug,
-			label: source.label,
-			sections: sectionEntries.map(([key, pages]) => ({
-				key,
-				label: key === 'standalone' ? 'Reference' : `Part ${key}`,
-				pages,
-			})),
-		});
+export async function renderHub(): Promise<DocHub> {
+	const { data, body } = frontmatter(await readFile(resolve(root, 'docs/index.md'), 'utf8'));
+	if (!data.title || !data.description)
+		throw new Error('docs/index.md needs a title and description');
+	return {
+		title: data.title,
+		description: data.description,
+		html: (await render(body.replace(/^\s*#\s+.+\n?/, ''))).html,
+	};
+}
+
+export async function writeDocs(rendered: Map<string, DocPage[]>) {
+	const pages = sources.flatMap((source) => rendered.get(source.slug) ?? []);
+	const seen = new Map<string, string>();
+	for (const page of pages) {
+		const other = seen.get(page.slug);
+		if (other)
+			throw new Error(`Two docs pages map to /docs/${page.slug}/: ${other} and ${page.editUrl}`);
+		seen.set(page.slug, page.editUrl);
 	}
-	return { groups, pages: allPages, hub, generatedAt: new Date().toISOString() };
+	const docs: Docs = {
+		hub: await renderHub(),
+		groups: sources
+			.filter((source) => rendered.get(source.slug)?.length)
+			.map((source) => {
+				const own = rendered.get(source.slug)!;
+				return {
+					slug: source.slug,
+					label: source.label,
+					summary: source.summary,
+					sections: ['Guide', 'Reference']
+						.map((label) => ({
+							label,
+							pages: own
+								.filter((page) => page.section === label)
+								.map(({ slug, title, description }) => ({ slug, title, description })),
+						}))
+						.filter((section) => section.pages.length > 0),
+				};
+			}),
+		pages,
+	};
+	const out = resolve(root, 'src/lib/server/docs.json');
+	await mkdir(dirname(out), { recursive: true });
+	await writeFile(out, JSON.stringify(docs));
+	console.log(`Wrote ${pages.length} docs pages across ${docs.groups.length} sources.`);
 }

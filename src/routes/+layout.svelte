@@ -1,150 +1,50 @@
 <script lang="ts">
 	import '../app.css';
-	import { page } from '$app/state';
-	import { slide } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
-	import { Megaphone, Settings, Menu, X, GitBranch } from 'lucide-svelte';
-	import { cn } from '$lib/cn';
-	import SettingsModal from '$lib/components/SettingsModal.svelte';
-	import Logo from '$lib/components/Logo.svelte';
+	import { Tooltip } from 'bits-ui';
+	import { onMount } from 'svelte';
+	import { beforeNavigate, onNavigate } from '$app/navigation';
+	import { fetchAnnouncements } from '#lib/api.ts';
+	import { newestFirst } from '#lib/announcements.ts';
+	import { reading } from '#lib/announcements.svelte.ts';
+	import AnnouncementBar from '#lib/components/layout/AnnouncementBar.svelte';
+	import Footer from '#lib/components/layout/Footer.svelte';
+	import Header from '#lib/components/layout/Header.svelte';
+	import { fresh } from '#lib/fresh.svelte.ts';
 
-	let { children } = $props();
+	let { data, children } = $props();
 
-	let settingsOpen = $state(false);
-	let mobileNavOpen = $state(false);
+	const latest = fresh(
+		() => data.latest,
+		async (apiUrl) => newestFirst(await fetchAnnouncements(apiUrl))[0] ?? null
+	);
 
-	$effect(() => {
-		page.url.pathname;
-		mobileNavOpen = false;
-	});
-
-	const navLinks = [
-		{ name: 'Home', path: '/' },
-		{ name: 'Patches', path: '/patches/' },
-		{ name: 'Patch online', path: '/patch/' },
-		{ name: 'Download', path: '/download/' },
-		{ name: 'Docs', path: '/docs/' },
-	];
+	onMount(reading.restore);
 
 	// The patcher page is cross-origin isolated, which only a full page load can switch on or off.
-	const isolated = $derived(page.url.pathname.startsWith('/patch/'));
-	const reload = (path: string) => (path === '/patch/' ? '' : undefined);
+	const isolated = (path: string) => path.startsWith('/patch/');
+	beforeNavigate(({ from, to, cancel, type }) => {
+		if (type !== 'link' || !from || !to) return;
+		if (isolated(from.url.pathname) === isolated(to.url.pathname)) return;
+		cancel();
+		location.href = to.url.href;
+	});
 
-	function isActive(path: string) {
-		const current = page.url.pathname;
-		if (path === '/') return current === '/';
-		return current.startsWith(path);
-	}
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 </script>
 
-<div
-	class="min-h-screen flex flex-col bg-background text-foreground transition-colors font-sans relative"
-	data-sveltekit-reload={isolated ? '' : undefined}
->
-	<header class="sticky top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border">
-		<div class="container mx-auto px-6 h-20 flex items-center justify-between">
-			<a href="/" class="flex items-center gap-1.5 group">
-				<Logo size={28} class="transition-transform group-hover:scale-105" />
-				<span class="font-semibold text-lg tracking-tight">Reseam</span>
-			</a>
-
-			<nav class="hidden md:flex items-center gap-8">
-				{#each navLinks as link (link.path)}
-					<a
-						href={link.path}
-						data-sveltekit-reload={reload(link.path)}
-						class={cn(
-							'text-sm font-medium transition-colors hover:text-primary',
-							isActive(link.path) ? 'text-foreground' : 'text-muted-foreground'
-						)}
-					>
-						{link.name}
-					</a>
-				{/each}
-			</nav>
-
-			<div class="flex items-center gap-2">
-				<a
-					href="/announcements/"
-					class="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
-					aria-label="Announcements"
-				>
-					<Megaphone size={18} />
-				</a>
-				<button
-					onclick={() => (settingsOpen = true)}
-					class="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
-					aria-label="Settings"
-				>
-					<Settings size={18} />
-				</button>
-				<button
-					onclick={() => (mobileNavOpen = !mobileNavOpen)}
-					class="md:hidden p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
-					aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
-					aria-expanded={mobileNavOpen}
-					aria-controls="mobile-nav"
-				>
-					{#if mobileNavOpen}
-						<X size={18} />
-					{:else}
-						<Menu size={18} />
-					{/if}
-				</button>
-			</div>
-		</div>
-
-		{#if mobileNavOpen}
-			<nav
-				id="mobile-nav"
-				transition:slide={{ duration: 180, easing: cubicOut }}
-				class="md:hidden border-t border-border bg-background/95 backdrop-blur-md overflow-hidden"
-			>
-				<div class="container mx-auto px-6 py-2 flex flex-col">
-					{#each navLinks as link (link.path)}
-						<a
-							href={link.path}
-							data-sveltekit-reload={reload(link.path)}
-							class={cn(
-								'py-3 text-sm font-medium transition-colors hover:text-primary',
-								isActive(link.path) ? 'text-foreground' : 'text-muted-foreground'
-							)}
-						>
-							{link.name}
-						</a>
-					{/each}
-				</div>
-			</nav>
-		{/if}
-	</header>
-
-	<main class="flex-1 flex flex-col">
-		{@render children()}
-	</main>
-
-	<footer class="py-8 border-border mt-auto">
-		<div
-			class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6"
-		>
-			<div class="flex items-center gap-1.5 text-muted-foreground">
-				<Logo size={24} />
-				<span class="font-medium text-sm">Reseam</span>
-				<span class="text-xs ml-2 opacity-60">
-					© {new Date().getFullYear()} Reseam Team
-				</span>
-			</div>
-			<div class="flex gap-2">
-				<a
-					href="https://git.reseam.app"
-					rel="noopener noreferrer"
-					class="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
-					aria-label="Source code"
-				>
-					<GitBranch size={18} />
-				</a>
-			</div>
-		</div>
-	</footer>
-
-	<SettingsModal open={settingsOpen} onclose={() => (settingsOpen = false)} />
-</div>
+<Tooltip.Provider delayDuration={300}>
+	<div class="flex min-h-dvh flex-col">
+		{#if latest.value}<AnnouncementBar announcement={latest.value} />{/if}
+		<Header unread={latest.value ? reading.isNew(latest.value.id) : false} />
+		<main class="flex flex-1 flex-col">{@render children()}</main>
+		<Footer />
+	</div>
+</Tooltip.Provider>

@@ -1,21 +1,29 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import Button from '$lib/components/Button.svelte';
+	import Logo from '#lib/components/layout/Logo.svelte';
+	import Button from '#lib/components/ui/Button.svelte';
+
+	const missing = $derived(page.status === 404);
+
+	// The pieces drift apart after the page appears, so the change is visible.
+	let apart = $state(false);
+	onMount(() => requestAnimationFrame(() => (apart = true)));
 </script>
 
-<svelte:head>
-	<title>{page.status === 404 ? 'Not found' : 'Error'} · Reseam</title>
-</svelte:head>
+<svelte:head><title>{missing ? 'Not found' : 'Error'} · Reseam</title></svelte:head>
 
 <div
-	class="container mx-auto px-6 py-20 max-w-xl text-center flex-1 flex flex-col items-center justify-center"
+	class="container-page grid flex-1 place-content-center justify-items-center gap-3 py-20 text-center"
 >
-	<div class="text-primary text-6xl font-bold tracking-tight mb-4">{page.status}</div>
-	<h1 class="text-2xl sm:text-3xl font-bold mb-4">
-		{page.status === 404 ? 'Page not found' : 'Something went wrong'}
-	</h1>
-	<p class="text-muted-foreground mb-8">
-		{page.error?.message || "The page you're looking for doesn't exist."}
+	<Logo class="mb-4 size-28" {apart} />
+	<p class="text-sm font-bold tracking-[0.2em] text-primary">{page.status}</p>
+	<h1 class="text-title font-bold">{missing ? 'Page not found' : 'Something went wrong'}</h1>
+	<p class="text-lg text-muted-foreground">
+		{missing ? "This page doesn't exist or has moved." : page.error?.message}
 	</p>
-	<Button href="/" size="lg">Back home</Button>
+	<div class="mt-5 flex flex-wrap justify-center gap-3">
+		<Button href="/" size="lg">Back home</Button>
+		<Button href="/patches/" size="lg" variant="outline">Browse patches</Button>
+	</div>
 </div>

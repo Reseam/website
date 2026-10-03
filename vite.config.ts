@@ -1,3 +1,4 @@
+import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import type { Connect } from 'vite';
@@ -20,7 +21,17 @@ const crossOriginIsolation: Plugin = {
 };
 
 export default defineConfig({
-	plugins: [crossOriginIsolation, tailwindcss(), sveltekit()],
+	plugins: [
+		crossOriginIsolation,
+		tailwindcss(),
+		sveltekit({
+			adapter: adapter({ strict: true, fallback: '404.html' }),
+			compilerOptions: {
+				runes: ({ filename }) =>
+					filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
+			},
+		}),
+	],
 	// CheerpJ loads through importScripts, which needs classic workers.
 	worker: { format: 'iife' },
 	// The package ships TypeScript sources with worker URLs relative to them.

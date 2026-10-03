@@ -1,21 +1,23 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import KeyRound from '@lucide/svelte/icons/key-round';
 	import { cubicOut } from 'svelte/easing';
-	import { CircleAlert, KeyRound } from 'lucide-svelte';
-	import PageMeta from '$lib/components/PageMeta.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import ActionBar from '$lib/components/patcher/ActionBar.svelte';
-	import AppPanel from '$lib/components/patcher/AppPanel.svelte';
-	import Callout from '$lib/components/patcher/Callout.svelte';
-	import Done from '$lib/components/patcher/Done.svelte';
-	import DropZone from '$lib/components/patcher/DropZone.svelte';
-	import Failed from '$lib/components/patcher/Failed.svelte';
-	import KeyDialog from '$lib/components/patcher/KeyDialog.svelte';
-	import PatchList from '$lib/components/patcher/PatchList.svelte';
-	import Progress from '$lib/components/patcher/Progress.svelte';
-	import Panel from '$lib/components/patcher/Panel.svelte';
-	import SourceList from '$lib/components/patcher/SourceList.svelte';
-	import { capability, Patcher } from '$lib/patcher/patcher.svelte';
+	import { fly } from 'svelte/transition';
+	import PageMeta from '#lib/components/layout/PageMeta.svelte';
+	import ActionBar from '#lib/components/patcher/ActionBar.svelte';
+	import AppPanel from '#lib/components/patcher/AppPanel.svelte';
+	import Done from '#lib/components/patcher/Done.svelte';
+	import DropZone from '#lib/components/patcher/DropZone.svelte';
+	import Failed from '#lib/components/patcher/Failed.svelte';
+	import KeyDialog from '#lib/components/patcher/KeyDialog.svelte';
+	import PatchList from '#lib/components/patcher/PatchList.svelte';
+	import Progress from '#lib/components/patcher/Progress.svelte';
+	import Sources from '#lib/components/patcher/Sources.svelte';
+	import Button from '#lib/components/ui/Button.svelte';
+	import Callout from '#lib/components/ui/Callout.svelte';
+	import Panel from '#lib/components/ui/Panel.svelte';
+	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
+	import { capability, Patcher } from '#lib/patcher/patcher.svelte.ts';
 
 	// Patching needs browser APIs, so the patcher only exists after hydration.
 	let patcher = $state<Patcher>();
@@ -37,80 +39,85 @@
 		};
 	});
 
-	const phase = $derived(patcher?.phase.name);
+	const phase = $derived(patcher?.phase);
+	const enter = { y: 8, duration: 250, easing: cubicOut };
 </script>
 
 <PageMeta
 	title="Patch an app · Reseam"
-	description="Patch Android apps in your browser with Reseam. Your files stay on your device."
+	description="Patch Android apps in your browser when you can't install Reseam Manager. Your files stay on your device."
 />
 
-<div class="container mx-auto max-w-3xl px-6 pt-12 sm:pt-16">
-	<div in:fly={{ y: 10, duration: 400, easing: cubicOut }}>
-		<div class="mb-8 flex items-start justify-between gap-4">
+<div class="container-page">
+	<div class="mx-auto grid max-w-232 grid-cols-1 gap-6 pt-10 pb-6 sm:pt-14">
+		<header class="flex flex-wrap items-start justify-between gap-4">
 			<div>
-				<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Patch an app</h1>
-				<p class="mt-2 text-muted-foreground">
-					Runs in your browser. Your files never leave this device.
+				<h1 class="text-title font-bold">Patch an app</h1>
+				<p class="mt-3 text-muted-foreground">
+					Runs in this browser. It's slower than Reseam Manager, and your files stay on this device.
 				</p>
 			</div>
 			{#if patcher}
 				<Button
-					variant="outlined"
-					size="sm"
-					class="mt-1 shrink-0 gap-2"
+					variant="outline"
 					onclick={() => (keyOpen = true)}
-					disabled={phase === 'patching'}
+					disabled={phase?.name === 'patching'}
 				>
-					<KeyRound size={15} /> <span class="hidden sm:inline">Signing key</span>
+					<KeyRound size={16} /> Signing key
 				</Button>
 			{/if}
-		</div>
+		</header>
 
 		{#if unsupported || failure}
-			<div class="flex gap-4 rounded-[1.25rem] border border-border bg-card p-6">
-				<CircleAlert size={20} class="mt-0.5 shrink-0 text-error" />
-				<div>
-					<p>{unsupported ?? failure}</p>
-					<p class="mt-2 text-sm text-muted-foreground">
-						You can also patch with <a href="/download/" class="text-primary hover:underline"
-							>Reseam Manager</a
-						>.
-					</p>
-				</div>
-			</div>
-		{:else if !patcher}
-			<div class="h-64 animate-pulse rounded-[1.25rem] bg-muted"></div>
-		{:else if patcher.phase.name === 'patching'}
-			<Progress {patcher} {...patcher.phase} />
-		{:else if patcher.phase.name === 'done'}
-			<Done {patcher} {...patcher.phase} />
-		{:else if patcher.phase.name === 'failed'}
-			<Failed {patcher} {...patcher.phase} />
+			<Panel>
+				<PanelHeader
+					icon={CircleAlert}
+					tone="error"
+					title={unsupported ? "This browser can't patch apps" : 'The patcher could not start'}
+					subtitle={unsupported ?? failure ?? undefined}
+				>
+					{#snippet aside()}<Button href="/download/" size="sm">Get Reseam Manager</Button
+						>{/snippet}
+				</PanelHeader>
+			</Panel>
+		{:else if !patcher || !phase}
+			<div
+				class="h-72 animate-pulse rounded-xl bg-card"
+				aria-label="Loading the patcher"
+				role="status"
+			></div>
 		{:else}
-			<div class="space-y-4">
-				{#if patcher.notice}
-					<div role="status">
-						<Callout icon={CircleAlert} tone="warning">{patcher.notice}</Callout>
-					</div>
-				{/if}
-				{#if patcher.input}
-					<AppPanel {patcher} file={patcher.input.app} />
-				{:else}
-					<DropZone onfiles={(files) => patcher!.choose(files)} />
-					<Panel><SourceList {patcher} /></Panel>
-				{/if}
-				{#if patcher.phase.name === 'ready'}
-					<PatchList {patcher} />
-				{/if}
-			</div>
-			{#if patcher.phase.name === 'ready'}
-				<ActionBar {patcher} />
-			{/if}
+			{#key phase.name === 'reading' ? 'ready' : phase.name}
+				<div in:fly={enter} class="grid grid-cols-1 gap-6">
+					{#if phase.name === 'patching'}
+						<Progress {patcher} {...phase} />
+					{:else if phase.name === 'done'}
+						<Done {patcher} {...phase} />
+					{:else if phase.name === 'failed'}
+						<Failed {patcher} {...phase} />
+					{:else}
+						{#if patcher.notice}
+							<div role="status">
+								<Callout icon={CircleAlert} tone="warning">{patcher.notice}</Callout>
+							</div>
+						{/if}
+						{#if patcher.input}
+							<AppPanel {patcher} file={patcher.input.app} />
+						{:else}
+							<DropZone onfiles={(files) => patcher!.choose(files)} />
+						{/if}
+						<div><Sources {patcher} /></div>
+						{#if phase.name === 'ready'}
+							<PatchList {patcher} />
+							<ActionBar {patcher} />
+						{/if}
+					{/if}
+				</div>
+			{/key}
 		{/if}
 
 		<!-- The CheerpJ Community License asks for credit. -->
-		<p class="py-10 text-center text-xs text-muted-foreground">
+		<p class="py-6 text-center text-xs text-muted-foreground">
 			Powered by <a
 				href="https://cheerpj.com/"
 				rel="noopener noreferrer"
@@ -120,6 +127,4 @@
 	</div>
 </div>
 
-{#if patcher}
-	<KeyDialog {patcher} open={keyOpen} onclose={() => (keyOpen = false)} />
-{/if}
+{#if patcher}<KeyDialog {patcher} bind:open={keyOpen} />{/if}

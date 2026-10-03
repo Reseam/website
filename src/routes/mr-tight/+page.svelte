@@ -1,7 +1,7 @@
 <script lang="ts">
-	import EasterEgg from '$lib/components/EasterEgg.svelte';
-	import asks from '$lib/assets/easter-eggs/mr-tight-asks.webp';
-	import confirmed from '$lib/assets/easter-eggs/mr-tight-confirmed.webp';
+	import asks from '#lib/assets/easter-eggs/mr-tight-asks.webp';
+	import confirmed from '#lib/assets/easter-eggs/mr-tight-confirmed.webp';
+	import EasterEgg from '#lib/components/layout/EasterEgg.svelte';
 </script>
 
 <EasterEgg

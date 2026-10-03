@@ -1,4 +1,4 @@
-import { fetchLatestPatches } from '$lib/api';
+import { fetchLatestPatches } from '#lib/api.ts';
 
 /** Signer of the official Reseam patches. Its bundles run without asking. */
 export const OFFICIAL_SIGNER = '556c1b22f4e03398212ba10fe6a31db252df49f599b938d24a9f2b6baec41a1d';

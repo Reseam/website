@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { File as FileIcon, Folder, X } from 'lucide-svelte';
+	import FileIcon from '@lucide/svelte/icons/file';
+	import Folder from '@lucide/svelte/icons/folder';
+	import X from '@lucide/svelte/icons/x';
 	import type { OptionDeclaration } from '@reseam/browser';
-	import type { OptionDraft } from '$lib/patcher/options';
+	import { Label } from 'bits-ui';
+	import Checkbox from '#lib/components/ui/Checkbox.svelte';
+	import Select from '#lib/components/ui/Select.svelte';
+	import { buttonClass } from '#lib/components/ui/button.ts';
+	import type { OptionDraft } from '#lib/patcher/options.ts';
 
 	let {
 		option,
@@ -17,61 +23,58 @@
 		onchange: (draft: OptionDraft) => void;
 	} = $props();
 
-	let fileInput = $state<HTMLInputElement>();
-	let folderInput = $state<HTMLInputElement>();
-
-	const describedBy = $derived(
+	const title = $derived(option.title || option.key);
+	const describedby = $derived(
 		[option.description && `${id}-description`, error && `${id}-error`].filter(Boolean).join(' ') ||
 			undefined
 	);
-	const control =
-		'w-full rounded-[0.75rem] border border-border bg-background px-3 py-2 text-sm transition-colors focus:border-primary aria-invalid:border-destructive';
 
-	function pickFiles(input: HTMLInputElement, folder: boolean) {
+	function picked(input: HTMLInputElement, folder: boolean) {
 		const files = [...(input.files ?? [])];
 		input.value = '';
 		if (files.length > 0) onchange({ kind: 'path', files, folder });
 	}
 </script>
 
-<div class="text-sm">
+<div class="grid gap-1.5 text-sm">
 	{#if draft.kind === 'toggle'}
-		<label class="flex cursor-pointer items-start gap-2.5">
-			<input
+		<div class="flex items-start gap-2.5">
+			<Checkbox
 				{id}
-				type="checkbox"
 				checked={draft.value}
-				aria-describedby={describedBy}
-				onchange={(event) => onchange({ kind: 'toggle', value: event.currentTarget.checked })}
-				class="mt-0.5 size-4 shrink-0 accent-primary"
+				aria-describedby={describedby}
+				onCheckedChange={(value) => onchange({ kind: 'toggle', value })}
 			/>
-			<span class="font-medium">{option.title || option.key}</span>
-		</label>
+			<Label.Root for={id} class="font-medium">{title}</Label.Root>
+		</div>
 	{:else}
-		<label for={id} class="mb-1.5 block font-medium">
-			{option.title || option.key}
-			{#if option.required && option.default_value === null}
-				<span class="font-normal text-muted-foreground">· Required</span>
-			{/if}
-		</label>
+		<Label.Root for={id} class="font-medium">
+			{title}
+			{#if option.required && option.default_value === null}<span
+					class="font-normal text-muted-foreground">· Required</span
+				>{/if}
+		</Label.Root>
 		{#if draft.kind === 'path'}
 			<div class="flex flex-wrap items-center gap-2">
-				<button
-					{id}
-					type="button"
-					aria-describedby={describedBy}
-					onclick={() => fileInput?.click()}
-					class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 hover:bg-muted"
-				>
+				<label class={buttonClass('outline', 'sm')}>
 					<FileIcon size={14} /> Choose file
-				</button>
-				<button
-					type="button"
-					onclick={() => folderInput?.click()}
-					class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 hover:bg-muted"
-				>
+					<input
+						{id}
+						type="file"
+						class="sr-only"
+						aria-describedby={describedby}
+						onchange={(event) => picked(event.currentTarget, false)}
+					/>
+				</label>
+				<label class={buttonClass('outline', 'sm')}>
 					<Folder size={14} /> Choose folder
-				</button>
+					<input
+						type="file"
+						webkitdirectory
+						class="sr-only"
+						onchange={(event) => picked(event.currentTarget, true)}
+					/>
+				</label>
 				{#if draft.files.length > 0}
 					<span class="inline-flex min-w-0 items-center gap-1 text-muted-foreground">
 						<span class="truncate">
@@ -81,7 +84,7 @@
 						</span>
 						<button
 							type="button"
-							aria-label="Clear {option.title || option.key}"
+							aria-label="Clear {title}"
 							onclick={() => onchange({ kind: 'path', files: [], folder: false })}
 							class="rounded-full p-1 hover:bg-muted hover:text-foreground"
 						>
@@ -90,48 +93,25 @@
 					</span>
 				{/if}
 			</div>
-			<input
-				bind:this={fileInput}
-				type="file"
-				class="sr-only"
-				tabindex="-1"
-				aria-hidden="true"
-				onchange={() => pickFiles(fileInput!, false)}
-			/>
-			<input
-				bind:this={folderInput}
-				type="file"
-				webkitdirectory
-				class="sr-only"
-				tabindex="-1"
-				aria-hidden="true"
-				onchange={() => pickFiles(folderInput!, true)}
-			/>
 		{:else if option.valid_values?.length}
-			<select
+			<Select
 				{id}
 				value={draft.value}
-				aria-describedby={describedBy}
-				aria-invalid={error ? true : undefined}
-				onchange={(event) => onchange({ kind: 'text', value: event.currentTarget.value })}
-				class={control}
-			>
-				{#if option.default_value === null}<option value="">Choose…</option>{/if}
-				{#each option.valid_values as value (value)}
-					<option {value}>{value}</option>
-				{/each}
-			</select>
+				items={option.valid_values}
+				invalid={!!error}
+				{describedby}
+				onchange={(value) => onchange({ kind: 'text', value })}
+			/>
 		{:else if option.option_type === 'string_list'}
 			<textarea
 				{id}
 				rows="3"
 				value={draft.value}
 				placeholder="One per line"
-				aria-describedby={describedBy}
+				aria-describedby={describedby}
 				aria-invalid={error ? true : undefined}
 				oninput={(event) => onchange({ kind: 'text', value: event.currentTarget.value })}
-				class={control}
-			></textarea>
+				class="field"></textarea>
 		{:else}
 			<input
 				{id}
@@ -142,22 +122,17 @@
 					: option.option_type === 'float'
 						? 'decimal'
 						: undefined}
-				aria-describedby={describedBy}
+				aria-describedby={describedby}
 				aria-invalid={error ? true : undefined}
 				oninput={(event) => onchange({ kind: 'text', value: event.currentTarget.value })}
-				class={control}
+				class="field"
 			/>
 		{/if}
 	{/if}
 	{#if option.description}
-		<p
-			id="{id}-description"
-			class="mt-1 text-muted-foreground {draft.kind === 'toggle' ? 'pl-6.5' : ''}"
-		>
+		<p id="{id}-description" class={['text-muted-foreground', draft.kind === 'toggle' && 'pl-7.5']}>
 			{option.description}
 		</p>
 	{/if}
-	{#if error}
-		<p id="{id}-error" class="mt-1 text-destructive">{error}</p>
-	{/if}
+	{#if error}<p id="{id}-error" class="text-error">{error}</p>{/if}
 </div>

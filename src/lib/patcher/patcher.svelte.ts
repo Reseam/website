@@ -15,8 +15,8 @@ import {
 } from '@reseam/browser';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { asset } from '$app/paths';
-import { settings } from '$lib/settings.svelte';
-import { duration } from '$lib/format';
+import { settings } from '#lib/settings.svelte.ts';
+import { duration } from '#lib/format.ts';
 import { fingerprint } from './files';
 import { sortFiles, type AppInput } from './inputs';
 import { fetchOfficialBundle, OFFICIAL_SIGNER, type OfficialBundle } from './official';
@@ -65,9 +65,7 @@ export type Phase =
 	  };
 
 export type Official =
-	| { status: 'loading' }
-	| { status: 'ready'; bundle: OfficialBundle }
-	| { status: 'failed' };
+	{ status: 'loading' } | { status: 'ready'; bundle: OfficialBundle } | { status: 'failed' };
 
 export function capability(): string | null {
 	if (!globalThis.crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') {
@@ -105,9 +103,11 @@ export class Patcher {
 	);
 	readonly blocker = $derived(this.findBlocker());
 
-	// scripts/copy-runtime.ts serves the package's runtime files from the site root.
+	// scripts/copy-runtime.ts serves the package's runtime files as static assets; asset() only
+	// resolves files, so the runtime folder is found through one of them.
 	private readonly java = new JavaRuntime({
-		runtimeBase: new URL(asset(`/${runtime.base}`), location.href).href,
+		runtimeBase: new URL('.', new URL(asset(`${runtime.base}methods.json` as const), location.href))
+			.href,
 	});
 	private session: BrowserSession | null = null;
 	private controller = new AbortController();

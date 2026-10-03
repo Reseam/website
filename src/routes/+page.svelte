@@ -1,66 +1,49 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
-	import { ArrowRight, GitBranch } from 'lucide-svelte';
-	import Button from '$lib/components/Button.svelte';
-	import HeroPhone from '$lib/components/HeroPhone.svelte';
-	import HowItWorks from '$lib/components/HowItWorks.svelte';
-	import PageMeta from '$lib/components/PageMeta.svelte';
-
-	const totalSteps = 6;
-	let step = $state(0);
-
-	$effect(() => {
-		const timer = setInterval(() => {
-			step = (step + 1) % totalSteps;
-		}, 2200);
-		return () => clearInterval(timer);
-	});
+	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import HeroDemo from '#lib/components/home/HeroDemo.svelte';
+	import Steps from '#lib/components/home/Steps.svelte';
+	import PageMeta from '#lib/components/layout/PageMeta.svelte';
+	import Button from '#lib/components/ui/Button.svelte';
 </script>
 
 <PageMeta
 	title="Reseam: a better way to use your apps"
-	description="Easily add helpful new features or remove common annoyances from the apps you use every day."
+	description="Add new features or remove annoyances from the apps you use every day. No technical skills required."
 />
 
-<div class="px-6 py-16 lg:py-24">
-	<div in:fly={{ y: 20, duration: 600, easing: cubicOut }} class="max-w-6xl mx-auto w-full">
-		<div class="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-10">
-			<div class="lg:flex-1 lg:max-w-sm text-center lg:text-left">
-				<h1
-					class="text-4xl sm:text-5xl font-bold mb-6 text-foreground tracking-tight leading-tight"
-				>
-					A better way to use your apps.
-				</h1>
-				<p class="text-lg text-muted-foreground mb-10 leading-relaxed">
-					Easily add helpful new features or remove common annoyances from the apps you use every
-					day. No technical skills required.
-				</p>
-
-				<div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-					<Button
-						href="/download/"
-						size="lg"
-						class="w-full sm:w-auto text-base rounded-[1rem] shadow-sm py-6 px-8"
-					>
-						Get Reseam
-						<ArrowRight class="ml-2" size={18} />
-					</Button>
-					<a
-						href="https://git.reseam.app"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="w-full sm:w-auto text-muted-foreground hover:text-foreground transition-colors inline-flex items-center justify-center h-12 px-6 font-medium text-sm"
-					>
-						<GitBranch class="mr-2" size={18} />
-						View Source
-					</a>
-				</div>
-			</div>
-
-			<HeroPhone {step} />
+<section
+	class="container-page grid items-center gap-12 py-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:py-20"
+>
+	<div class="text-center lg:text-left">
+		<h1 class="text-display font-bold">A better way to use your apps.</h1>
+		<p class="mx-auto mt-6 mb-9 max-w-md text-lg text-muted-foreground lg:mx-0">
+			Add new features or remove annoyances from the apps you use every day. No technical skills
+			required.
+		</p>
+		<div class="flex flex-wrap justify-center gap-3 lg:justify-start">
+			<Button href="/download/" size="lg">Download <ArrowRight size={18} /></Button>
+			<Button href="/patches/" size="lg" variant="outline">Browse patches</Button>
 		</div>
 	</div>
-</div>
+	<HeroDemo />
+</section>
 
-<HowItWorks />
+<Steps />
+
+<section aria-labelledby="get" class="container-page">
+	<div class="flex flex-wrap items-center justify-between gap-8 border-t border-border py-16">
+		<div>
+			<h2 id="get" class="text-3xl font-bold tracking-tight sm:text-4xl">Get Reseam Manager</h2>
+			<p class="mt-2 text-muted-foreground">For Android, Windows and Linux.</p>
+			<p class="mt-4 text-sm text-muted-foreground">
+				Can't install it?
+				<a
+					href="/patch/"
+					class="text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary"
+					>Patch in your browser</a
+				>. It's slower.
+			</p>
+		</div>
+		<Button href="/download/" size="lg">Download <ArrowRight size={18} /></Button>
+	</div>
+</section>

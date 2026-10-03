@@ -1,34 +1,30 @@
-import { FORGE_API, FORGE_BASE } from '$lib/docs/sources';
-import type { PageServerLoad } from './$types';
+import { FORGE_API, FORGE_BASE } from '#lib/docs/sources.ts';
+import { manager } from '#lib/server/api.ts';
 
-type CliRelease = {
-	tag_name: string;
-	published_at: string;
-	html_url: string;
-	assets: { name: string }[];
+type CliRelease = { tag_name: string; published_at: string; assets: { name: string }[] };
+
+const CLI_BUILDS: Record<string, string> = {
+	'reseam-linux-x64': 'Linux',
+	'reseam-windows-x64.exe': 'Windows',
 };
 
-// Prerendered with the static site: Forgejo doesn't allow cross-origin browser requests.
-export const load: PageServerLoad = async ({ fetch }) => {
+// Prerendered: Forgejo does not allow cross-origin requests from browsers.
+export async function load({ fetch }) {
 	const response = await fetch(`${FORGE_API}/repos/reseam/reseam/releases/latest`);
-	if (!response.ok) throw new Error(`CLI release fetch failed: ${response.status}`);
+	if (!response.ok) throw new Error(`CLI release lookup returned ${response.status}`);
 	const release: CliRelease = await response.json();
-	const platforms: Record<string, string> = {
-		'reseam-linux-x64': 'Linux x64',
-		'reseam-windows-x64.exe': 'Windows x64',
-	};
 	return {
+		manager: await manager(),
 		cli: {
-			version: release.tag_name,
+			version: release.tag_name.replace(/^v/, ''),
 			publishedAt: release.published_at,
-			releaseUrl: release.html_url,
 			releasesUrl: `${FORGE_BASE}/reseam/reseam/releases`,
-			downloads: release.assets
-				.filter((asset) => asset.name in platforms)
+			builds: release.assets
+				.filter((asset) => asset.name in CLI_BUILDS)
 				.map((asset) => ({
-					name: platforms[asset.name],
+					platform: CLI_BUILDS[asset.name],
 					url: `https://cdn.reseam.app/engine/${encodeURIComponent(release.tag_name)}/${asset.name}`,
 				})),
 		},
 	};
-};
+}
