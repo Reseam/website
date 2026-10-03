@@ -12,10 +12,10 @@ export type DocSource = {
 
 export const sources: DocSource[] = [
 	{
-		slug: 'engine',
+		slug: 'authoring',
 		repo: 'reseam/reseam',
-		label: 'Engine',
-		summary: 'Write patches in Kotlin, build them into a signed bundle, and publish it.',
+		label: 'Writing patches',
+		summary: 'Start from the template, write patches in Kotlin, and publish a signed bundle.',
 		path: 'docs',
 		branch: 'main',
 	},
@@ -30,9 +30,8 @@ export const sources: DocSource[] = [
 	{
 		slug: 'api',
 		repo: 'reseam/api',
-		label: 'API',
-		summary:
-			'The server behind api.reseam.app: the patch index, release downloads, and announcements.',
+		label: 'API server',
+		summary: 'Run your own instance of the server behind api.reseam.app.',
 		path: 'docs',
 		branch: 'main',
 	},

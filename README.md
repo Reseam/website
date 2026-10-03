@@ -1,6 +1,12 @@
-# Reseam website
+<p align="center">
+  <img src="https://reseam.app/logo.svg" alt="Reseam logo" width="96">
+</p>
 
-The static site at [reseam.app](https://reseam.app): home page, patch catalog, in-browser patcher, downloads, announcements, and the documentation for the engine, CLI, and API. SvelteKit 3 with `adapter-static`, Tailwind 4 and Bits UI, served by nginx.
+<h1 align="center">Reseam website</h1>
+
+The site at [reseam.app](https://reseam.app): the home page, the patch catalog, the browser patcher, downloads, announcements, and the docs for writing patches, the CLI, and the API server.
+
+It is a static SvelteKit 3 site (`adapter-static`) built with Tailwind 4 and Bits UI, and served by nginx.
 
 ## Developing
 
