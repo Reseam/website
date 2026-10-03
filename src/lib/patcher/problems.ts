@@ -1,9 +1,14 @@
-import { EngineError } from '@reseam/browser';
+import { EngineError, type Problem } from '@reseam/browser';
 
-export function describe(error: unknown, patchName: (reference: string) => string): string {
+type PatchName = (reference: string) => string;
+
+export function describe(error: unknown, patchName: PatchName): string {
 	if (!(error instanceof EngineError))
 		return error instanceof Error ? error.message : String(error);
-	const problem = error.problem;
+	return explain(error.problem, patchName) ?? error.message;
+}
+
+export function explain(problem: Problem, patchName: PatchName): string | undefined {
 	switch (problem.type) {
 		case 'unreadable_apk':
 			return 'This app file could not be read. Download it again and retry.';
@@ -25,6 +30,6 @@ export function describe(error: unknown, patchName: (reference: string) => strin
 		case 'option_choice':
 			return `The value for ${problem.key} is not valid.`;
 		default:
-			return error.message;
+			return undefined;
 	}
 }

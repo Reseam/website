@@ -2,6 +2,7 @@
 	import { LoaderCircle, Plus, RotateCcw, ShieldAlert, ShieldCheck, X } from 'lucide-svelte';
 	import type { BundleMetadata } from '@reseam/browser';
 	import { OFFICIAL_SIGNER } from '$lib/patcher/official';
+	import { explain } from '$lib/patcher/problems';
 	import type { Patcher } from '$lib/patcher/patcher.svelte';
 
 	let { patcher }: { patcher: Patcher } = $props();
@@ -85,7 +86,9 @@
 				</button>
 			</div>
 			{#if bundle?.problem}
-				<p class="mt-1.5 pl-7.5 text-muted-foreground">This bundle could not be read.</p>
+				<p class="mt-1.5 pl-7.5 text-muted-foreground">
+					{explain(bundle.problem, patcher.patchName) ?? 'This bundle could not be read.'}
+				</p>
 			{:else if bundle && !official}
 				<label class="mt-2 flex cursor-pointer items-start gap-2.5 pl-7.5">
 					<input
