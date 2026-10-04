@@ -37,7 +37,7 @@
 	"dependencies": {
 		"@internationalized/date": "^3.12.4",
 		"@lucide/svelte": "^1.51.0",
-		"@reseam/browser": "0.18.1",
+		"@reseam/browser": "0.18.2",
 		"bits-ui": "^2.19.5",
 		"fflate": "^0.8.3"
 	},
