@@ -46,3 +46,7 @@ bun run preview
 ```sh
 bun run check
 ```
+
+## License
+
+AGPL-3.0-or-later, with additional terms under section 7 in [NOTICE](NOTICE).
