@@ -31,7 +31,7 @@
 		>
 			<Icon size={18} />
 			{#if dot}<span
-					class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-background"
+					class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"
 				></span>{/if}
 		</svelte:element>
 	{/snippet}

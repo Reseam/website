@@ -36,7 +36,7 @@
 	}
 </script>
 
-<div class="grid gap-1.5 text-sm">
+<div class="grid gap-1.5 text-body-medium">
 	{#if draft.kind === 'toggle'}
 		<div class="flex items-start gap-2.5">
 			<Checkbox
@@ -45,13 +45,13 @@
 				aria-describedby={describedby}
 				onCheckedChange={(value) => onchange({ kind: 'toggle', value })}
 			/>
-			<Label.Root for={id} class="font-medium">{title}</Label.Root>
+			<Label.Root for={id} class="text-label-large">{title}</Label.Root>
 		</div>
 	{:else}
-		<Label.Root for={id} class="font-medium">
+		<Label.Root for={id} class="text-label-large">
 			{title}
 			{#if option.required && option.default_value === null}<span
-					class="font-normal text-muted-foreground">· Required</span
+					class="text-body-medium text-on-surface-variant">· Required</span
 				>{/if}
 		</Label.Root>
 		{#if draft.kind === 'path'}
@@ -76,7 +76,7 @@
 					/>
 				</label>
 				{#if draft.files.length > 0}
-					<span class="inline-flex min-w-0 items-center gap-1 text-muted-foreground">
+					<span class="inline-flex min-w-0 items-center gap-1 text-on-surface-variant">
 						<span class="truncate">
 							{draft.folder
 								? `${draft.files[0].webkitRelativePath.split('/')[0]} (${draft.files.length} files)`
@@ -86,7 +86,7 @@
 							type="button"
 							aria-label="Clear {title}"
 							onclick={() => onchange({ kind: 'path', files: [], folder: false })}
-							class="rounded-full p-1 hover:bg-muted hover:text-foreground"
+							class="rounded-full p-1 hover:bg-surface-container hover:text-on-surface"
 						>
 							<X size={14} />
 						</button>
@@ -130,7 +130,10 @@
 		{/if}
 	{/if}
 	{#if option.description}
-		<p id="{id}-description" class={['text-muted-foreground', draft.kind === 'toggle' && 'pl-7.5']}>
+		<p
+			id="{id}-description"
+			class={['text-on-surface-variant', draft.kind === 'toggle' && 'pl-7.5']}
+		>
 			{option.description}
 		</p>
 	{/if}

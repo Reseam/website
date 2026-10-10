@@ -47,20 +47,22 @@
 			{#each filtered as [app, patches] (app)}
 				<section aria-label={app ?? 'Any app'}>
 					<header class="flex items-baseline justify-between gap-3 px-1 pb-2.5">
-						<h2 class={app ? 'truncate font-mono text-sm font-semibold' : 'font-semibold'}>
+						<h2 class={app ? 'truncate font-mono text-mono-sm-semibold' : 'text-title-small'}>
 							{app ?? 'Any app'}
 						</h2>
-						<span class="text-sm text-muted-foreground tabular-nums">{patches.length}</span>
+						<span class="text-body-medium text-on-surface-variant tabular-nums"
+							>{patches.length}</span
+						>
 					</header>
 					<ul
-						class="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card"
+						class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low"
 					>
 						{#each patches as patch (patch.id)}<PatchItem {patch} />{/each}
 					</ul>
 				</section>
 			{:else}
 				<div
-					class="grid justify-items-center gap-3 rounded-lg border border-dashed border-border px-6 py-16 text-center text-muted-foreground"
+					class="grid justify-items-center gap-3 rounded-lg border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
 				>
 					{#if groups.size === 0}
 						<p>The current release has no patches to list.</p>
@@ -69,13 +71,13 @@
 						<button
 							type="button"
 							onclick={() => (query = '')}
-							class="text-sm font-medium text-foreground hover:text-primary">Clear search</button
+							class="text-label-large text-on-surface hover:text-primary">Clear search</button
 						>
 					{/if}
 				</div>
 			{/each}
 			{#if release.failed}
-				<p role="status" class="text-sm text-muted-foreground">
+				<p role="status" class="text-body-medium text-on-surface-variant">
 					Showing the patches from when this site was built. The API at your configured address did
 					not answer.
 				</p>

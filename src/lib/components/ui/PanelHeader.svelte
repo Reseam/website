@@ -24,9 +24,9 @@
 	} = $props();
 
 	const tones: Record<Tone, string> = {
-		primary: 'bg-primary/15 text-primary',
-		error: 'bg-error/15 text-error',
-		muted: 'bg-muted text-muted-foreground',
+		primary: 'bg-secondary-container text-primary',
+		error: 'bg-error-container text-error',
+		muted: 'bg-surface-container text-on-surface-variant',
 	};
 </script>
 
@@ -38,8 +38,8 @@
 			/>{/if}
 	</span>
 	<div class="min-w-0 flex-1">
-		<h2 {id} class="truncate text-lg font-semibold tracking-tight">{title}</h2>
-		{#if subtitle}<p class="text-sm text-muted-foreground">{subtitle}</p>{/if}
+		<h2 {id} class="truncate text-title-large">{title}</h2>
+		{#if subtitle}<p class="text-body-medium text-on-surface-variant">{subtitle}</p>{/if}
 	</div>
 	{@render aside?.()}
 </header>

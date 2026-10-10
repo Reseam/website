@@ -27,9 +27,11 @@
 </script>
 
 <div class="grid grid-cols-1 gap-3">
-	<div class="flex items-baseline justify-between gap-4 text-sm">
-		<h3 class="font-medium">Time</h3>
-		<span class="text-muted-foreground tabular-nums">{duration(report.milliseconds)} total</span>
+	<div class="flex items-baseline justify-between gap-4">
+		<h3 class="text-label-large">Time</h3>
+		<span class="text-body-medium text-on-surface-variant tabular-nums"
+			>{duration(report.milliseconds)} total</span
+		>
 	</div>
 	<div class="flex h-2 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
 		{#each stages as { stage, milliseconds } (stage)}<div
@@ -37,18 +39,18 @@
 				style:flex-grow={milliseconds}
 			></div>{/each}
 	</div>
-	<ul class="grid gap-1.5 text-sm">
+	<ul class="grid gap-1.5 text-body-medium">
 		{#each stages as { stage, milliseconds } (stage)}
 			<li class="flex items-center gap-2.5">
 				<span class="size-2 shrink-0 rounded-full bg-primary {shade(stage)}"></span>
-				<span class="flex-1 text-muted-foreground">{label(stage)}</span>
+				<span class="flex-1 text-on-surface-variant">{label(stage)}</span>
 				<span class="tabular-nums">{duration(milliseconds)}</span>
 			</li>
 		{/each}
 	</ul>
 	<Collapsible.Root>
 		<Collapsible.Trigger
-			class="group mt-2 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+			class="group mt-2 inline-flex items-center gap-1 text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 		>
 			Details <ChevronDown
 				size={14}
@@ -58,7 +60,9 @@
 		<Collapsible.Content class="collapsible">
 			<div class="grid grid-cols-1 gap-3 pt-3">
 				{#if report.patches.length > 0}
-					<ul class="divide-y divide-border rounded-md border border-border text-sm">
+					<ul
+						class="divide-y divide-outline-variant rounded-md border border-outline-variant text-body-medium"
+					>
 						{#each report.patches as run (run.reference)}
 							<li class="flex items-start gap-3 px-4 py-2.5">
 								{#if run.status.kind === 'applied'}<Check
@@ -67,13 +71,13 @@
 									/>
 								{:else if run.status.kind === 'skipped'}<CircleSlash
 										size={15}
-										class="mt-0.5 shrink-0 text-muted-foreground"
+										class="mt-0.5 shrink-0 text-on-surface-variant"
 									/>
 								{:else}<X size={15} class="mt-0.5 shrink-0 text-error" />{/if}
 								<span class="min-w-0 flex-1">
 									<span class="block truncate">{patcher.patchName(run.reference)}</span>
 									{#if run.status.kind !== 'applied'}<span
-											class="line-clamp-2 text-xs break-words text-muted-foreground"
+											class="line-clamp-2 text-body-small break-words text-on-surface-variant"
 											>{run.status.reason}</span
 										>{/if}
 								</span>
@@ -83,7 +87,7 @@
 				{/if}
 				<div class="relative">
 					<pre
-						class="max-h-72 overflow-auto rounded-md border border-border bg-background p-4 pr-12 font-mono text-xs leading-relaxed text-muted-foreground">{patcher.log.join(
+						class="max-h-72 overflow-auto rounded-md border border-outline-variant bg-surface p-4 pr-12 font-mono text-mono-xs text-on-surface-variant">{patcher.log.join(
 							'\n'
 						)}</pre>
 					<button

@@ -22,17 +22,16 @@
 <Dialog.Root bind:open>
 	<Dialog.Portal>
 		<Dialog.Overlay
-			class="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0"
+			class="fixed inset-0 z-50 bg-scrim backdrop-blur-sm transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0"
 		/>
 		<Dialog.Content
-			class="fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-1/2 gap-5 overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-float transition-[opacity,scale] duration-200 ease-emphasized data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
+			class="fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-1/2 gap-5 overflow-y-auto rounded-xl border border-outline-variant bg-surface-container-low p-6 shadow-elevation-3 transition-[opacity,scale] duration-200 ease-emphasized data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
 		>
 			<header class="flex items-start justify-between gap-4">
 				<div class="grid gap-1.5">
-					<Dialog.Title level={2} class="text-lg font-semibold tracking-tight">{title}</Dialog.Title
-					>
+					<Dialog.Title level={2} class="text-title-large">{title}</Dialog.Title>
 					{#if description}
-						<Dialog.Description class="text-sm text-muted-foreground"
+						<Dialog.Description class="text-body-medium text-on-surface-variant"
 							>{description}</Dialog.Description
 						>
 					{/if}

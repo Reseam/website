@@ -52,8 +52,8 @@
 	<div class="mx-auto grid max-w-232 grid-cols-1 gap-6 pt-10 pb-6 sm:pt-14">
 		<header class="flex flex-wrap items-start justify-between gap-4">
 			<div>
-				<h1 class="text-title font-bold">Patch an app</h1>
-				<p class="mt-3 text-muted-foreground">
+				<h1 class="text-headline-large sm:text-display-medium">Patch an app</h1>
+				<p class="mt-3 text-body-large text-on-surface-variant">
 					Runs in this browser. It's slower than Reseam Manager, and your files stay on this device.
 				</p>
 			</div>
@@ -82,7 +82,7 @@
 			</Panel>
 		{:else if !patcher || !phase}
 			<div
-				class="h-72 animate-pulse rounded-xl bg-card"
+				class="h-72 animate-pulse rounded-xl bg-surface-container-low"
 				aria-label="Loading the patcher"
 				role="status"
 			></div>
@@ -117,11 +117,11 @@
 		{/if}
 
 		<!-- The CheerpJ Community License asks for credit. -->
-		<p class="py-6 text-center text-xs text-muted-foreground">
+		<p class="py-6 text-center text-body-small text-on-surface-variant">
 			Powered by <a
 				href="https://cheerpj.com/"
 				rel="noopener noreferrer"
-				class="underline-offset-2 hover:text-foreground hover:underline">CheerpJ</a
+				class="underline-offset-2 hover:text-on-surface hover:underline">CheerpJ</a
 			>
 		</p>
 	</div>

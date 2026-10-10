@@ -19,19 +19,14 @@
 	});
 </script>
 
-<nav aria-labelledby="toc-title" class="sticky top-6 grid gap-2 text-sm">
-	<p
-		id="toc-title"
-		class="mb-1 text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase"
-	>
-		On this page
-	</p>
+<nav aria-labelledby="toc-title" class="sticky top-6 grid gap-2 text-body-medium">
+	<p id="toc-title" class="mb-1 text-label-medium text-on-surface-variant">On this page</p>
 	{#each headings as heading (heading.id)}
 		<a
 			href="#{heading.id}"
 			aria-current={heading.id === active ? 'location' : undefined}
 			class={[
-				'border-l-2 border-transparent py-0.5 text-muted-foreground transition-colors hover:text-foreground aria-[current=location]:border-primary aria-[current=location]:text-foreground',
+				'border-l-2 border-transparent py-0.5 text-on-surface-variant transition-colors hover:text-on-surface aria-[current=location]:border-primary aria-[current=location]:text-on-surface',
 				heading.level === 3 ? 'pl-6' : 'pl-3',
 			]}
 		>

@@ -24,26 +24,26 @@
 	);
 </script>
 
-<p class="px-1 pb-2.5 text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-	Patches from
-</p>
-<ul class="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
+<p class="px-1 pb-2.5 text-label-medium text-on-surface-variant">Patches from</p>
+<ul
+	class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low"
+>
 	{#if patcher.official.status !== 'failed' || !officialAdded}
 		<li class="flex items-center gap-3 px-4 py-3.5 sm:px-5">
 			<div class="min-w-0 flex-1">
-				<p class="font-medium">Official patches</p>
-				<p class="text-sm text-muted-foreground" role="status">
+				<p class="text-title-medium">Official patches</p>
+				<p class="text-body-medium text-on-surface-variant" role="status">
 					{#if patcher.official.status === 'ready'}Reseam · {patcher.official.bundle.version}
 					{:else if patcher.official.status === 'loading'}Downloading…
 					{:else}Could not be downloaded.{/if}
 				</p>
 			</div>
 			{#if patcher.official.status === 'ready'}
-				<span class="inline-flex items-center gap-1.5 text-sm font-medium text-primary"
+				<span class="inline-flex items-center gap-1.5 text-label-large text-primary"
 					><Check size={15} strokeWidth={3} /> Ready</span
 				>
 			{:else if patcher.official.status === 'loading'}
-				<LoaderCircle size={18} class="animate-spin text-muted-foreground" />
+				<LoaderCircle size={18} class="animate-spin text-on-surface-variant" />
 			{:else}
 				<button
 					type="button"
@@ -58,14 +58,14 @@
 		{@const official = bundle?.public_key === OFFICIAL_SIGNER}
 		<li class="flex items-start gap-3 px-4 py-3.5 sm:px-5">
 			<div class="min-w-0 flex-1">
-				<p class="font-medium break-words">{bundle?.name ?? file.name}</p>
-				<p class="text-sm text-muted-foreground">
+				<p class="text-title-medium break-words">{bundle?.name ?? file.name}</p>
+				<p class="text-body-medium text-on-surface-variant">
 					{[bundle?.author && `by ${bundle.author}`, official && 'Official']
 						.filter(Boolean)
 						.join(' · ') || 'Checking bundle…'}
 				</p>
 				{#if bundle?.problem}
-					<p class="mt-1.5 text-sm text-error">
+					<p class="mt-1.5 text-body-medium text-error">
 						{explain(bundle.problem, patcher.patchName) ?? 'This bundle could not be read.'}
 					</p>
 				{:else if bundle && !official}
@@ -75,9 +75,12 @@
 							checked={patcher.trusted.has(bundle.public_key)}
 							onCheckedChange={(value) => patcher.trust(bundle.public_key, value)}
 						/>
-						<Label.Root for="trust-{index}" class="min-w-0 text-sm text-muted-foreground">
+						<Label.Root
+							for="trust-{index}"
+							class="min-w-0 text-body-medium text-on-surface-variant"
+						>
 							I trust this signer. Its patches run code while patching.
-							<code class="mt-1 block font-mono text-xs break-all opacity-70"
+							<code class="mt-1 block font-mono text-mono-xs break-all opacity-70"
 								>{bundle.public_key}</code
 							>
 						</Label.Root>
@@ -96,9 +99,9 @@
 	{/each}
 	<li>
 		<label
-			class="flex cursor-pointer items-center gap-3 px-4 py-3.5 text-sm font-medium transition-colors hover:bg-muted has-focus-visible:bg-muted sm:px-5"
+			class="flex cursor-pointer items-center gap-3 px-4 py-3.5 text-label-large transition-colors hover:bg-surface-container has-focus-visible:bg-surface-container sm:px-5"
 		>
-			<Plus size={16} class="text-muted-foreground" /> Add a patch bundle
+			<Plus size={16} class="text-on-surface-variant" /> Add a patch bundle
 			<input
 				type="file"
 				multiple

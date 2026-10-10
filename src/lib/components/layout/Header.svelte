@@ -30,8 +30,8 @@
 			href={link.href}
 			aria-current={current(link.href) ? 'page' : undefined}
 			class={[
-				'font-medium transition-colors hover:text-foreground aria-[current=page]:text-foreground',
-				mobile ? 'py-3 text-base text-muted-foreground' : 'text-sm text-muted-foreground',
+				'text-label-large text-on-surface-variant transition-colors hover:text-on-surface aria-[current=page]:text-on-surface',
+				mobile && 'py-3',
 			]}
 		>
 			{link.label}
@@ -41,7 +41,7 @@
 
 <Collapsible.Root bind:open={menuOpen}>
 	<header class="container-page flex h-18 items-center gap-6">
-		<a href="/" class="group mr-auto flex items-center gap-2.5 text-lg font-bold tracking-tight">
+		<a href="/" class="group mr-auto flex items-center gap-2.5 text-title-large">
 			<Logo
 				class="size-7 transition-transform duration-300 ease-spring group-hover:scale-110 group-hover:-rotate-6"
 			/>
@@ -57,7 +57,10 @@
 		</div>
 	</header>
 	<Collapsible.Content class="collapsible md:hidden">
-		<nav aria-label="Main" class="container-page flex flex-col border-b border-border pb-3">
+		<nav
+			aria-label="Main"
+			class="container-page flex flex-col border-b border-outline-variant pb-3"
+		>
 			{@render links(true)}
 		</nav>
 	</Collapsible.Content>

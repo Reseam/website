@@ -21,10 +21,10 @@
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-190 gap-5 pt-12 pb-20 sm:pt-16">
-		<h1 class="text-title font-bold">{title}</h1>
-		<p class="-mt-2 mb-4 text-lg text-muted-foreground">{tagline}</p>
+		<h1 class="text-headline-large sm:text-display-medium">{title}</h1>
+		<p class="-mt-2 mb-4 text-body-large text-on-surface-variant">{tagline}</p>
 		{#each screenshots as screenshot (screenshot.src)}
-			<img {...screenshot} class="h-auto w-full rounded-xl border border-border" />
+			<img {...screenshot} class="h-auto w-full rounded-xl border border-outline-variant" />
 		{/each}
 		<Button href={next.href} variant="outline" size="lg" class="mt-4 justify-self-start"
 			>{next.label} <ArrowRight size={17} /></Button

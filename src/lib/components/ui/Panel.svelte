@@ -10,7 +10,10 @@
 
 <section
 	aria-labelledby={labelledby}
-	class={['overflow-hidden rounded-xl border border-border bg-card', className]}
+	class={[
+		'overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low',
+		className,
+	]}
 >
 	{@render children()}
 </section>

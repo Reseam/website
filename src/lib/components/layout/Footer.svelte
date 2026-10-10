@@ -13,16 +13,18 @@
 </script>
 
 <footer class="container-page mt-auto">
-	<div class="flex flex-wrap items-center justify-between gap-4 border-t border-border py-6">
-		<a href="/" class="flex items-center gap-2 text-sm font-semibold">
+	<div
+		class="flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant py-6"
+	>
+		<a href="/" class="flex items-center gap-2 text-label-large">
 			<Logo class="size-5" /> Reseam
 		</a>
 		<nav
 			aria-label="Footer"
-			class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground"
+			class="flex flex-wrap items-center gap-x-5 gap-y-2 text-body-medium text-on-surface-variant"
 		>
 			{#each links as link (link.href)}
-				<a href={link.href} class="transition-colors hover:text-foreground">{link.label}</a>
+				<a href={link.href} class="transition-colors hover:text-on-surface">{link.label}</a>
 			{/each}
 			<IconLink label="Source code" icon={GitBranch} href={SOURCE_URL} />
 		</nav>

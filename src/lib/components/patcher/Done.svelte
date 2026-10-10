@@ -78,12 +78,12 @@
 	/>
 	<PanelSection class="grid grid-cols-1 gap-4">
 		<div
-			class="flex flex-col gap-4 rounded-lg border border-border bg-background px-4 py-3.5 sm:flex-row sm:items-center"
+			class="flex flex-col gap-4 rounded-lg border border-outline-variant bg-surface px-4 py-3.5 sm:flex-row sm:items-center"
 		>
-			<FileArchive size={20} class="hidden shrink-0 text-muted-foreground sm:block" />
+			<FileArchive size={20} class="hidden shrink-0 text-on-surface-variant sm:block" />
 			<div class="min-w-0 flex-1">
-				<p class="truncate text-sm font-medium">{fileName}</p>
-				<p class="text-xs text-muted-foreground">
+				<p class="truncate text-label-large">{fileName}</p>
+				<p class="text-body-small text-on-surface-variant">
 					{megabytes(size)}{split ? ` · ${apks.length} split APKs` : ''}
 				</p>
 			</div>
@@ -94,28 +94,30 @@
 			</Button>
 		</div>
 		{#if split}
-			<p class="text-sm text-muted-foreground">
+			<p class="text-body-medium text-on-surface-variant">
 				Install the .apks file with a split APK installer.
 			</p>
 			<Collapsible.Root>
 				<Collapsible.Trigger
-					class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+					class="text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 					>Download APKs one by one</Collapsible.Trigger
 				>
 				<Collapsible.Content class="collapsible">
-					<ul class="mt-3 divide-y divide-border rounded-md border border-border text-sm">
+					<ul
+						class="mt-3 divide-y divide-outline-variant rounded-md border border-outline-variant text-body-medium"
+					>
 						{#each apks as artifact (artifact.name)}
 							<li>
 								<button
 									type="button"
 									onclick={() => save(artifact.file, apkName(artifact))}
-									class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted"
+									class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container"
 								>
 									<span class="min-w-0 flex-1 truncate">{apkName(artifact)}</span>
-									<span class="text-muted-foreground tabular-nums"
+									<span class="text-on-surface-variant tabular-nums"
 										>{megabytes(artifact.file.size)}</span
 									>
-									<Download size={14} class="text-muted-foreground" />
+									<Download size={14} class="text-on-surface-variant" />
 								</button>
 							</li>
 						{/each}
@@ -125,7 +127,7 @@
 		{/if}
 		{#if newKey}
 			<Callout icon={KeyRound} title="Back up your signing key">
-				<p class="mt-1 text-muted-foreground">
+				<p class="mt-1 text-on-surface-variant">
 					This browser made the key that signed {label}. Updates must be signed with the same key,
 					so keep a copy somewhere safe.
 				</p>

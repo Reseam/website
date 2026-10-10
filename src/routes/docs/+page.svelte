@@ -8,35 +8,37 @@
 
 <PageMeta title="Docs · Reseam" description={data.hub.description} />
 
-<p class="text-sm font-semibold text-primary">Docs</p>
-<h1 class="mt-1 text-title font-bold">{data.hub.title}</h1>
-<div class="mt-4"><DocContent html={data.hub.html} /></div>
+<p class="text-label-large text-primary">Docs</p>
+<h1 class="mt-1 text-headline-large sm:text-display-medium">{data.hub.title}</h1>
+<div class="mt-4"><DocContent html={data.hub.html} variant="lead" /></div>
 
 {#each data.groups as group (group.slug)}
 	<section aria-labelledby="group-{group.slug}" class="mt-12 grid gap-4">
 		<div>
-			<h2 id="group-{group.slug}" class="text-xl font-semibold tracking-tight">{group.label}</h2>
-			<p class="mt-1 text-muted-foreground">{group.summary}</p>
+			<h2 id="group-{group.slug}" class="text-title-large">{group.label}</h2>
+			<p class="mt-1 text-body-large text-on-surface-variant">{group.summary}</p>
 		</div>
-		<ol class="grid overflow-hidden rounded-lg border border-border bg-card xl:grid-cols-2">
+		<ol
+			class="grid overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low xl:grid-cols-2"
+		>
 			{#each group.sections.flatMap((section) => section.pages) as link, index (link.slug)}
-				<li class="-mb-px border-b border-border xl:odd:border-r">
+				<li class="-mb-px border-b border-outline-variant xl:odd:border-r">
 					<a
 						href="/docs/{link.slug}/"
-						class="group flex h-full items-center gap-4 px-5 py-3.5 transition-colors hover:bg-muted"
+						class="group flex h-full items-center gap-4 px-5 py-3.5 transition-colors hover:bg-surface-container"
 					>
-						<span class="w-6 shrink-0 font-mono text-xs font-semibold text-primary tabular-nums"
+						<span class="w-6 shrink-0 font-mono text-mono-xs-semibold text-primary tabular-nums"
 							>{String(index + 1).padStart(2, '0')}</span
 						>
 						<span class="grid min-w-0 flex-1">
-							<span class="font-semibold">{link.title}</span>
-							{#if link.description}<span class="text-sm text-muted-foreground"
+							<span class="text-title-medium">{link.title}</span>
+							{#if link.description}<span class="text-body-medium text-on-surface-variant"
 									>{link.description}</span
 								>{/if}
 						</span>
 						<ChevronRight
 							size={16}
-							class="shrink-0 text-muted-foreground transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-foreground"
+							class="shrink-0 text-on-surface-variant transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-on-surface"
 						/>
 					</a>
 				</li>

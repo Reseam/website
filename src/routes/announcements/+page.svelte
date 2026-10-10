@@ -28,15 +28,17 @@
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-232 gap-6 pt-10 pb-20 sm:pt-14">
-		<h1 class="text-title font-bold">Announcements</h1>
+		<h1 class="text-headline-large sm:text-display-medium">Announcements</h1>
 		{#if tags.length > 0}<TagFilter {tags} bind:value={tag} />{/if}
 		{#if shown.length > 0}
-			<ul class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+			<ul
+				class="divide-y divide-outline-variant overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low"
+			>
 				{#each shown as announcement (announcement.id)}<AnnouncementItem {announcement} />{/each}
 			</ul>
 		{:else}
 			<div
-				class="grid justify-items-center gap-3 rounded-xl border border-dashed border-border px-6 py-16 text-center text-muted-foreground"
+				class="grid justify-items-center gap-3 rounded-xl border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
 			>
 				<Megaphone size={28} class="opacity-40" />
 				<p>{tag ? `No announcements tagged “${tag}”.` : 'No announcements yet.'}</p>

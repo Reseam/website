@@ -12,7 +12,7 @@
 <Checkbox.Root
 	bind:checked
 	class={[
-		'grid size-5 shrink-0 place-items-center rounded-[0.375rem] border-[1.5px] border-muted-foreground transition-colors duration-150 aria-checked:border-primary aria-checked:bg-primary data-disabled:opacity-50',
+		'grid size-5 shrink-0 place-items-center rounded-sm border border-on-surface-variant transition-colors duration-150 aria-checked:border-primary aria-checked:bg-primary data-disabled:opacity-50',
 		className,
 	]}
 	{...rest}
@@ -21,7 +21,7 @@
 		<Check
 			size={14}
 			strokeWidth={3.5}
-			class="text-primary-foreground transition-[opacity,scale] duration-150 {checked
+			class="text-on-primary transition-[opacity,scale] duration-150 {checked
 				? 'scale-100 opacity-100'
 				: 'scale-50 opacity-0'}"
 		/>

@@ -41,7 +41,7 @@
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-232 gap-6 pt-10 pb-20 sm:pt-14">
-		<h1 class="text-title font-bold">Download</h1>
+		<h1 class="text-headline-large sm:text-display-medium">Download</h1>
 
 		<Panel>
 			<PanelHeader
@@ -50,10 +50,10 @@
 				subtitle="Version {version} · Released {shortDate(manager.value.release.created_at)}"
 			/>
 			<PanelSection class="grid gap-3">
-				<p class="font-semibold">{main[0].platform}</p>
+				<p class="text-title-medium">{main[0].platform}</p>
 				{#each main as build (build.id)}
 					<div class="flex flex-wrap items-center gap-4">
-						<p class="min-w-48 flex-1 text-sm text-muted-foreground">{build.detail}</p>
+						<p class="min-w-48 flex-1 text-body-medium text-on-surface-variant">{build.detail}</p>
 						<Button
 							href={build.url}
 							size="lg"
@@ -63,16 +63,16 @@
 					</div>
 				{/each}
 				{#if main[0].platform === 'Android'}
-					<p class="text-sm text-muted-foreground">
+					<p class="text-body-medium text-on-surface-variant">
 						Your phone may ask you to allow installs from your browser.
 					</p>
 				{/if}
 			</PanelSection>
 			<PanelSection class="grid gap-3">
-				<p class="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-					Other downloads
-				</p>
-				<ul class="divide-y divide-border overflow-hidden rounded-lg border border-border">
+				<p class="text-label-medium text-on-surface-variant">Other downloads</p>
+				<ul
+					class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant"
+				>
 					{#each others as build (build.id)}<DownloadRow
 							title={build.platform}
 							detail={build.detail}
@@ -91,23 +91,26 @@
 				)} · For patch authors"
 			/>
 			<PanelSection class="grid gap-3">
-				<ul class="divide-y divide-border overflow-hidden rounded-lg border border-border">
+				<ul
+					class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant"
+				>
 					{#each data.cli.builds as build (build.url)}<DownloadRow
 							title={build.platform}
 							detail="64-bit"
 							href={build.url}
 						/>{/each}
 				</ul>
-				<p class="text-sm text-muted-foreground">Needs 64-bit Java 17 or newer.</p>
+				<p class="text-body-medium text-on-surface-variant">Needs 64-bit Java 17 or newer.</p>
 			</PanelSection>
-			<PanelSection class="flex flex-wrap items-center justify-between gap-3 py-4 text-sm">
-				<span class="text-muted-foreground">New to the CLI?</span>
+			<PanelSection class="flex flex-wrap items-center justify-between gap-3 py-4 text-body-medium">
+				<span class="text-on-surface-variant">New to the CLI?</span>
 				<span class="flex gap-5">
-					<a href="/docs/cli/install/" class="font-medium transition-colors hover:text-primary"
+					<a href="/docs/cli/install/" class="text-label-large transition-colors hover:text-primary"
 						>Install guide</a
 					>
-					<a href={data.cli.releasesUrl} class="font-medium transition-colors hover:text-primary"
-						>All releases</a
+					<a
+						href={data.cli.releasesUrl}
+						class="text-label-large transition-colors hover:text-primary">All releases</a
 					>
 				</span>
 			</PanelSection>

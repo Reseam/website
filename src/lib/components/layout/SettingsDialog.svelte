@@ -24,7 +24,7 @@
 
 <Dialog bind:open title="Settings">
 	<form id="settings-form" onsubmit={save} novalidate class="grid gap-2">
-		<Label.Root for="api-url" class="text-sm font-medium">API server</Label.Root>
+		<Label.Root for="api-url" class="text-label-large">API server</Label.Root>
 		<input
 			id="api-url"
 			type="url"
@@ -34,11 +34,11 @@
 			aria-describedby="api-url-help"
 			class="field"
 		/>
-		<p id="api-url-help" class="text-sm text-muted-foreground">
+		<p id="api-url-help" class="text-body-medium text-on-surface-variant">
 			Where this site gets patches, downloads and announcements. Leave it as is unless you run your
 			own Reseam API. Saved in this browser only.
 		</p>
-		{#if error}<p class="text-sm text-error" role="alert">{error}</p>{/if}
+		{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
 	</form>
 	{#snippet footer()}
 		<Button variant="ghost" class="mr-auto" onclick={() => (value = DEFAULT_API_URL)}>Reset</Button>

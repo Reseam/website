@@ -39,24 +39,26 @@
 			/>
 			<div class="min-w-0 flex-1">
 				<div class="flex flex-wrap items-center gap-2">
-					<Label.Root for="patch-{key}" class="cursor-pointer font-semibold"
+					<Label.Root for="patch-{key}" class="cursor-pointer text-title-medium"
 						>{patch.name}</Label.Root
 					>
 					{#if patch.compatibility.kind === 'universal'}<Badge>Any app</Badge>{/if}
 				</div>
-				<div id="patch-{key}-about" class="text-sm text-muted-foreground">
+				<div id="patch-{key}-about" class="text-body-medium text-on-surface-variant">
 					{#if patch.description}<p class="mt-0.5">{patch.description}</p>{/if}
 					{#if included}
-						<p class="mt-1 text-xs">Included for {requiredBy.map(patcher.patchName).join(', ')}</p>
+						<p class="mt-1 text-body-small">
+							Included for {requiredBy.map(patcher.patchName).join(', ')}
+						</p>
 					{:else if !available}
-						<p class="mt-1 text-xs">Not made for this app version</p>
+						<p class="mt-1 text-body-small">Not made for this app version</p>
 					{/if}
 				</div>
 				{#if running && patch.options.length > 0}
 					<Collapsible.Trigger
 						class={[
-							'group mt-2 inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-foreground',
-							errors > 0 ? 'text-error' : 'text-muted-foreground',
+							'group mt-2 inline-flex items-center gap-1.5 text-label-medium transition-colors hover:text-on-surface',
+							errors > 0 ? 'text-error' : 'text-on-surface-variant',
 						]}
 					>
 						<Settings2 size={13} />
@@ -72,7 +74,7 @@
 			</div>
 		</div>
 		<Collapsible.Content class="collapsible">
-			<div class="mt-3 grid gap-4 rounded-md bg-muted p-4 sm:ml-8.5">
+			<div class="mt-3 grid gap-4 rounded-md bg-surface-container p-4 sm:ml-8.5">
 				{#each patch.options as option (option.key)}
 					<OptionField
 						{option}

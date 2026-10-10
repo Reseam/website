@@ -10,12 +10,12 @@
 
 <a
 	href="/announcements/{announcement.id}/"
-	class="group flex items-center justify-center gap-3 border-b border-border bg-primary/5 px-4 py-2.5 text-sm transition-colors hover:bg-primary/10"
+	class="group flex items-center justify-center gap-3 border-b border-outline-variant bg-surface-container px-4 py-2.5 transition-colors hover:bg-surface-container-high"
 >
 	<Badge tone={level.tone}>{level.label}</Badge>
-	<span class="min-w-0 truncate font-medium">{announcement.title}</span>
+	<span class="min-w-0 truncate text-label-large text-on-surface">{announcement.title}</span>
 	<span
-		class="hidden shrink-0 items-center gap-1 text-muted-foreground transition-colors group-hover:text-foreground sm:inline-flex"
+		class="hidden shrink-0 items-center gap-1 text-body-medium text-on-surface-variant transition-colors group-hover:text-on-surface sm:inline-flex"
 	>
 		Read <ArrowRight
 			size={14}

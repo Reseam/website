@@ -47,7 +47,7 @@
 				open={query.trim() !== '' || current.startsWith(`${group.slug}/`) || current === ''}
 			>
 				<Collapsible.Trigger
-					class="group flex w-full items-center justify-between rounded-sm px-2.5 py-2 text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+					class="group flex w-full items-center justify-between rounded-sm px-2.5 py-2 text-label-large text-on-surface-variant transition-colors hover:text-on-surface"
 				>
 					{group.label}
 					<ChevronRight
@@ -58,19 +58,17 @@
 				<Collapsible.Content class="collapsible">
 					{#each group.sections as section (section.label)}
 						{#if section.label !== 'Guide'}
-							<p
-								class="mt-3 mb-1 ml-5 text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground uppercase"
-							>
+							<p class="mt-3 mb-1 ml-3 text-label-large text-on-surface-variant">
 								{section.label}
 							</p>
 						{/if}
-						<ul class="ml-3 grid gap-px border-l border-border pb-2 pl-2">
+						<ul class="ml-3 grid gap-px border-l border-outline-variant pb-2 pl-2">
 							{#each section.pages as link (link.slug)}
 								<li>
 									<a
 										href="/docs/{link.slug}/"
 										aria-current={link.slug === current ? 'page' : undefined}
-										class="block rounded-sm px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
+										class="block rounded-sm px-3 py-1.5 text-body-medium text-on-surface-variant transition-colors hover:text-on-surface aria-[current=page]:bg-surface-container aria-[current=page]:text-on-surface"
 									>
 										{link.title}
 									</a>
@@ -81,7 +79,9 @@
 				</Collapsible.Content>
 			</Collapsible.Root>
 		{:else}
-			<p class="px-2.5 py-4 text-sm text-muted-foreground">No pages match “{query.trim()}”.</p>
+			<p class="px-2.5 py-4 text-body-medium text-on-surface-variant">
+				No pages match “{query.trim()}”.
+			</p>
 		{/each}
 	</nav>
 {/snippet}
@@ -94,7 +94,7 @@
 
 <Collapsible.Root bind:open={menuOpen} class="lg:hidden">
 	<Collapsible.Trigger
-		class="group flex w-full items-center justify-between rounded-md border border-border bg-card px-4 py-2.5 text-sm font-medium"
+		class="group flex w-full items-center justify-between rounded-md border border-outline-variant bg-surface-container-low px-4 py-2.5 text-label-large"
 	>
 		{currentTitle}
 		<ChevronDown

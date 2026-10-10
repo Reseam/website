@@ -81,7 +81,7 @@
 >
 	{#if pending}
 		<Callout icon={TriangleAlert} tone="warning" title="Replace the current key?">
-			<p class="mt-1 text-muted-foreground">
+			<p class="mt-1 text-on-surface-variant">
 				Apps patched with the current key can then only be updated after uninstalling them, unless
 				you keep its backup.
 			</p>
@@ -92,7 +92,7 @@
 		</Callout>
 	{:else if forgetting}
 		<Callout icon={TriangleAlert} tone="warning" title="Forget this key?">
-			<p class="mt-1 text-muted-foreground">
+			<p class="mt-1 text-on-surface-variant">
 				A new key is made on the next patch. Apps signed with this one can then only be updated
 				after uninstalling them.
 			</p>
@@ -103,12 +103,8 @@
 		</Callout>
 	{:else if patcher.signingKey}
 		<div class="grid gap-1.5">
-			<p class="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-				Certificate SHA-256
-			</p>
-			<code class="font-mono text-xs leading-relaxed break-all"
-				>{patcher.signingKey.fingerprint}</code
-			>
+			<p class="text-label-medium text-on-surface-variant">Certificate SHA-256</p>
+			<code class="font-mono text-mono-xs break-all">{patcher.signingKey.fingerprint}</code>
 		</div>
 		<div class="flex flex-wrap gap-2">
 			<Button size="sm" onclick={backup}>Download backup</Button>
@@ -116,11 +112,11 @@
 			<Button size="sm" variant="ghost" onclick={() => (forgetting = true)}>Forget</Button>
 		</div>
 	{:else}
-		<p class="text-sm">No key yet. One is made the first time you patch.</p>
+		<p class="text-body-medium">No key yet. One is made the first time you patch.</p>
 		<div>{@render importButton()}</div>
 	{/if}
-	{#if error}<p class="text-sm text-error" role="alert">{error}</p>{/if}
-	<p class="text-xs text-muted-foreground">
+	{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
+	<p class="text-body-small text-on-surface-variant">
 		Import the backup .zip, or a .pk8 key with its .der certificate.
 	</p>
 </Dialog>

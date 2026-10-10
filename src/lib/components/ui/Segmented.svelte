@@ -19,12 +19,12 @@
 	value={value ?? ''}
 	onValueChange={(next) => next && onchange(next as T)}
 	aria-label={label}
-	class="flex h-9 shrink-0 rounded-md border border-border p-[3px]"
+	class="flex h-9 shrink-0 rounded-md border border-outline-variant p-[3px]"
 >
 	{#each options as option (option.value)}
 		<ToggleGroup.Item
 			value={option.value}
-			class="flex-1 rounded-sm px-3 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground data-[state=on]:bg-muted data-[state=on]:text-foreground"
+			class="flex-1 rounded-sm px-3 text-body-medium text-on-surface-variant transition-colors duration-150 hover:text-on-surface data-[state=on]:bg-surface-container data-[state=on]:text-on-surface"
 		>
 			{option.label}
 		</ToggleGroup.Item>

@@ -29,7 +29,7 @@
 		'grid cursor-pointer justify-items-center gap-2 rounded-xl border-2 border-dashed px-6 py-14 text-center transition-colors duration-200 has-focus-visible:border-primary sm:py-16',
 		dragging
 			? 'border-primary bg-primary/5'
-			: 'border-border hover:border-primary/50 hover:bg-primary/[0.03]',
+			: 'border-outline-variant hover:border-primary/50 hover:bg-primary/[0.03]',
 	]}
 >
 	<Upload
@@ -40,8 +40,10 @@
 			dragging && '-translate-y-1 scale-110',
 		]}
 	/>
-	<span class="text-lg font-semibold">Drop an APK, APKM or XAPK</span>
-	<span class="text-sm text-muted-foreground">Split APKs and patch bundles can come along.</span>
+	<span class="text-title-medium">Drop an APK, APKM or XAPK</span>
+	<span class="text-body-medium text-on-surface-variant"
+		>Split APKs and patch bundles can come along.</span
+	>
 	<span class="mt-3 {buttonClass('outline', 'sm')}">Choose file</span>
 	<input
 		type="file"

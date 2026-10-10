@@ -2,11 +2,15 @@
 	let { class: className, apart = false }: { class?: string; apart?: boolean } = $props();
 </script>
 
-<svg viewBox="200 200 620 620" aria-hidden="true" class={['overflow-visible', className]}>
+<svg
+	viewBox="306.87 306.58 410.66 410.66"
+	aria-hidden="true"
+	class={['overflow-visible', className]}
+>
 	<path
 		class={[
-			'fill-primary-deep transition-transform duration-700 ease-emphasized',
-			apart && '-translate-x-12 translate-y-8 -rotate-6',
+			'fill-logo-original transition-transform duration-700 ease-emphasized',
+			apart && '-translate-x-8 translate-y-5 -rotate-6',
 		]}
 		style:transform-box="fill-box"
 		style:transform-origin="center"
@@ -14,8 +18,8 @@
 	/>
 	<path
 		class={[
-			'fill-primary transition-transform duration-700 ease-emphasized',
-			apart && 'translate-x-14 -translate-y-9 rotate-8',
+			'fill-logo-patch transition-transform duration-700 ease-emphasized',
+			apart && 'translate-x-9 -translate-y-6 rotate-8',
 		]}
 		style:transform-box="fill-box"
 		style:transform-origin="center"

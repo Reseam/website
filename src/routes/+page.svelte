@@ -15,8 +15,10 @@
 	class="container-page grid items-center gap-12 py-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:py-20"
 >
 	<div class="text-center lg:text-left">
-		<h1 class="text-display font-bold">A better way to use your apps.</h1>
-		<p class="mx-auto mt-6 mb-9 max-w-md text-lg text-muted-foreground lg:mx-0">
+		<h1 class="text-display-small lg:text-display-large">A better way to use your apps.</h1>
+		<p
+			class="mx-auto mt-5 mb-12 max-w-xs text-body-large text-on-surface-variant lg:mx-0 lg:max-w-100"
+		>
 			Add new features or remove annoyances from the apps you use every day. No technical skills
 			required.
 		</p>
@@ -31,15 +33,17 @@
 <Steps />
 
 <section aria-labelledby="get" class="container-page">
-	<div class="flex flex-wrap items-center justify-between gap-8 border-t border-border py-16">
+	<div
+		class="flex flex-wrap items-center justify-between gap-8 border-t border-outline-variant py-16"
+	>
 		<div>
-			<h2 id="get" class="text-3xl font-bold tracking-tight sm:text-4xl">Get Reseam Manager</h2>
-			<p class="mt-2 text-muted-foreground">For Android, Windows and Linux.</p>
-			<p class="mt-4 text-sm text-muted-foreground">
+			<h2 id="get" class="text-headline-medium sm:text-display-small">Get Reseam Manager</h2>
+			<p class="mt-2 text-body-large text-on-surface-variant">For Android, Windows and Linux.</p>
+			<p class="mt-4 text-body-medium text-on-surface-variant">
 				Can't install it?
 				<a
 					href="/patch/"
-					class="text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary"
+					class="text-on-surface underline decoration-outline-variant underline-offset-4 transition-colors hover:decoration-primary"
 					>Patch in your browser</a
 				>. It's slower.
 			</p>

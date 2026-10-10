@@ -63,8 +63,10 @@
 	</Panel>
 {:else}
 	<Panel labelledby="patches-title">
-		<div class="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
-			<h2 id="patches-title" class="mr-auto font-semibold">Patches</h2>
+		<div
+			class="flex flex-wrap items-center gap-3 border-b border-outline-variant px-5 py-4 sm:px-6"
+		>
+			<h2 id="patches-title" class="mr-auto text-title-medium">Patches</h2>
 			<Segmented
 				label="Select patches"
 				value={activePreset}
@@ -73,7 +75,7 @@
 			/>
 		</div>
 		{#if mismatched}
-			<div class="border-b border-border px-5 py-4 sm:px-6">
+			<div class="border-b border-outline-variant px-5 py-4 sm:px-6">
 				<Callout icon={TriangleAlert} tone="warning">
 					<p>
 						Some patches are not made for {apk?.version_name
@@ -90,7 +92,7 @@
 							checked={patcher.ignoreVersions}
 							onCheckedChange={(value) => patcher.allowAnyVersion(value)}
 						/>
-						<Label.Root for="any-version" class="text-muted-foreground"
+						<Label.Root for="any-version" class="text-on-surface-variant"
 							>Use them anyway. They may not work.</Label.Root
 						>
 					</div>
@@ -98,15 +100,15 @@
 			</div>
 		{/if}
 		{#if patcher.listed.length > 8}
-			<div class="border-b border-border px-5 py-3 sm:px-6">
+			<div class="border-b border-outline-variant px-5 py-3 sm:px-6">
 				<SearchField bind:value={query} label="Search patches" />
 			</div>
 		{/if}
-		<ul class="divide-y divide-border">
+		<ul class="divide-y divide-outline-variant">
 			{#each visible as patch (reference(patch))}
 				<PatchRow {patcher} {patch} />
 			{:else}
-				<li class="px-6 py-10 text-center text-sm text-muted-foreground">
+				<li class="px-6 py-10 text-center text-body-medium text-on-surface-variant">
 					No patches match “{query.trim()}”.
 				</li>
 			{/each}

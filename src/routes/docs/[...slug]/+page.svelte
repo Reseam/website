@@ -19,13 +19,13 @@
 <div class="grid grid-cols-1 items-start gap-16 xl:grid-cols-[minmax(0,1fr)_15rem]">
 	<article class="grid grid-cols-1 gap-6">
 		<header>
-			<p class="text-sm font-semibold text-primary">{group?.label}</p>
-			<h1 class="mt-1 text-title font-bold">{page.title}</h1>
+			<p class="text-label-large text-primary">{group?.label}</p>
+			<h1 class="mt-1 text-headline-large sm:text-display-medium">{page.title}</h1>
 		</header>
 		<DocContent html={page.html} />
 		<a
 			href={page.editUrl}
-			class="inline-flex items-center gap-1.5 justify-self-start text-sm text-muted-foreground transition-colors hover:text-foreground"
+			class="inline-flex items-center gap-1.5 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 		>
 			<Pencil size={14} /> Edit this page
 		</a>

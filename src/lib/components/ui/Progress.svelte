@@ -8,7 +8,7 @@
 	{value}
 	max={100}
 	aria-label={label}
-	class="h-1.5 overflow-hidden rounded-full bg-muted"
+	class="h-1.5 overflow-hidden rounded-full bg-surface-container"
 >
 	{#if value === null}
 		<div class="h-full w-1/3 animate-indeterminate rounded-full bg-primary"></div>

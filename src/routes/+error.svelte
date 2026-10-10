@@ -17,9 +17,11 @@
 	class="container-page grid flex-1 place-content-center justify-items-center gap-3 py-20 text-center"
 >
 	<Logo class="mb-4 size-28" {apart} />
-	<p class="text-sm font-bold tracking-[0.2em] text-primary">{page.status}</p>
-	<h1 class="text-title font-bold">{missing ? 'Page not found' : 'Something went wrong'}</h1>
-	<p class="text-lg text-muted-foreground">
+	<p class="text-label-large text-primary">{page.status}</p>
+	<h1 class="text-headline-large sm:text-display-medium">
+		{missing ? 'Page not found' : 'Something went wrong'}
+	</h1>
+	<p class="text-body-large text-on-surface-variant">
 		{missing ? "This page doesn't exist or has moved." : page.error?.message}
 	</p>
 	<div class="mt-5 flex flex-wrap justify-center gap-3">

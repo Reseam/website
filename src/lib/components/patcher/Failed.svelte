@@ -32,12 +32,14 @@
 		subtitle={failed.length > 0 ? `${plural(failed.length, 'patch', 'patches')} failed` : undefined}
 	/>
 	<PanelSection class="grid grid-cols-1 gap-4">
-		<p class="text-sm">{message}</p>
+		<p class="text-body-medium">{message}</p>
 		{#if failed.length > 0}
-			<ul class="divide-y divide-border rounded-md border border-border text-sm">
+			<ul
+				class="divide-y divide-outline-variant rounded-md border border-outline-variant text-body-medium"
+			>
 				{#each failed as { reference, reason } (reference)}
 					<li class="px-4 py-3">
-						<p class="font-medium">{patcher.patchName(reference)}</p>
+						<p class="text-label-large">{patcher.patchName(reference)}</p>
 						{#if reason}<p class="mt-1 line-clamp-3 break-words text-error">{reason}</p>{/if}
 					</li>
 				{/each}

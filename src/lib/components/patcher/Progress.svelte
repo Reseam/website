@@ -59,13 +59,13 @@
 			.join(' · ')}
 	>
 		{#snippet aside()}<span
-				class="font-mono text-sm text-muted-foreground tabular-nums"
+				class="font-mono text-mono-sm text-on-surface-variant tabular-nums"
 				aria-hidden="true">{duration(now)}</span
 			>{/snippet}
 	</PanelHeader>
 	<PanelSection class="grid gap-5">
 		<ProgressBar value={percent} label="Patching progress" />
-		<ol class="grid gap-3.5 text-[0.95rem]" aria-live="polite">
+		<ol class="grid gap-3.5 text-body-large" aria-live="polite">
 			{#each STAGES as entry, position (entry.stage)}
 				{@const time = spent(position)}
 				<li class="grid grid-cols-[1.25rem_1fr_auto] items-start gap-3.5">
@@ -75,13 +75,14 @@
 								size={16}
 								class="animate-spin text-primary"
 							/>
-						{:else}<span class="size-1.5 rounded-full bg-border"></span>{/if}
+						{:else}<span class="size-1.5 rounded-full bg-outline-variant"></span>{/if}
 					</span>
 					<span class="min-w-0">
-						<span class={position > index ? 'text-muted-foreground' : undefined}>{entry.label}</span
+						<span class={position > index ? 'text-on-surface-variant' : undefined}
+							>{entry.label}</span
 						>
 						{#if entry.stage === 'applying' && position === index}
-							<span class="block truncate text-sm text-muted-foreground"
+							<span class="block truncate text-body-medium text-on-surface-variant"
 								>{finished} of {total}{current ? ` · ${current}` : ''}</span
 							>
 						{/if}
@@ -89,8 +90,8 @@
 					{#if time !== null && (position === index || time >= 100)}
 						<span
 							class={[
-								'text-sm tabular-nums',
-								position === index ? 'text-foreground' : 'text-muted-foreground',
+								'text-body-medium tabular-nums',
+								position === index ? 'text-on-surface' : 'text-on-surface-variant',
 							]}>{duration(time)}</span
 						>
 					{/if}

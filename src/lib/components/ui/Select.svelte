@@ -32,22 +32,22 @@
 		{id}
 		aria-invalid={invalid || undefined}
 		aria-describedby={describedby}
-		class="field flex items-center justify-between gap-2 text-left data-placeholder:text-muted-foreground"
+		class="field flex items-center justify-between gap-2 text-left data-placeholder:text-on-surface-variant"
 	>
 		<span class="truncate">{value || placeholder}</span>
-		<ChevronsUpDown size={15} class="shrink-0 text-muted-foreground" />
+		<ChevronsUpDown size={15} class="shrink-0 text-on-surface-variant" />
 	</Select.Trigger>
 	<Select.Portal>
 		<Select.Content
 			sideOffset={6}
-			class="z-50 max-h-72 w-(--bits-select-anchor-width) overflow-hidden rounded-md border border-border bg-card shadow-float transition-[opacity,scale] duration-150 data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0"
+			class="z-50 max-h-72 w-(--bits-select-anchor-width) overflow-hidden rounded-md border border-outline-variant bg-surface-container-low shadow-elevation-3 transition-[opacity,scale] duration-150 data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0"
 		>
 			<Select.Viewport class="p-1">
 				{#each items as item (item)}
 					<Select.Item
 						value={item}
 						label={item}
-						class="flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-sm outline-none data-highlighted:bg-muted"
+						class="flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-body-medium outline-none data-highlighted:bg-surface-container"
 					>
 						{#snippet children({ selected })}
 							<span class="truncate">{item}</span>

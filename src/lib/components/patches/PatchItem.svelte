@@ -11,18 +11,20 @@
 
 <li class="grid gap-1 px-5 py-4 sm:px-6">
 	<div class="flex flex-wrap items-center gap-2.5">
-		<h3 class="font-semibold">{patch.name}</h3>
+		<h3 class="text-title-medium">{patch.name}</h3>
 		{#if !patch.enabled_by_default}<Badge>Optional</Badge>{/if}
 	</div>
-	{#if patch.description}<p class="max-w-[90ch] text-sm text-muted-foreground">
+	{#if patch.description}<p class="max-w-[90ch] text-body-medium text-on-surface-variant">
 			{patch.description}
 		</p>{/if}
 	<Collapsible.Root>
-		<div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+		<div
+			class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-small text-on-surface-variant"
+		>
 			<span class="tabular-nums">{versionText(patch.versions)}</span>
 			{#if patch.options.length > 0}
 				<Collapsible.Trigger
-					class="group inline-flex items-center gap-1 font-medium text-foreground transition-colors hover:text-primary"
+					class="group inline-flex items-center gap-1 text-label-medium text-on-surface transition-colors hover:text-primary"
 				>
 					{plural(patch.options.length, 'setting')}
 					<ChevronDown
