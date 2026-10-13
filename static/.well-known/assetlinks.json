@@ -1,0 +1,12 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "app.reseam.manager",
+			"sha256_cert_fingerprints": [
+				"54:77:95:0E:7C:C3:C5:B2:95:4C:7B:E9:48:4E:4B:14:2F:30:EA:7E:B5:90:B5:91:58:23:05:ED:FE:9D:B1:AF"
+			]
+		}
+	}
+]
