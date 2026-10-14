@@ -12,7 +12,7 @@ export function managerBuilds(apiUrl: string, version: string): ManagerBuild[] {
 		id: `android-${abi}`,
 		platform: 'Android',
 		detail,
-		url: file(`composeApp-${abi}-release.apk`),
+		url: file(`reseam-manager-${version}-${abi}.apk`),
 	});
 	return [
 		android('arm64-v8a', '64-bit ARM, most phones'),

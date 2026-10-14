@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GitBranch from '@lucide/svelte/icons/git-branch';
-	import { SOURCE_URL } from '#lib/site.ts';
+	import { DISCORD_URL, SOURCE_URL } from '#lib/site.ts';
+	import DiscordIcon from './DiscordIcon.svelte';
 	import IconLink from './IconLink.svelte';
 	import Logo from './Logo.svelte';
 
@@ -26,6 +27,7 @@
 			{#each links as link (link.href)}
 				<a href={link.href} class="transition-colors hover:text-on-surface">{link.label}</a>
 			{/each}
+			<IconLink label="Discord" icon={DiscordIcon} href={DISCORD_URL} />
 			<IconLink label="Source code" icon={GitBranch} href={SOURCE_URL} />
 		</nav>
 	</div>
