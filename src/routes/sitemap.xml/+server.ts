@@ -4,7 +4,15 @@ import { SITE_URL } from '#lib/site.ts';
 
 export const prerender = true;
 
-const PAGES = ['/', '/patches/', '/patch/', '/download/', '/docs/', '/announcements/'];
+const PAGES = [
+	'/',
+	'/patches/',
+	'/patch/',
+	'/download/',
+	'/docs/',
+	'/announcements/',
+	'/donations/',
+];
 
 export async function GET() {
 	const today = new Date().toISOString().slice(0, 10);

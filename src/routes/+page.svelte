@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import Heart from '@lucide/svelte/icons/heart';
+	import CallToAction from '#lib/components/home/CallToAction.svelte';
 	import HeroDemo from '#lib/components/home/HeroDemo.svelte';
 	import Steps from '#lib/components/home/Steps.svelte';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
@@ -32,22 +34,31 @@
 
 <Steps />
 
-<section aria-labelledby="get" class="container-page">
-	<div
-		class="flex flex-wrap items-center justify-between gap-8 border-t border-outline-variant py-16"
-	>
-		<div>
-			<h2 id="get" class="text-headline-medium sm:text-display-small">Get Reseam Manager</h2>
-			<p class="mt-2 text-body-large text-on-surface-variant">For Android, Windows and Linux.</p>
-			<p class="mt-4 text-body-medium text-on-surface-variant">
-				Can't install it?
-				<a
-					href="/patch/"
-					class="text-on-surface underline decoration-outline-variant underline-offset-4 transition-colors hover:decoration-primary"
-					>Patch in your browser</a
-				>. It's slower.
-			</p>
-		</div>
+<CallToAction id="get" title="Get Reseam Manager" subtitle="For Android, Windows and Linux.">
+	<p class="mt-4 text-body-medium text-on-surface-variant">
+		Can't install it?
+		<a
+			href="/patch/"
+			class="text-on-surface underline decoration-outline-variant underline-offset-4 transition-colors hover:decoration-primary"
+			>Patch in your browser</a
+		>. It's slower.
+	</p>
+	{#snippet action()}
 		<Button href="/download/" size="lg">Download <ArrowRight size={18} /></Button>
-	</div>
-</section>
+	{/snippet}
+</CallToAction>
+
+<CallToAction
+	id="support"
+	title="Support Reseam"
+	subtitle="Donations pay for the server, the domains and other resources."
+>
+	{#snippet action()}
+		<Button href="/donations/" size="lg" variant="outline" class="group">
+			<Heart
+				size={17}
+				class="text-primary transition-transform duration-300 ease-spring group-hover:scale-125"
+			/> Donate
+		</Button>
+	{/snippet}
+</CallToAction>

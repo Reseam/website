@@ -206,6 +206,35 @@
 			translate: 300% 0;
 		}
 	}
+
+	--animate-heartbeat: heartbeat 1.6s var(--ease-emphasized) infinite;
+	@keyframes heartbeat {
+		0%,
+		30%,
+		60%,
+		100% {
+			scale: 1;
+		}
+		15% {
+			scale: 1.15;
+		}
+		45% {
+			scale: 1.1;
+		}
+	}
+
+	--animate-heart-ring: heart-ring 1.6s var(--ease-emphasized) infinite;
+	@keyframes heart-ring {
+		from {
+			scale: 1;
+			opacity: 0.6;
+		}
+		60%,
+		to {
+			scale: 1.7;
+			opacity: 0;
+		}
+	}
 }
 
 @utility container-page {
