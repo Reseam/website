@@ -463,9 +463,7 @@ export class Patcher {
 					this.phase.current = this.patchName(event.patch);
 				return;
 			case 'patch_finished': {
-				// The engine reports every patch in its bundles; only this run's listed patches matter,
-				// plus any hidden dependency that failed.
-				const listed = this.running.has(event.patch) && !this.isHidden(event.patch);
+				const listed = !this.isHidden(event.patch);
 				if (!listed && event.status.kind !== 'failed') return;
 				this.runs.push({ reference: event.patch, status: event.status });
 				this.write(this.describeRun(event.patch, event.status));
