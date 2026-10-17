@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Download from '@lucide/svelte/icons/download';
+	import KeyRound from '@lucide/svelte/icons/key-round';
 	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 	import { onMount } from 'svelte';
 	import { fetchManager } from '#lib/api.ts';
@@ -34,7 +35,7 @@
 
 <PageMeta
 	title="Download · Reseam"
-	description="Download Reseam Manager for Android, Windows and Linux, or the Reseam CLI."
+	description="Download Reseam Manager for Android, Windows and Linux, GmsCore, or the Reseam CLI."
 />
 
 {#snippet logo()}<Logo class="size-7" />{/snippet}
@@ -75,6 +76,30 @@
 				>
 					{#each others as build (build.id)}<DownloadRow
 							title={build.platform}
+							detail={build.detail}
+							href={build.url}
+						/>{/each}
+				</ul>
+			</PanelSection>
+		</Panel>
+
+		<Panel labelledby="gmscore">
+			<PanelHeader
+				id="gmscore"
+				icon={KeyRound}
+				title="GmsCore"
+				subtitle="Version {data.gmscore.version} · Released {shortDate(data.gmscore.publishedAt)}"
+			/>
+			<PanelSection class="grid gap-3">
+				<p class="text-body-medium text-on-surface-variant">
+					Patched apps that sign in with a Google account need GmsCore. It installs next to
+					Google Play Services and doesn't replace it.
+				</p>
+				<ul
+					class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant"
+				>
+					{#each data.gmscore.builds as build (build.url)}<DownloadRow
+							title={build.title}
 							detail={build.detail}
 							href={build.url}
 						/>{/each}

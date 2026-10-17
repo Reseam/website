@@ -1,7 +1,7 @@
 import { FORGE_API, FORGE_BASE } from '#lib/docs/sources.ts';
 import { manager } from '#lib/server/api.ts';
 
-type CliRelease = { tag_name: string; published_at: string; assets: { name: string }[] };
+type Release = { tag_name: string; published_at: string; assets: { name: string }[] };
 
 const CLI_BUILDS: Record<string, string> = {
 	'reseam-linux-x64': 'Linux',
@@ -10,21 +10,44 @@ const CLI_BUILDS: Record<string, string> = {
 
 // Prerendered: Forgejo does not allow cross-origin requests from browsers.
 export async function load({ fetch }) {
-	const response = await fetch(`${FORGE_API}/repos/reseam/reseam/releases/latest`);
-	if (!response.ok) throw new Error(`CLI release lookup returned ${response.status}`);
-	const release: CliRelease = await response.json();
+	const latest = async (repo: string): Promise<Release> => {
+		const response = await fetch(`${FORGE_API}/repos/reseam/${repo}/releases/latest`);
+		if (!response.ok) throw new Error(`${repo} release lookup returned ${response.status}`);
+		return response.json();
+	};
+	const [cli, gmscore] = await Promise.all([latest('reseam'), latest('gmscore')]);
+	const gmscoreVersion = gmscore.tag_name.replace(/^v/, '');
+	const gmscoreFile = (name: string) =>
+		`https://cdn.reseam.app/gmscore/${encodeURIComponent(gmscore.tag_name)}/${name}`;
 	return {
 		manager: await manager(),
 		cli: {
-			version: release.tag_name.replace(/^v/, ''),
-			publishedAt: release.published_at,
+			version: cli.tag_name.replace(/^v/, ''),
+			publishedAt: cli.published_at,
 			releasesUrl: `${FORGE_BASE}/reseam/reseam/releases`,
-			builds: release.assets
+			builds: cli.assets
 				.filter((asset) => asset.name in CLI_BUILDS)
 				.map((asset) => ({
 					platform: CLI_BUILDS[asset.name],
-					url: `https://cdn.reseam.app/engine/${encodeURIComponent(release.tag_name)}/${asset.name}`,
+					url: `https://cdn.reseam.app/engine/${encodeURIComponent(cli.tag_name)}/${asset.name}`,
 				})),
+		},
+		// File names as the GmsCore release workflow uploads them.
+		gmscore: {
+			version: gmscoreVersion,
+			publishedAt: gmscore.published_at,
+			builds: [
+				{
+					title: 'Android',
+					detail: 'Most phones',
+					url: gmscoreFile(`reseam-gmscore-${gmscoreVersion}.apk`),
+				},
+				{
+					title: 'Huawei',
+					detail: 'Huawei phones',
+					url: gmscoreFile(`reseam-gmscore-${gmscoreVersion}-huawei.apk`),
+				},
+			],
 		},
 	};
 }
