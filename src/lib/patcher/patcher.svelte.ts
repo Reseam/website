@@ -472,6 +472,14 @@ export class Patcher {
 				this.phase.total = Math.max(this.phase.total, this.phase.finished);
 				return;
 			}
+			case 'patches_reverted': {
+				const reverted = new Set(event.patches);
+				const listed = this.runs.filter((run) => reverted.has(run.reference) && !this.isHidden(run.reference));
+				this.runs = this.runs.filter((run) => !reverted.has(run.reference));
+				this.write(`Running ${event.patches.length} patches again`);
+				if (this.phase.name === 'patching') this.phase.finished -= listed.length;
+				return;
+			}
 		}
 	}
 
