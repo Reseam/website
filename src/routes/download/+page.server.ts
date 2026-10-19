@@ -1,7 +1,7 @@
 import { FORGE_API, FORGE_BASE } from '#lib/docs/sources.ts';
 import { manager } from '#lib/server/api.ts';
 
-type Release = { tag_name: string; published_at: string; assets: { name: string }[] };
+type Release = { tag_name: string; published_at: string };
 
 const CLI_BUILDS: Record<string, string> = {
 	'reseam-linux-x64': 'Linux',
@@ -25,12 +25,10 @@ export async function load({ fetch }) {
 			version: cli.tag_name.replace(/^v/, ''),
 			publishedAt: cli.published_at,
 			releasesUrl: `${FORGE_BASE}/reseam/reseam/releases`,
-			builds: cli.assets
-				.filter((asset) => asset.name in CLI_BUILDS)
-				.map((asset) => ({
-					platform: CLI_BUILDS[asset.name],
-					url: `https://cdn.reseam.app/engine/${encodeURIComponent(cli.tag_name)}/${asset.name}`,
-				})),
+			builds: Object.entries(CLI_BUILDS).map(([name, platform]) => ({
+				platform,
+				url: `https://cdn.reseam.app/engine/${encodeURIComponent(cli.tag_name)}/${name}`,
+			})),
 		},
 		// File names as the GmsCore release workflow uploads them.
 		gmscore: {
