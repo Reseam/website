@@ -10,7 +10,7 @@
 		{ label: 'Patch online', href: '/patch/' },
 		{ label: 'Docs', href: '/docs/' },
 		{ label: 'Announcements', href: '/announcements/' },
-		{ label: 'Donations', href: '/donations/' },
+		{ label: 'Donations', href: '/donate/' },
 	];
 </script>
 

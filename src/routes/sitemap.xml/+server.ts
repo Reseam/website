@@ -11,7 +11,7 @@ const PAGES = [
 	'/download/',
 	'/docs/',
 	'/announcements/',
-	'/donations/',
+	'/donate/',
 ];
 
 export async function GET() {

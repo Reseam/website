@@ -54,7 +54,7 @@
 	subtitle="Donations pay for the server, the domains and other resources."
 >
 	{#snippet action()}
-		<Button href="/donations/" size="lg" variant="outline" class="group">
+		<Button href="/donate/" size="lg" variant="outline" class="group">
 			<Heart
 				size={17}
 				class="text-primary transition-transform duration-300 ease-spring group-hover:scale-125"
