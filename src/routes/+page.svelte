@@ -2,10 +2,13 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Heart from '@lucide/svelte/icons/heart';
 	import CallToAction from '#lib/components/home/CallToAction.svelte';
+	import Forgejo from '#lib/components/brand/Forgejo.svelte';
+	import GitHub from '#lib/components/brand/GitHub.svelte';
 	import HeroDemo from '#lib/components/home/HeroDemo.svelte';
 	import Steps from '#lib/components/home/Steps.svelte';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
+	import { MIRROR_URL, SOCIALS, SOURCE_URL } from '#lib/site.ts';
 </script>
 
 <PageMeta
@@ -28,6 +31,22 @@
 			<Button href="/download/" size="lg">Download <ArrowRight size={18} /></Button>
 			<Button href="/patches/" size="lg" variant="outline">Browse patches</Button>
 		</div>
+		<p
+			class="mt-7 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-body-medium text-on-surface-variant lg:justify-start"
+		>
+			Open source, AGPL-3.0
+			<a
+				href={SOURCE_URL}
+				class="inline-flex items-center gap-1.5 text-on-surface underline decoration-outline-variant underline-offset-4 transition-colors hover:decoration-primary"
+				><Forgejo size={16} /> Forgejo</a
+			>
+			<a
+				href={MIRROR_URL}
+				class="inline-flex items-center gap-1.5 text-on-surface underline decoration-outline-variant underline-offset-4 transition-colors hover:decoration-primary"
+				><GitHub size={16} /> GitHub mirror</a
+			>
+		</p>
+		<p class="mt-3 text-body-medium text-on-surface-variant">Made by former ReVanced developers</p>
 	</div>
 	<HeroDemo />
 </section>
@@ -45,6 +64,19 @@
 	</p>
 	{#snippet action()}
 		<Button href="/download/" size="lg">Download <ArrowRight size={18} /></Button>
+	{/snippet}
+</CallToAction>
+
+<CallToAction id="community" title="Join the community" subtitle="News, help and patch requests.">
+	{#snippet action()}
+		<div class="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-wrap">
+			{#each SOCIALS as social (social.href)}
+				<Button href={social.href} size="lg" variant="outline">
+					<social.icon size={18} />
+					{social.name}
+				</Button>
+			{/each}
+		</div>
 	{/snippet}
 </CallToAction>
 
