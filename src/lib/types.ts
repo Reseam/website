@@ -57,6 +57,8 @@ export type ReleaseResponse = {
 	release: ReleaseInfo;
 };
 
+export type AppInfo = { name: string; icon?: string };
+
 export type AnnouncementLevel = 0 | 1 | 2 | 3;
 
 export type Announcement = {

@@ -1,5 +1,5 @@
-import { patches } from '#lib/server/api.ts';
+import { apps, patches } from '#lib/server/api.ts';
 
 export async function load() {
-	return { release: await patches() };
+	return { release: await patches(), apps: await apps() };
 }

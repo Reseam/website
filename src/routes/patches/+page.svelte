@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { fetchLatestPatches } from '#lib/api.ts';
-	import { groupByApp, matches } from '#lib/catalog.ts';
+	import { appNames } from '#lib/apps.svelte.ts';
+	import { groupByApp, matches, packagesOf } from '#lib/catalog.ts';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
+	import AppIcon from '#lib/components/patches/AppIcon.svelte';
 	import AppList from '#lib/components/patches/AppList.svelte';
 	import PatchItem from '#lib/components/patches/PatchItem.svelte';
 	import SearchField from '#lib/components/ui/SearchField.svelte';
@@ -15,6 +17,10 @@
 	let selected = $state<string | null | undefined>();
 
 	const groups = $derived(groupByApp(release.value.release.patches ?? []));
+	const names = appNames(
+		() => data.apps,
+		() => packagesOf(groups)
+	);
 	const filtered = $derived(
 		[...groups]
 			.filter(([app]) => selected === undefined || app === selected)
@@ -25,6 +31,7 @@
 		[...groups].map(([id, patches]) => ({
 			id,
 			count: patches.filter((patch) => matches(patch, query)).length,
+			info: id === null ? undefined : names.value[id],
 		}))
 	);
 </script>
@@ -45,11 +52,22 @@
 		<AppList {apps} total={apps.reduce((sum, app) => sum + app.count, 0)} bind:selected />
 		<div class="grid gap-9">
 			{#each filtered as [app, patches] (app)}
-				<section aria-label={app ?? 'Any app'}>
-					<header class="flex items-baseline justify-between gap-3 px-1 pb-2.5">
-						<h2 class={app ? 'truncate font-mono text-mono-sm-semibold' : 'text-title-small'}>
-							{app ?? 'Any app'}
-						</h2>
+				{@const info = app === null ? undefined : names.value[app]}
+				<section aria-label={info?.name ?? app ?? 'Any app'}>
+					<header class="flex items-center justify-between gap-3 px-1 pb-2.5">
+						{#if info}
+							<div class="flex min-w-0 items-center gap-3">
+								<AppIcon icon={info.icon} size={32} />
+								<div class="grid min-w-0">
+									<h2 class="truncate text-title-small">{info.name}</h2>
+									<span class="truncate font-mono text-mono-xs text-on-surface-variant">{app}</span>
+								</div>
+							</div>
+						{:else}
+							<h2 class={app ? 'truncate font-mono text-mono-sm-semibold' : 'text-title-small'}>
+								{app ?? 'Any app'}
+							</h2>
+						{/if}
 						<span class="text-body-medium text-on-surface-variant tabular-nums"
 							>{patches.length}</span
 						>

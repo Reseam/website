@@ -23,6 +23,10 @@ export function groupByApp(patches: PatchInfo[]): Map<string | null, CatalogPatc
 	);
 }
 
+export function packagesOf(groups: Map<string | null, CatalogPatch[]>) {
+	return [...groups.keys()].filter((app) => app !== null);
+}
+
 export function versionText(versions: string[]) {
 	if (versions.length === 0) return 'Any version';
 	if (versions.length === 1) return `Version ${versions[0]}`;
