@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { Label } from 'bits-ui';
+	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { storedAdminApi, type AdminApi } from '#lib/admin.ts';
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
 	import { recentDate } from '#lib/format.ts';
@@ -21,11 +23,13 @@
 	let sending = $state(false);
 	let error = $state('');
 	const reported = new SvelteSet<number>();
+	let admin = $state<AdminApi>();
+	onMount(() => (admin = storedAdminApi(apiUrl)));
 
 	$effect(() => {
 		const id = request.id;
 		phase = 'loading';
-		fetchComments(apiUrl, id).then(
+		(admin ? admin.comments(id) : fetchComments(apiUrl, id)).then(
 			(found) => {
 				if (request.id !== id) return;
 				comments = found;
@@ -41,32 +45,47 @@
 		error = failure instanceof Error ? failure.message : String(failure);
 	}
 
+	async function post(body: string) {
+		error = '';
+		sending = true;
+		try {
+			const posted = await (admin
+				? admin.postComment(request.id, body)
+				: board.voter.comment(request.id, body));
+			comments = [...comments, posted];
+			board.commented(posted, 1);
+			draft = '';
+		} catch (failure) {
+			failed(failure);
+		} finally {
+			sending = false;
+		}
+	}
+
 	function send(event: SubmitEvent) {
 		event.preventDefault();
 		const body = draft.trim();
 		if (!body) return;
-		board.withVoter(async () => {
-			error = '';
-			sending = true;
-			try {
-				const posted = await board.voter.comment(request.id, body);
-				comments = [...comments, posted];
-				board.commented(posted, 1);
-				draft = '';
-			} catch (failure) {
-				failed(failure);
-			} finally {
-				sending = false;
-			}
-		});
+		if (admin) post(body);
+		else board.withVoter(() => post(body));
 	}
 
 	async function remove(comment: RequestComment) {
 		error = '';
 		try {
-			await board.voter.deleteComment(comment.id);
+			await (admin ? admin.deleteComment(comment.id) : board.voter.deleteComment(comment.id));
 			comments = comments.filter((c) => c.id !== comment.id);
 			board.commented(comment, -1);
+		} catch (failure) {
+			failed(failure);
+		}
+	}
+
+	async function toggleHidden(comment: RequestComment) {
+		error = '';
+		try {
+			const next = await admin!.hideComment(comment.id, !comment.hidden);
+			comments = comments.map((c) => (c.id === next.id ? next : c));
 		} catch (failure) {
 			failed(failure);
 		}
@@ -106,12 +125,26 @@
 						{#if comment.team}<Badge tone="primary">Reseam team</Badge>{/if}
 						<time datetime={comment.created_at}>{recentDate(comment.created_at)}</time>
 						{#if comment.hidden}<span class="text-warning"
-								>Held as possible spam. Only you see it.</span
+								>{admin
+									? 'Hidden from everyone else.'
+									: 'Held as possible spam. Only you see it.'}</span
 							>{/if}
 					</p>
 					<p class="text-body-large whitespace-pre-wrap">{comment.body}</p>
-					<div class="text-label-large text-on-surface-variant">
-						{#if board.mineComment(comment)}
+					<div class="flex gap-4 text-label-large text-on-surface-variant">
+						{#if admin}
+							<button
+								type="button"
+								onclick={() => toggleHidden(comment)}
+								class="transition-colors hover:text-on-surface"
+								>{comment.hidden ? 'Show' : 'Hide'}</button
+							>
+							<button
+								type="button"
+								onclick={() => remove(comment)}
+								class="transition-colors hover:text-error">Delete</button
+							>
+						{:else if board.mineComment(comment)}
 							<button
 								type="button"
 								onclick={() => remove(comment)}
@@ -132,9 +165,11 @@
 		</ol>
 	{/if}
 
-	{#if canWrite}
+	{#if canWrite || admin}
 		<form onsubmit={send} class="grid gap-3">
-			<Label.Root for="comment-body" class="text-label-large">Add a comment</Label.Root>
+			<Label.Root for="comment-body" class="text-label-large"
+				>{admin ? 'Reply as the Reseam team' : 'Add a comment'}</Label.Root
+			>
 			<textarea
 				id="comment-body"
 				bind:value={draft}
@@ -142,7 +177,7 @@
 				rows="3"
 				class="field resize-y"></textarea>
 			<Button type="submit" class="justify-self-start" disabled={!draft.trim() || sending}
-				>Comment</Button
+				>{admin ? 'Reply as team' : 'Comment'}</Button
 			>
 		</form>
 	{/if}

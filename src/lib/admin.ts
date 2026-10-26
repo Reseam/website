@@ -6,6 +6,8 @@ import type {
 	RequestStatus,
 } from '#lib/types.ts';
 
+export const ADMIN_TOKEN_KEY = 'reseam.adminToken';
+
 export type RequestChanges = {
 	status?: RequestStatus;
 	shipped_in?: string | null;
@@ -69,3 +71,9 @@ export function adminApi(apiUrl: string, token: string) {
 }
 
 export type AdminApi = ReturnType<typeof adminApi>;
+
+/** The admin API when this browser holds the admin token, so moderators act where they read. */
+export function storedAdminApi(apiUrl: string) {
+	const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+	return token ? adminApi(apiUrl, token) : undefined;
+}

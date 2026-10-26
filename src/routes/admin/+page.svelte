@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Label } from 'bits-ui';
-	import { adminApi } from '#lib/admin.ts';
+	import { ADMIN_TOKEN_KEY, adminApi } from '#lib/admin.ts';
 	import AnnouncementsAdmin from '#lib/components/admin/AnnouncementsAdmin.svelte';
 	import RequestEditor from '#lib/components/admin/RequestEditor.svelte';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
@@ -11,8 +11,6 @@
 	import { settings } from '#lib/settings.svelte.ts';
 	import type { PatchRequest } from '#lib/types.ts';
 
-	const TOKEN_KEY = 'reseam.adminToken';
-
 	let token = $state('');
 	let draft = $state('');
 	let tab = $state<'requests' | 'announcements'>('requests');
@@ -21,7 +19,7 @@
 	let error = $state('');
 
 	$effect(() => {
-		token = localStorage.getItem(TOKEN_KEY) ?? '';
+		token = localStorage.getItem(ADMIN_TOKEN_KEY) ?? '';
 	});
 
 	const api = $derived(token ? adminApi(settings.apiUrl, token) : undefined);
@@ -39,13 +37,13 @@
 
 	function signIn(event: SubmitEvent) {
 		event.preventDefault();
-		localStorage.setItem(TOKEN_KEY, draft.trim());
+		localStorage.setItem(ADMIN_TOKEN_KEY, draft.trim());
 		token = draft.trim();
 		draft = '';
 	}
 
 	function signOut() {
-		localStorage.removeItem(TOKEN_KEY);
+		localStorage.removeItem(ADMIN_TOKEN_KEY);
 		token = '';
 	}
 </script>
