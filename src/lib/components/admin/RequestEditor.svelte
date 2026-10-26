@@ -76,7 +76,11 @@
 <li class="grid gap-3 px-5 py-4 sm:px-6">
 	<div class="flex flex-wrap items-center gap-2.5">
 		<span class="text-body-medium text-on-surface-variant tabular-nums">#{request.id}</span>
-		<span class="min-w-0 flex-1 text-title-medium">{request.title}</span>
+		<a
+			href="/requests/?id={request.id}"
+			class="min-w-0 flex-1 text-title-medium transition-colors hover:text-primary"
+			>{request.title}</a
+		>
 		<StatusBadge status={request.status} />
 		{#if request.status === 'hidden'}<span class="text-label-medium text-error">Hidden</span>{/if}
 	</div>
@@ -85,7 +89,7 @@
 		</p>{/if}
 	<p class="flex flex-wrap gap-3 text-body-small text-on-surface-variant">
 		<span class="font-mono">{request.app ?? 'no app'}</span>
-		<span>{request.votes} votes</span>
+		<span>{plural(request.votes, 'vote')}</span>
 		<button
 			type="button"
 			aria-expanded={showComments}

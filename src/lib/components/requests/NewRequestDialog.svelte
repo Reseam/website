@@ -5,7 +5,7 @@
 	import Callout from '#lib/components/ui/Callout.svelte';
 	import Dialog from '#lib/components/ui/Dialog.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
-	import { RequestError, type Voter } from '#lib/requests.svelte.ts';
+	import { RequestError, shippedEntry, type Voter } from '#lib/requests.svelte.ts';
 	import type { PatchRequest } from '#lib/types.ts';
 	import Turnstile from './Turnstile.svelte';
 
@@ -81,8 +81,14 @@
 	description="Ask for a patch, a fix, or support for an app. Requests are public."
 >
 	{#if duplicate}
+		{@const shipped = duplicate.shipped_in ? shippedEntry(duplicate.shipped_in) : undefined}
 		<Callout icon={CircleAlert} title="Someone asked for this already">
-			<p class="mt-1 text-on-surface-variant">“{duplicate.title}” has {duplicate.votes} votes.</p>
+			<p class="mt-1 text-on-surface-variant">
+				“{duplicate.title}”
+				{#if shipped}shipped in <a href={shipped.href} class="text-primary hover:underline"
+						>{shipped.label}</a
+					>.{:else}has {duplicate.votes} votes.{/if}
+			</p>
 		</Callout>
 	{:else}
 		<form id="request-form" onsubmit={submit} novalidate class="grid gap-4">
