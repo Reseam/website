@@ -9,7 +9,8 @@
 		{ label: 'Patches', href: '/patches/' },
 		{ label: 'Patch online', href: '/patch/' },
 		{ label: 'Docs', href: '/docs/' },
-		{ label: 'Announcements', href: '/announcements/' },
+		{ label: 'Updates', href: '/updates/' },
+		{ label: 'Requests', href: '/requests/' },
 		{ label: 'Donations', href: '/donate/' },
 	];
 

@@ -10,13 +10,20 @@
 		description,
 		children,
 		footer,
+		size = 'md',
 	}: {
 		open?: boolean;
 		title: string;
 		description?: string;
 		children: Snippet;
 		footer?: Snippet;
+		size?: 'md' | 'lg';
 	} = $props();
+
+	const widths = {
+		md: 'w-[min(28rem,calc(100vw-2rem))] p-6',
+		lg: 'w-[min(40rem,calc(100vw-2rem))] p-6 sm:p-8',
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -25,7 +32,10 @@
 			class="fixed inset-0 z-50 bg-scrim backdrop-blur-sm transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0"
 		/>
 		<Dialog.Content
-			class="fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] -translate-1/2 gap-5 overflow-y-auto rounded-xl border border-outline-variant bg-surface-container-low p-6 shadow-elevation-3 transition-[opacity,scale] duration-200 ease-emphasized data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
+			class={[
+				'fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] -translate-1/2 gap-5 overflow-y-auto rounded-xl border border-outline-variant bg-surface-container-low shadow-elevation-3 transition-[opacity,scale] duration-200 ease-emphasized data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0',
+				widths[size],
+			]}
 		>
 			<header class="flex items-start justify-between gap-4">
 				<div class="grid gap-1.5">

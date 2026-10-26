@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import Tooltip from '#lib/components/ui/Tooltip.svelte';
-	import { buttonClass } from '#lib/components/ui/button.ts';
+	import { buttonClass, type ButtonVariant } from '#lib/components/ui/button.ts';
 
 	let {
 		label,
@@ -9,12 +9,16 @@
 		href,
 		onclick,
 		dot = false,
+		variant = 'ghost',
+		iconSize = 18,
 	}: {
 		label: string;
 		icon: Component<{ size?: number }>;
 		href?: string;
 		onclick?: () => void;
 		dot?: boolean;
+		variant?: ButtonVariant;
+		iconSize?: number;
 	} = $props();
 </script>
 
@@ -27,9 +31,9 @@
 			{onclick}
 			type={href ? undefined : 'button'}
 			aria-label={label}
-			class="relative {buttonClass('ghost', 'icon')}"
+			class="relative {buttonClass(variant, 'icon')}"
 		>
-			<Icon size={18} />
+			<Icon size={iconSize} />
 			{#if dot}<span
 					class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"
 				></span>{/if}

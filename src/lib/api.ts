@@ -1,17 +1,32 @@
-import type { Announcement, AppInfo, ReleaseResponse } from '#lib/types.ts';
+import type { Announcement, AppInfo, ReleaseIndex, ReleaseResponse } from '#lib/types.ts';
 
 type Fetch = typeof fetch;
 
-export function fetchManager(apiUrl: string, fetcher: Fetch = fetch) {
-	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/manager`, fetcher);
+export function fetchPatchesIndex(apiUrl: string, fetcher: Fetch = fetch) {
+	return fetchJson<ReleaseIndex>(`${apiUrl}/patches.json`, fetcher);
 }
 
-export function fetchLatestPatches(apiUrl: string, fetcher: Fetch = fetch) {
-	return fetchJson<ReleaseResponse>(`${apiUrl}/v1/patches`, fetcher);
+export function fetchManagerIndex(apiUrl: string, fetcher: Fetch = fetch) {
+	return fetchJson<ReleaseIndex>(`${apiUrl}/manager.json`, fetcher);
+}
+
+/** The newest stable release; `reseam release` writes an index newest first. */
+export function latestStable(index: ReleaseIndex): ReleaseResponse {
+	const release = index.releases.find((release) => !release.prerelease);
+	if (!release) throw new Error(`${index.bundle.name} has no stable release`);
+	return { bundle: index.bundle, release };
+}
+
+export async function fetchManager(apiUrl: string, fetcher: Fetch = fetch) {
+	return latestStable(await fetchManagerIndex(apiUrl, fetcher));
+}
+
+export async function fetchLatestPatches(apiUrl: string, fetcher: Fetch = fetch) {
+	return latestStable(await fetchPatchesIndex(apiUrl, fetcher));
 }
 
 export function fetchAnnouncements(apiUrl: string, fetcher: Fetch = fetch) {
-	return fetchJson<Announcement[]>(`${apiUrl}/v1/announcements?archived=false`, fetcher);
+	return fetchJson<Announcement[]>(`${apiUrl}/v1/announcements`, fetcher);
 }
 
 const MAX_APPS_PER_QUESTION = 100;
@@ -36,7 +51,7 @@ export async function fetchApps(downloaderUrl: string, packages: string[], fetch
 	return Object.assign({}, ...answers) as Record<string, AppInfo>;
 }
 
-async function fetchJson<T>(url: string, fetcher: Fetch): Promise<T> {
+export async function fetchJson<T>(url: string, fetcher: Fetch): Promise<T> {
 	const response = await fetcher(url, { headers: { Accept: 'application/json' } });
 	if (!response.ok) throw new Error(`${url} returned ${response.status}`);
 	return response.json();

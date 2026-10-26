@@ -5,9 +5,8 @@
 	import X from '@lucide/svelte/icons/x';
 	import { Collapsible } from 'bits-ui';
 	import { page } from '$app/state';
-	import Discord from '#lib/components/brand/Discord.svelte';
 	import { buttonClass } from '#lib/components/ui/button.ts';
-	import { DISCORD_URL, NAV } from '#lib/site.ts';
+	import { NAV } from '#lib/site.ts';
 	import IconLink from './IconLink.svelte';
 	import Logo from './Logo.svelte';
 	import SettingsDialog from './SettingsDialog.svelte';
@@ -50,8 +49,7 @@
 		</a>
 		<nav aria-label="Main" class="hidden items-center gap-7 md:flex">{@render links(false)}</nav>
 		<div class="flex items-center gap-1">
-			<IconLink label="Announcements" icon={Megaphone} href="/announcements/" dot={unread} />
-			<IconLink label="Discord" icon={Discord} href={DISCORD_URL} />
+			<IconLink label="Updates" icon={Megaphone} href="/updates/" dot={unread} />
 			<IconLink label="Settings" icon={Settings} onclick={() => (settingsOpen = true)} />
 			<Collapsible.Trigger class="md:hidden {buttonClass('ghost', 'icon')}" aria-label="Menu">
 				{#if menuOpen}<X size={18} />{:else}<Menu size={18} />{/if}

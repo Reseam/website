@@ -57,6 +57,12 @@ export type ReleaseResponse = {
 	release: ReleaseInfo;
 };
 
+export type ReleaseIndex = {
+	format_version?: number;
+	bundle: BundleInfo;
+	releases: ReleaseInfo[];
+};
+
 export type AppInfo = { name: string; icon?: string };
 
 export type AnnouncementLevel = 0 | 1 | 2 | 3;
@@ -70,4 +76,18 @@ export type Announcement = {
 	created_at: string;
 	archived_at: string | null;
 	tags: string[];
+};
+
+export type RequestStatus = 'open' | 'planned' | 'shipped' | 'declined' | 'duplicate' | 'hidden';
+
+export type PatchRequest = {
+	id: number;
+	app: string | null;
+	title: string;
+	body: string | null;
+	status: RequestStatus;
+	shipped_in: string | null;
+	duplicate_of: number | null;
+	votes: number;
+	created_at: string;
 };

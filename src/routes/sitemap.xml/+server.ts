@@ -1,5 +1,6 @@
 import { docs } from '#lib/server/docs.ts';
-import { announcements } from '#lib/server/api.ts';
+import { announcements, managerIndex, patchesIndex } from '#lib/server/api.ts';
+import { entryPath, updateEntries } from '#lib/updates.ts';
 import { SITE_URL } from '#lib/site.ts';
 
 export const prerender = true;
@@ -10,7 +11,8 @@ const PAGES = [
 	'/patch/',
 	'/download/',
 	'/docs/',
-	'/announcements/',
+	'/updates/',
+	'/requests/',
 	'/donate/',
 ];
 
@@ -19,10 +21,9 @@ export async function GET() {
 	const urls = [
 		...PAGES.map((path) => ({ path, lastmod: today })),
 		...docs.pages.map(({ slug }) => ({ path: `/docs/${slug}/`, lastmod: today })),
-		...(await announcements()).map(({ id, created_at }) => ({
-			path: `/announcements/${id}/`,
-			lastmod: created_at.slice(0, 10),
-		})),
+		...updateEntries(await patchesIndex(), await managerIndex(), await announcements()).map(
+			(entry) => ({ path: entryPath(entry), lastmod: entry.date.slice(0, 10) })
+		),
 	];
 	const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

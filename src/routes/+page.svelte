@@ -2,6 +2,7 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Heart from '@lucide/svelte/icons/heart';
 	import CallToAction from '#lib/components/home/CallToAction.svelte';
+	import IconLink from '#lib/components/layout/IconLink.svelte';
 	import Forgejo from '#lib/components/brand/Forgejo.svelte';
 	import GitHub from '#lib/components/brand/GitHub.svelte';
 	import HeroDemo from '#lib/components/home/HeroDemo.svelte';
@@ -47,6 +48,23 @@
 			>
 		</p>
 		<p class="mt-3 text-body-medium text-on-surface-variant">Made by former ReVanced developers</p>
+		<div class="mt-5 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+			{#each SOCIALS as social (social.href)}
+				<IconLink
+					label="Reseam on {social.name}"
+					icon={social.icon}
+					href={social.href}
+					variant="outline"
+					iconSize={20}
+				/>
+			{/each}
+			<Button href="/donate/" variant="outline" class="group">
+				<Heart
+					size={16}
+					class="text-primary transition-transform duration-300 ease-spring group-hover:scale-125"
+				/> Donate
+			</Button>
+		</div>
 	</div>
 	<HeroDemo />
 </section>
@@ -67,16 +85,13 @@
 	{/snippet}
 </CallToAction>
 
-<CallToAction id="community" title="Join the community" subtitle="News, help and patch requests.">
+<CallToAction
+	id="requests"
+	title="Missing a patch?"
+	subtitle="Ask for it, or vote on what others asked for. No account needed."
+>
 	{#snippet action()}
-		<div class="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-wrap">
-			{#each SOCIALS as social (social.href)}
-				<Button href={social.href} size="lg" variant="outline">
-					<social.icon size={18} />
-					{social.name}
-				</Button>
-			{/each}
-		</div>
+		<Button href="/requests/" size="lg" variant="outline">Request a patch</Button>
 	{/snippet}
 </CallToAction>
 

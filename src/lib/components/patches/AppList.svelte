@@ -6,10 +6,12 @@
 		apps,
 		total,
 		selected = $bindable(),
+		noneLabel = 'Any app',
 	}: {
 		apps: { id: string | null; count: number; info?: AppInfo }[];
 		total: number;
 		selected: string | null | undefined;
+		noneLabel?: string;
 	} = $props();
 </script>
 
@@ -24,7 +26,7 @@
 		<span
 			class={['flex-1 truncate max-lg:overflow-visible', id && !info && 'font-mono text-mono-xs']}
 			title={info ? id : undefined}
-			>{id === undefined ? 'All apps' : (info?.name ?? id ?? 'Any app')}</span
+			>{id === undefined ? 'All apps' : (info?.name ?? id ?? noneLabel)}</span
 		>
 		<span class="text-body-small tabular-nums">{count}</span>
 	</button>

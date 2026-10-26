@@ -1,5 +1,11 @@
 import { DOWNLOADER_URL } from '$app/env/public';
-import { fetchAnnouncements, fetchApps, fetchLatestPatches, fetchManager } from '#lib/api.ts';
+import {
+	fetchAnnouncements,
+	fetchApps,
+	fetchManagerIndex,
+	fetchPatchesIndex,
+	latestStable,
+} from '#lib/api.ts';
 import { groupByApp, packagesOf } from '#lib/catalog.ts';
 import { DEFAULT_API_URL } from '#lib/settings.svelte.ts';
 
@@ -10,8 +16,10 @@ const once = <T>(load: () => Promise<T>) => {
 };
 
 export const announcements = once(() => fetchAnnouncements(DEFAULT_API_URL));
-export const patches = once(() => fetchLatestPatches(DEFAULT_API_URL));
-export const manager = once(() => fetchManager(DEFAULT_API_URL));
+export const patchesIndex = once(() => fetchPatchesIndex(DEFAULT_API_URL));
+export const managerIndex = once(() => fetchManagerIndex(DEFAULT_API_URL));
+export const patches = once(async () => latestStable(await patchesIndex()));
+export const manager = once(async () => latestStable(await managerIndex()));
 
 /** Names are a nicety: without the downloader the build shows package names and visitors' browsers ask again. */
 export const apps = once(async () => {

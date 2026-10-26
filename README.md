@@ -21,7 +21,11 @@ bun run dev
 
 ## Data
 
-Every page is prerendered. Pages that show API data (patches, announcements, Reseam Manager downloads) are built with the API at `API_URL` (default `https://api.reseam.app`) and refresh from the visitor's configured API in the browser. Visitors can change that address in the settings dialog.
+Every page is prerendered. Pages that show API data (patches, updates, requests, Reseam Manager downloads) are built with the API at `API_URL` (default `https://api.reseam.app`) and refresh from the visitor's configured API in the browser. Visitors can change that address in the settings dialog.
+
+An update published after the build has no page of its own yet: the static `404.html` fallback renders it in the browser from the API, so links posted by Relay work right away. The root layout and update pages load universally for that reason.
+
+Requests need `TURNSTILE_SITE_KEY` (a build argument in the Dockerfile) for posting and voting; without it the list is read-only. `/admin/` moderates requests and posts announcements with the API's admin token.
 
 The Download page reads the latest CLI release from Forgejo at build time. Rebuild the site after a CLI release to update it.
 

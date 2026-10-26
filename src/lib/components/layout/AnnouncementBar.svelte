@@ -9,7 +9,7 @@
 </script>
 
 <a
-	href="/announcements/{announcement.id}/"
+	href="/updates/news/{announcement.id}/"
 	class="group flex items-center justify-center gap-3 border-b border-outline-variant bg-surface-container px-4 py-2.5 transition-colors hover:bg-surface-container-high"
 >
 	<Badge tone={level.tone}>{level.label}</Badge>

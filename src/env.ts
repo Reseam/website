@@ -7,6 +7,13 @@ export const variables = defineEnvVars({
 		description: 'Reseam API the site is built against and visitors start from.',
 		schema: (value) => (value || 'https://api.reseam.app').replace(/\/+$/, ''),
 	},
+	TURNSTILE_SITE_KEY: {
+		public: true,
+		static: true,
+		description:
+			'Cloudflare Turnstile site key for posting and voting on requests. Empty makes requests read-only.',
+		schema: (value) => value ?? '',
+	},
 	DOWNLOADER_URL: {
 		public: true,
 		static: true,

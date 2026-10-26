@@ -10,6 +10,7 @@
 		placeholder = 'Choose…',
 		invalid = false,
 		describedby,
+		labelOf = (item) => item,
 		onchange,
 	}: {
 		id: string;
@@ -18,6 +19,7 @@
 		placeholder?: string;
 		invalid?: boolean;
 		describedby?: string;
+		labelOf?: (item: string) => string;
 		onchange: (value: string) => void;
 	} = $props();
 </script>
@@ -25,7 +27,7 @@
 <Select.Root
 	type="single"
 	{value}
-	items={items.map((item) => ({ value: item, label: item }))}
+	items={items.map((item) => ({ value: item, label: labelOf(item) }))}
 	onValueChange={onchange}
 >
 	<Select.Trigger
@@ -34,7 +36,7 @@
 		aria-describedby={describedby}
 		class="field flex items-center justify-between gap-2 text-left data-placeholder:text-on-surface-variant"
 	>
-		<span class="truncate">{value || placeholder}</span>
+		<span class="truncate">{value ? labelOf(value) : placeholder}</span>
 		<ChevronsUpDown size={15} class="shrink-0 text-on-surface-variant" />
 	</Select.Trigger>
 	<Select.Portal>
@@ -46,11 +48,11 @@
 				{#each items as item (item)}
 					<Select.Item
 						value={item}
-						label={item}
+						label={labelOf(item)}
 						class="flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-body-medium outline-none data-highlighted:bg-surface-container"
 					>
 						{#snippet children({ selected })}
-							<span class="truncate">{item}</span>
+							<span class="truncate">{labelOf(item)}</span>
 							{#if selected}<Check size={15} class="text-primary" />{/if}
 						{/snippet}
 					</Select.Item>
