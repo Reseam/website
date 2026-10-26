@@ -11,6 +11,7 @@ const APP_NAMES: Record<string, string> = {
 	youtube: 'YouTube',
 	'youtube-music': 'YouTube Music',
 	tiktok: 'TikTok',
+	gmscore: 'GmsCore',
 };
 
 export function scopeName(scope: string) {
