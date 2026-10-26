@@ -17,7 +17,7 @@
 	// Inspection lists bundles in mount order: the official bundle first, when it loaded.
 	const offset = $derived(patcher.official.status === 'ready' ? 1 : 0);
 	const metadata = (index: number): BundleMetadata | undefined =>
-		patcher.inspection?.bundles[index + offset];
+		(patcher.inspection?.bundles ?? patcher.bundleCheck)?.[index + offset];
 	// A hand-added copy of the official bundle stands in for a failed download.
 	const officialAdded = $derived(
 		patcher.bundles.some((_, index) => metadata(index)?.public_key === OFFICIAL_SIGNER)
@@ -58,11 +58,15 @@
 		{@const official = bundle?.public_key === OFFICIAL_SIGNER}
 		<li class="flex items-start gap-3 px-4 py-3.5 sm:px-5">
 			<div class="min-w-0 flex-1">
-				<p class="text-title-medium break-words">{bundle?.name ?? file.name}</p>
+				<p class="text-title-medium break-words">{bundle?.name || file.name}</p>
 				<p class="text-body-medium text-on-surface-variant">
-					{[bundle?.author && `by ${bundle.author}`, official && 'Official']
-						.filter(Boolean)
-						.join(' · ') || 'Checking bundle…'}
+					{bundle
+						? [bundle.version, bundle.author && `by ${bundle.author}`, official && 'Official']
+								.filter(Boolean)
+								.join(' · ')
+						: patcher.checking
+							? 'Checking bundle…'
+							: ''}
 				</p>
 				{#if bundle?.problem}
 					<p class="mt-1.5 text-body-medium text-error">
@@ -90,7 +94,7 @@
 			<button
 				type="button"
 				onclick={() => patcher.removeBundle(file)}
-				aria-label="Remove {bundle?.name ?? file.name}"
+				aria-label="Remove {bundle?.name || file.name}"
 				class="-mt-1 -mr-2 {buttonClass('ghost', 'icon')}"
 			>
 				<X size={16} />

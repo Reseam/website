@@ -4,6 +4,7 @@ import {
 	JavaRuntime,
 	runtime,
 	type Artifact,
+	type BundleMetadata,
 	type Inspection,
 	type MountedFile,
 	type OptionValue,
@@ -85,6 +86,9 @@ export class Patcher {
 	bundles = $state<File[]>([]);
 	input = $state<AppInput | null>(null);
 	inspection = $state<Inspection | null>(null);
+	/** Bundles read without an app, so added bundles show their name or problem before an app is chosen. */
+	bundleCheck = $state<BundleMetadata[] | null>(null);
+	checking = $state(false);
 	notice = $state<string | null>(null);
 	ignoreVersions = $state(false);
 	readonly chosen = new SvelteSet<string>();
@@ -135,7 +139,7 @@ export class Patcher {
 		} catch {
 			this.official = { status: 'failed' };
 		}
-		if (this.input) await this.inspect();
+		await this.refresh();
 	}
 
 	async choose(files: File[]) {
@@ -144,12 +148,12 @@ export class Patcher {
 		if (sorted.error) return;
 		this.bundles = [...this.bundles, ...sorted.bundles];
 		if (sorted.input) this.input = sorted.input;
-		if (this.input) await this.inspect();
+		await this.refresh();
 	}
 
 	async removeBundle(file: File) {
 		this.bundles = this.bundles.filter((bundle) => bundle !== file);
-		if (this.input) await this.inspect();
+		await this.refresh();
 	}
 
 	async clearApp() {
@@ -158,6 +162,7 @@ export class Patcher {
 		this.inspection = null;
 		this.notice = null;
 		this.phase = { name: 'empty' };
+		await this.refresh();
 	}
 
 	patchName = (key: string) =>
@@ -376,28 +381,39 @@ export class Patcher {
 		return { options, uploads };
 	}
 
-	private async inspect() {
-		const input = this.input!;
-		this.phase = { name: 'reading' };
+	/** Reads the app with every bundle, or only the added bundles while no app is chosen. */
+	private async refresh() {
+		if (this.input) await this.inspect(this.input);
+		else if (this.bundles.length > 0) await this.inspect(null);
+		else this.bundleCheck = null;
+	}
+
+	private async inspect(input: AppInput | null) {
+		if (input) this.phase = { name: 'reading' };
 		this.inspection = null;
+		this.bundleCheck = null;
 		this.notice = null;
 		await this.closeSession();
 		// loadOfficial inspects again once the official bundle settles.
 		if (this.official.status === 'loading') return;
 		this.controller = new AbortController();
-		const extension = input.app.name.split('.').at(-1)!.toLowerCase();
+		const extension = input?.app.name.split('.').at(-1)!.toLowerCase();
 		const bundles = [
 			...(this.official.status === 'ready' ? [this.official.bundle.file] : []),
 			...this.bundles,
 		];
 		this.files = [
-			{ name: `app.${extension}`, file: input.app },
-			...input.splits.map((file, index) => ({ name: `split-${index}.apk`, file })),
+			...(input
+				? [
+						{ name: `app.${extension}`, file: input.app },
+						...input.splits.map((file, index) => ({ name: `split-${index}.apk`, file })),
+					]
+				: []),
 			...bundles.map((file, index) => ({ name: `bundle-${index}.reseam`, file })),
 		];
 		this.paths = {
-			apk: `/input/app.${extension}`,
-			splits: input.splits.map((_, index) => `/input/split-${index}.apk`),
+			apk: input ? `/input/app.${extension}` : '',
+			splits: input ? input.splits.map((_, index) => `/input/split-${index}.apk`) : [],
 			bundles: bundles.map((_, index) => `/input/bundle-${index}.reseam`),
 		};
 		if (bundles.length === 0) {
@@ -405,15 +421,21 @@ export class Patcher {
 			this.notice = 'Add a patch bundle, or retry the Reseam patches.';
 			return;
 		}
+		this.checking = true;
 		try {
 			await this.openSession([]);
-			void this.session!.warmup().catch((error) => this.write(String(error)));
+			if (input) void this.session!.warmup().catch((error) => this.write(String(error)));
 			const inspection = await this.session!.inspect({
-				apk_path: this.paths.apk,
+				apk_path: input ? this.paths.apk : undefined,
 				split_paths: this.paths.splits,
 				bundle_paths: this.paths.bundles,
 			});
 			if (this.input !== input) return;
+			if (!input) {
+				this.bundleCheck = inspection.bundles;
+				await this.closeSession();
+				return;
+			}
 			this.inspection = inspection;
 			this.ignoreVersions = false;
 			this.drafts.clear();
@@ -428,6 +450,8 @@ export class Patcher {
 			this.input = null;
 			this.notice = describe(error, this.patchName);
 			this.phase = { name: 'empty' };
+		} finally {
+			if (this.input === input) this.checking = false;
 		}
 	}
 
