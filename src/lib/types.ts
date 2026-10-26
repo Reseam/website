@@ -89,5 +89,15 @@ export type PatchRequest = {
 	shipped_in: string | null;
 	duplicate_of: number | null;
 	votes: number;
+	comments: number;
+	created_at: string;
+};
+
+export type RequestComment = {
+	id: number;
+	request_id: number;
+	body: string;
+	team: boolean;
+	hidden: boolean;
 	created_at: string;
 };

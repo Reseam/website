@@ -7,6 +7,7 @@
 	import AppList from '#lib/components/patches/AppList.svelte';
 	import NewRequestDialog from '#lib/components/requests/NewRequestDialog.svelte';
 	import RequestBrowser from '#lib/components/requests/RequestBrowser.svelte';
+	import RequestComments from '#lib/components/requests/RequestComments.svelte';
 	import RequestDetail from '#lib/components/requests/RequestDetail.svelte';
 	import RequestNotices from '#lib/components/requests/RequestNotices.svelte';
 	import VerifyDialog from '#lib/components/requests/VerifyDialog.svelte';
@@ -101,6 +102,7 @@
 					onvote={() => board.vote(selected)}
 					onreport={() => board.report(selected)}
 				/>
+				<RequestComments {board} request={selected} apiUrl={settings.apiUrl} {canWrite} />
 			{:else}
 				<RequestBrowser
 					{board}

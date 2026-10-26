@@ -1,6 +1,7 @@
 <script lang="ts">
+	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import AppIcon from '#lib/components/patches/AppIcon.svelte';
-	import { recentDate } from '#lib/format.ts';
+	import { plural, recentDate } from '#lib/format.ts';
 	import type { AppInfo, PatchRequest } from '#lib/types.ts';
 	import StatusBadge from './StatusBadge.svelte';
 	import VoteButton from './VoteButton.svelte';
@@ -42,6 +43,12 @@
 				</span>
 			{/if}
 			<time datetime={request.created_at}>{recentDate(request.created_at)}</time>
+			{#if request.comments > 0}
+				<span class="flex items-center gap-1.5">
+					<MessageSquare size={14} aria-hidden="true" />
+					{plural(request.comments, 'comment')}
+				</span>
+			{/if}
 		</span>
 	</a>
 </li>

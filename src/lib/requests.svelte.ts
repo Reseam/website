@@ -1,8 +1,9 @@
 import { fetchJson } from '#lib/api.ts';
-import type { PatchRequest, RequestStatus } from '#lib/types.ts';
+import type { PatchRequest, RequestComment, RequestStatus } from '#lib/types.ts';
 
 const VOTER_KEY = 'reseam.voter';
 const SEEN_KEY = 'reseam.seenRequests';
+const SEEN_COMMENTS_KEY = 'reseam.seenComments';
 
 export const STATUSES: Record<Exclude<RequestStatus, 'hidden'>, string> = {
 	open: 'Open',
@@ -19,7 +20,7 @@ export type RequestQuery = {
 	q?: string;
 };
 export type RequestDraft = { app?: string; title: string; body?: string; force?: boolean };
-export type Activity = { requests: number[]; votes: number[] };
+export type Activity = { requests: number[]; votes: number[]; comments: number[] };
 
 export class RequestError extends Error {
 	constructor(
@@ -40,6 +41,10 @@ export function fetchRequests(
 		Object.entries(query).filter((entry): entry is [string, string] => !!entry[1])
 	);
 	return fetchJson<PatchRequest[]>(`${apiUrl}/v1/requests?${params}`, fetcher);
+}
+
+export function fetchComments(apiUrl: string, id: number) {
+	return fetchJson<RequestComment[]>(`${apiUrl}/v1/requests/${id}/comments`, fetch);
 }
 
 /** "patches@0.48.0" as the Updates entry it shipped in. */
@@ -99,6 +104,15 @@ export function voterFor(apiUrl: string) {
 		vote: (id: number, on: boolean) =>
 			call<{ votes: number }>(`/v1/requests/${id}/vote`, { method: on ? 'PUT' : 'DELETE' }),
 		report: (id: number) => call<{ ok: boolean }>(`/v1/requests/${id}/report`, { method: 'POST' }),
+		comment: (id: number, body: string) =>
+			call<RequestComment>(`/v1/requests/${id}/comments`, {
+				method: 'POST',
+				body: JSON.stringify({ body }),
+			}),
+		reportComment: (id: number) =>
+			call<{ ok: boolean }>(`/v1/comments/${id}/report`, { method: 'POST' }),
+		deleteComment: (id: number) =>
+			call<{ ok: boolean }>(`/v1/comments/${id}`, { method: 'DELETE' }),
 	};
 }
 
@@ -118,6 +132,25 @@ export function unseenChanges(mine: PatchRequest[]) {
 			);
 		},
 	};
+}
+
+/** Your requests with comments you haven't seen, counted from the last time this browser showed them. */
+export function unseenComments(mine: PatchRequest[]) {
+	const seen: Record<string, number> = JSON.parse(read(SEEN_COMMENTS_KEY) ?? '{}');
+	return {
+		commented: mine.filter((request) => request.comments > (seen[request.id] ?? 0)),
+		markSeen() {
+			write(
+				SEEN_COMMENTS_KEY,
+				JSON.stringify(Object.fromEntries(mine.map((request) => [request.id, request.comments])))
+			);
+		},
+	};
+}
+
+export function markCommentsSeen(request: PatchRequest) {
+	const seen: Record<string, number> = JSON.parse(read(SEEN_COMMENTS_KEY) ?? '{}');
+	write(SEEN_COMMENTS_KEY, JSON.stringify({ ...seen, [request.id]: request.comments }));
 }
 
 function read(key: string) {

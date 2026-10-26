@@ -1,4 +1,10 @@
-import type { Announcement, AnnouncementLevel, PatchRequest, RequestStatus } from '#lib/types.ts';
+import type {
+	Announcement,
+	AnnouncementLevel,
+	PatchRequest,
+	RequestComment,
+	RequestStatus,
+} from '#lib/types.ts';
 
 export type RequestChanges = {
 	status?: RequestStatus;
@@ -36,6 +42,19 @@ export function adminApi(apiUrl: string, token: string) {
 			call<{ ok: boolean }>(`/v1/requests/${id}${author ? '?author=true' : ''}`, {
 				method: 'DELETE',
 			}),
+		comments: (id: number) => call<RequestComment[]>(`/v1/requests/${id}/comments`),
+		postComment: (id: number, body: string) =>
+			call<RequestComment>(`/v1/requests/${id}/comments`, {
+				method: 'POST',
+				body: JSON.stringify({ body }),
+			}),
+		hideComment: (id: number, hidden: boolean) =>
+			call<RequestComment>(`/v1/comments/${id}`, {
+				method: 'PATCH',
+				body: JSON.stringify({ hidden }),
+			}),
+		deleteComment: (id: number) =>
+			call<{ ok: boolean }>(`/v1/comments/${id}`, { method: 'DELETE' }),
 		announcements: () => call<Announcement[]>('/v1/announcements?archived=true'),
 		postAnnouncement: (draft: AnnouncementDraft) =>
 			call<Announcement>('/v1/announcements', { method: 'POST', body: JSON.stringify(draft) }),

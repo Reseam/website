@@ -1,6 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
-import type { Activity, Voter } from '#lib/requests.svelte.ts';
-import type { PatchRequest } from '#lib/types.ts';
+import { markCommentsSeen, type Activity, type Voter } from '#lib/requests.svelte.ts';
+import type { PatchRequest, RequestComment } from '#lib/types.ts';
 
 /**
  * The requests on the page and this browser's part in them. Votes show at once and roll back when the
@@ -10,7 +10,7 @@ export class RequestBoard {
 	#pending: (() => void) | undefined;
 	readonly voter: Voter;
 	readonly reported = new SvelteSet<number>();
-	activity = $state.raw<Activity>({ requests: [], votes: [] });
+	activity = $state.raw<Activity>({ requests: [], votes: [], comments: [] });
 	verifying = $state(false);
 	requests: PatchRequest[];
 
@@ -43,7 +43,7 @@ export class RequestBoard {
 	}
 
 	vote(request: PatchRequest) {
-		this.#withVoter(async () => {
+		this.withVoter(async () => {
 			const on = !this.voted(request);
 			const before = { votes: request.votes, ids: this.activity.votes };
 			this.#setVotes(
@@ -60,7 +60,7 @@ export class RequestBoard {
 	}
 
 	report(request: PatchRequest) {
-		this.#withVoter(async () => {
+		this.withVoter(async () => {
 			await this.voter.report(request.id);
 			this.reported.add(request.id);
 		});
@@ -71,7 +71,28 @@ export class RequestBoard {
 		this.activity = { ...this.activity, requests: [...this.activity.requests, request.id] };
 	}
 
-	#withVoter(action: () => void) {
+	mineComment(comment: RequestComment) {
+		return this.activity.comments.includes(comment.id);
+	}
+
+	/** Counts a comment this browser posted or deleted, so your own comments never show as new to you. */
+	commented(comment: RequestComment, change: 1 | -1) {
+		const visible = comment.hidden ? 0 : change;
+		this.requests = this.requests.map((r) =>
+			r.id === comment.request_id ? { ...r, comments: r.comments + visible } : r
+		);
+		this.activity = {
+			...this.activity,
+			comments:
+				change === 1
+					? [...this.activity.comments, comment.id]
+					: this.activity.comments.filter((id) => id !== comment.id),
+		};
+		const request = this.requests.find((r) => r.id === comment.request_id);
+		if (request && this.activity.requests.includes(request.id)) markCommentsSeen(request);
+	}
+
+	withVoter(action: () => void) {
 		if (this.voter.ready) return action();
 		this.#pending = action;
 		this.verifying = true;

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { AdminApi } from '#lib/admin.ts';
 	import StatusBadge from '#lib/components/requests/StatusBadge.svelte';
+	import CommentsAdmin from './CommentsAdmin.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
-	import { recentDate } from '#lib/format.ts';
+	import { plural, recentDate } from '#lib/format.ts';
 	import { STATUSES } from '#lib/requests.svelte.ts';
 	import type { PatchRequest, RequestStatus } from '#lib/types.ts';
 
@@ -26,6 +27,7 @@
 	let duplicateOf = $state('');
 	let error = $state('');
 	let busy = $state(false);
+	let showComments = $state(false);
 
 	$effect(() => {
 		status = request.status;
@@ -84,6 +86,12 @@
 	<p class="flex flex-wrap gap-3 text-body-small text-on-surface-variant">
 		<span class="font-mono">{request.app ?? 'no app'}</span>
 		<span>{request.votes} votes</span>
+		<button
+			type="button"
+			aria-expanded={showComments}
+			onclick={() => (showComments = !showComments)}
+			class="text-primary hover:underline">{plural(request.comments, 'comment')}</button
+		>
 		<span>{recentDate(request.created_at)}</span>
 	</p>
 	<div class="flex flex-wrap items-center gap-2">
@@ -119,4 +127,5 @@
 		>
 	</div>
 	{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
+	{#if showComments}<CommentsAdmin requestId={request.id} {api} />{/if}
 </li>
