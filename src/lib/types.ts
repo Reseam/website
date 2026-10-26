@@ -98,6 +98,7 @@ export type RequestComment = {
 	request_id: number;
 	body: string;
 	team: boolean;
+	requester: boolean;
 	hidden: boolean;
 	created_at: string;
 };

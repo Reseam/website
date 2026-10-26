@@ -66,6 +66,14 @@ export class RequestBoard {
 		});
 	}
 
+	replace(request: PatchRequest) {
+		this.requests = this.requests.map((r) => (r.id === request.id ? request : r));
+	}
+
+	remove(id: number) {
+		this.requests = this.requests.filter((r) => r.id !== id);
+	}
+
 	posted(request: PatchRequest) {
 		this.requests = [request, ...this.requests];
 		this.activity = { ...this.activity, requests: [...this.activity.requests, request.id] };

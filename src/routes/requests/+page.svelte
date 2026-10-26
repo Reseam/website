@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { TURNSTILE_SITE_KEY } from '$app/env/public';
 	import { afterNavigate, goto } from '$app/navigation';
+	import { storedAdminApi, type AdminApi } from '#lib/admin.ts';
 	import { appNames } from '#lib/apps.svelte.ts';
 	import AppList from '#lib/components/patches/AppList.svelte';
 	import NewRequestDialog from '#lib/components/requests/NewRequestDialog.svelte';
@@ -27,7 +28,11 @@
 		(apiUrl) => fetchRequests(apiUrl)
 	);
 	const board = new RequestBoard(() => list.value, voterFor(settings.apiUrl));
-	onMount(() => board.loadActivity());
+	let admin = $state<AdminApi>();
+	onMount(() => {
+		board.loadActivity();
+		admin = storedAdminApi(settings.apiUrl);
+	});
 
 	// Prerendered pages hydrate without their query, so ?id= and ?app= are read once the page runs.
 	let params = $state(new URLSearchParams());
@@ -92,17 +97,25 @@
 		<div class="grid min-w-0 gap-5">
 			<RequestNotices mine={board.mine()} {held} />
 			{#if selected}
-				<RequestDetail
-					request={selected}
-					app={selected.app ? names.value[selected.app] : undefined}
-					duplicateOf={board.requests.find((request) => request.id === selected.duplicate_of)}
-					voted={board.voted(selected)}
-					canVote={canWrite}
-					reported={board.reported.has(selected.id)}
-					onvote={() => board.vote(selected)}
-					onreport={() => board.report(selected)}
-				/>
-				<RequestComments {board} request={selected} apiUrl={settings.apiUrl} {canWrite} />
+				<div class="grid gap-12">
+					<RequestDetail
+						request={selected}
+						app={selected.app ? names.value[selected.app] : undefined}
+						duplicateOf={board.requests.find((request) => request.id === selected.duplicate_of)}
+						voted={board.voted(selected)}
+						canVote={canWrite}
+						reported={board.reported.has(selected.id)}
+						onvote={() => board.vote(selected)}
+						onreport={() => board.report(selected)}
+						{admin}
+						onchange={(updated) => board.replace(updated)}
+						onremove={() => {
+							board.remove(selected.id);
+							goto('?');
+						}}
+					/>
+					<RequestComments {board} request={selected} apiUrl={settings.apiUrl} {canWrite} {admin} />
+				</div>
 			{:else}
 				<RequestBrowser
 					{board}

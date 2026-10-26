@@ -1,21 +1,26 @@
 <script lang="ts">
 	import { Label } from 'bits-ui';
-	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import { storedAdminApi, type AdminApi } from '#lib/admin.ts';
-	import Badge from '#lib/components/ui/Badge.svelte';
+	import type { AdminApi } from '#lib/admin.ts';
 	import Button from '#lib/components/ui/Button.svelte';
-	import { recentDate } from '#lib/format.ts';
 	import type { RequestBoard } from '#lib/request-board.svelte.ts';
 	import { fetchComments } from '#lib/requests.svelte.ts';
 	import type { PatchRequest, RequestComment } from '#lib/types.ts';
+	import CommentItem from './CommentItem.svelte';
 
 	let {
 		board,
 		request,
 		apiUrl,
 		canWrite,
-	}: { board: RequestBoard; request: PatchRequest; apiUrl: string; canWrite: boolean } = $props();
+		admin,
+	}: {
+		board: RequestBoard;
+		request: PatchRequest;
+		apiUrl: string;
+		canWrite: boolean;
+		admin: AdminApi | undefined;
+	} = $props();
 
 	let comments = $state.raw<RequestComment[]>([]);
 	let phase = $state<'loading' | 'ready' | 'failed'>('loading');
@@ -23,8 +28,6 @@
 	let sending = $state(false);
 	let error = $state('');
 	const reported = new SvelteSet<number>();
-	let admin = $state<AdminApi>();
-	onMount(() => (admin = storedAdminApi(apiUrl)));
 
 	$effect(() => {
 		const id = request.id;
@@ -99,8 +102,13 @@
 	}
 </script>
 
-<section class="grid gap-4 border-t border-outline-variant pt-6" aria-labelledby="comments-heading">
-	<h2 id="comments-heading" class="text-title-large">Comments</h2>
+<section class="grid gap-6" aria-labelledby="comments-heading">
+	<h2 id="comments-heading" class="flex items-baseline gap-2 text-title-large">
+		Comments
+		{#if phase === 'ready' && comments.length > 0}<span
+				class="text-title-medium text-on-surface-variant tabular-nums">{comments.length}</span
+			>{/if}
+	</h2>
 
 	{#if phase === 'loading'}
 		<p class="text-body-medium text-on-surface-variant" role="status">Loading comments…</p>
@@ -108,66 +116,26 @@
 		<p class="text-body-medium text-on-surface-variant" role="status">
 			Comments didn't load. The API at your configured address did not answer.
 		</p>
-	{:else if comments.length === 0}
-		<p class="text-body-medium text-on-surface-variant">No comments yet.</p>
-	{:else}
-		<ol class="grid gap-3">
+	{:else if comments.length > 0}
+		<ol class="grid gap-6">
 			{#each comments as comment (comment.id)}
-				<li
-					class={[
-						'grid gap-2 rounded-xl border px-5 py-4',
-						comment.team
-							? 'border-primary/40 bg-secondary-container/40'
-							: 'border-outline-variant bg-surface-container-low',
-					]}
-				>
-					<p class="flex flex-wrap items-center gap-2 text-body-small text-on-surface-variant">
-						{#if comment.team}<Badge tone="primary">Reseam team</Badge>{/if}
-						<time datetime={comment.created_at}>{recentDate(comment.created_at)}</time>
-						{#if comment.hidden}<span class="text-warning"
-								>{admin
-									? 'Hidden from everyone else.'
-									: 'Held as possible spam. Only you see it.'}</span
-							>{/if}
-					</p>
-					<p class="text-body-large whitespace-pre-wrap">{comment.body}</p>
-					<div class="flex gap-4 text-label-large text-on-surface-variant">
-						{#if admin}
-							<button
-								type="button"
-								onclick={() => toggleHidden(comment)}
-								class="transition-colors hover:text-on-surface"
-								>{comment.hidden ? 'Show' : 'Hide'}</button
-							>
-							<button
-								type="button"
-								onclick={() => remove(comment)}
-								class="transition-colors hover:text-error">Delete</button
-							>
-						{:else if board.mineComment(comment)}
-							<button
-								type="button"
-								onclick={() => remove(comment)}
-								class="transition-colors hover:text-error">Delete</button
-							>
-						{:else if reported.has(comment.id)}
-							<span>Thanks, it's reported.</span>
-						{:else if !comment.team && canWrite}
-							<button
-								type="button"
-								onclick={() => report(comment)}
-								class="transition-colors hover:text-error">Report</button
-							>
-						{/if}
-					</div>
-				</li>
+				<CommentItem
+					{comment}
+					moderating={!!admin}
+					mine={board.mineComment(comment)}
+					reported={reported.has(comment.id)}
+					canReport={canWrite}
+					ontoggle={() => toggleHidden(comment)}
+					onremove={() => remove(comment)}
+					onreport={() => report(comment)}
+				/>
 			{/each}
 		</ol>
 	{/if}
 
 	{#if canWrite || admin}
-		<form onsubmit={send} class="grid gap-3">
-			<Label.Root for="comment-body" class="text-label-large"
+		<form onsubmit={send} class="grid gap-2">
+			<Label.Root for="comment-body" class="text-title-small"
 				>{admin ? 'Reply as the Reseam team' : 'Add a comment'}</Label.Root
 			>
 			<textarea
@@ -175,8 +143,9 @@
 				bind:value={draft}
 				maxlength="1000"
 				rows="3"
+				placeholder={comments.length === 0 && phase === 'ready' ? 'Be the first to comment' : ''}
 				class="field resize-y"></textarea>
-			<Button type="submit" class="justify-self-start" disabled={!draft.trim() || sending}
+			<Button type="submit" class="justify-self-end" disabled={!draft.trim() || sending}
 				>{admin ? 'Reply as team' : 'Comment'}</Button
 			>
 		</form>

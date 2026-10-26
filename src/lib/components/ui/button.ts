@@ -1,10 +1,11 @@
-export type ButtonVariant = 'primary' | 'outline' | 'ghost';
+export type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm';
 
 const variants: Record<ButtonVariant, string> = {
 	primary: 'bg-primary text-on-primary hover:brightness-105',
 	outline: 'border border-outline-variant text-on-surface hover:bg-surface-container',
 	ghost: 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
+	danger: 'text-error hover:bg-error-container hover:text-on-error-container',
 };
 
 const sizes: Record<ButtonSize, string> = {

@@ -68,13 +68,13 @@
 			<div class="flex gap-2">
 				<Button
 					size="sm"
-					variant="ghost"
+					variant={comment.hidden ? 'ghost' : 'danger'}
 					disabled={busy}
 					onclick={() =>
 						run(async () => replace(await api.hideComment(comment.id, !comment.hidden)))}
 					>{comment.hidden ? 'Show' : 'Hide'}</Button
 				>
-				<Button size="sm" variant="ghost" disabled={busy} onclick={() => remove(comment)}
+				<Button size="sm" variant="danger" disabled={busy} onclick={() => remove(comment)}
 					>Delete</Button
 				>
 			</div>
