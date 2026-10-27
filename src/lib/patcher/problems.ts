@@ -22,13 +22,6 @@ export function explain(problem: Problem, patchName: PatchName): string | undefi
 			return `${problem.bundle} needs a newer patcher. Reload the page to update.`;
 		case 'patches_failed':
 			return `${problem.patches.map(patchName).join(', ')} could not be applied.`;
-		case 'incompatible_package':
-			return `These patches are not made for ${problem.package}.`;
-		case 'missing_package':
-			return 'This file is not a valid app.';
-		case 'option_type':
-		case 'option_choice':
-			return `The value for ${problem.key} is not valid.`;
 		default:
 			return undefined;
 	}

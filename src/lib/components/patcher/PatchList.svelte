@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PackageX from '@lucide/svelte/icons/package-x';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import type { Preset } from '@reseam/browser';
+	import type { PatchPreset } from '@reseam/browser';
 	import { Label } from 'bits-ui';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Callout from '#lib/components/ui/Callout.svelte';
@@ -18,7 +18,7 @@
 
 	let query = $state('');
 
-	const presets: { value: Preset; label: string }[] = [
+	const presets: { value: PatchPreset; label: string }[] = [
 		{ value: 'recommended', label: 'Recommended' },
 		{ value: 'all', label: 'All' },
 		{ value: 'none', label: 'None' },

@@ -5,13 +5,13 @@ import {
 	runtime,
 	type Artifact,
 	type BundleMetadata,
-	type Inspection,
+	type InspectResponse,
 	type MountedFile,
 	type OptionValue,
 	type PatchMetadata,
+	type PatchPreset,
 	type PatchResult,
 	type PatchStatus,
-	type Preset,
 	type RunEvent,
 } from '@reseam/browser';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -85,7 +85,7 @@ export class Patcher {
 	official = $state<Official>({ status: 'loading' });
 	bundles = $state<File[]>([]);
 	input = $state<AppInput | null>(null);
-	inspection = $state<Inspection | null>(null);
+	inspection = $state<InspectResponse | null>(null);
 	/** Bundles read without an app, so added bundles show their name or problem before an app is chosen. */
 	bundleCheck = $state<BundleMetadata[] | null>(null);
 	checking = $state(false);
@@ -175,7 +175,7 @@ export class Patcher {
 		else this.chosen.add(key);
 	}
 
-	choosePreset(value: Preset) {
+	choosePreset(value: PatchPreset) {
 		this.chosen.clear();
 		for (const key of preset(this.listed, value, this.ignoreVersions)) this.chosen.add(key);
 	}
@@ -251,11 +251,15 @@ export class Patcher {
 				selection: {
 					preset: 'none',
 					enable: [...this.chosen],
+					disable: [],
 					options,
 					ignore_versions: this.ignoreVersions,
 				},
 				output: { kind: 'auto', path: '/output/patched' },
 				signing: { key: '/identity/reseam.pk8', cert: '/identity/reseam.der' },
+				dry_run: false,
+				install_method: 'install',
+				leave_out_failed: false,
 			});
 			this.write(
 				`Engine phases: ${outcome.metrics.phases.map((entry) => `${entry.phase} ${duration(entry.duration_ms)}`).join(', ')}`
@@ -426,9 +430,10 @@ export class Patcher {
 			await this.openSession([]);
 			if (input) void this.session!.warmup().catch((error) => this.write(String(error)));
 			const inspection = await this.session!.inspect({
-				apk_path: input ? this.paths.apk : undefined,
+				apk_path: input ? this.paths.apk : null,
 				split_paths: this.paths.splits,
 				bundle_paths: this.paths.bundles,
+				trust: { keys: [...this.trusted] },
 			});
 			if (this.input !== input) return;
 			if (!input) {
@@ -513,6 +518,7 @@ export class Patcher {
 			case 'applied':
 				return `Applied ${name}`;
 			case 'skipped':
+			case 'unmountable':
 				return `Skipped ${name}: ${status.reason}`;
 			case 'failed':
 				return `Failed ${name}: ${status.reason}`;

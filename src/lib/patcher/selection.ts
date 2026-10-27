@@ -1,11 +1,11 @@
-import type { Inspection, PatchMetadata, Preset } from '@reseam/browser';
+import type { InspectResponse, PatchMetadata, PatchPreset } from '@reseam/browser';
 
 export function reference(patch: PatchMetadata): string {
 	return `${patch.bundle}/${patch.id}`;
 }
 
 /** Patches that apply to the package at all; version mismatches are decided separately. */
-export function forPackage(inspection: Inspection): PatchMetadata[] {
+export function forPackage(inspection: InspectResponse): PatchMetadata[] {
 	const name = inspection.apk?.package_name;
 	return inspection.patches.filter(
 		(patch) =>
@@ -18,7 +18,11 @@ export function runnable(patch: PatchMetadata, ignoreVersions: boolean): boolean
 	return !patch.incompatibility || ignoreVersions;
 }
 
-export function preset(patches: PatchMetadata[], value: Preset, ignoreVersions: boolean): string[] {
+export function preset(
+	patches: PatchMetadata[],
+	value: PatchPreset,
+	ignoreVersions: boolean
+): string[] {
 	return patches
 		.filter((patch) => !patch.hidden && runnable(patch, ignoreVersions))
 		.filter((patch) => patch.presets.includes(value))
@@ -45,7 +49,7 @@ export function closure(chosen: Iterable<string>, patches: PatchMetadata[]): Map
 }
 
 /** Versions the loaded patches declare for this package, newest last as published. */
-export function supportedVersions(inspection: Inspection): string[] {
+export function supportedVersions(inspection: InspectResponse): string[] {
 	const name = inspection.apk?.package_name;
 	const versions = inspection.patches.flatMap((patch) =>
 		patch.compatibility.kind === 'packages'

@@ -1,4 +1,4 @@
-import type { MountedFile, OptionDeclaration, OptionValue } from '@reseam/browser';
+import type { MountedFile, OptionDeclaration, OptionType, OptionValue } from '@reseam/browser';
 
 export type OptionDraft =
 	| { kind: 'text'; value: string }
@@ -47,18 +47,17 @@ export function draftValue(
 	draft: OptionDraft,
 	directory: string
 ): { value: OptionValue; uploads: MountedFile[] } | null {
-	const type = option.option_type;
 	switch (draft.kind) {
 		case 'toggle':
 			return draft.value === (option.default_value?.value === true)
 				? null
-				: { value: { type, value: draft.value }, uploads: [] };
+				: { value: { type: 'bool', value: draft.value }, uploads: [] };
 		case 'path': {
 			if (draft.files.length === 0) return null;
 			if (!draft.folder) {
 				const name = `${directory}/${draft.files[0].name}`;
 				return {
-					value: { type, value: `/input/${name}` },
+					value: { type: 'path', value: `/input/${name}` },
 					uploads: [{ name, file: draft.files[0] }],
 				};
 			}
@@ -66,20 +65,25 @@ export function draftValue(
 				name: `${directory}/${file.webkitRelativePath.split('/').slice(1).join('/')}`,
 				file,
 			}));
-			return { value: { type, value: `/input/${directory}` }, uploads };
+			return { value: { type: 'path', value: `/input/${directory}` }, uploads };
 		}
 		case 'text': {
-			const text = draft.value.trim();
-			if (text === '') return null;
-			const value =
-				type === 'int'
-					? BigInt(text)
-					: type === 'float'
-						? Number(text)
-						: type === 'string_list'
-							? draft.value.split('\n').filter((line) => line.trim() !== '')
-							: draft.value;
-			return { value: { type, value }, uploads: [] };
+			if (draft.value.trim() === '') return null;
+			return { value: textValue(option.option_type, draft.value), uploads: [] };
 		}
+	}
+}
+
+/** Text drafts hold every type that is neither a toggle nor a path. */
+function textValue(type: OptionType, text: string): OptionValue {
+	switch (type) {
+		case 'int':
+			return { type, value: BigInt(text.trim()) };
+		case 'float':
+			return { type, value: Number(text) };
+		case 'string_list':
+			return { type, value: text.split('\n').filter((line) => line.trim() !== '') };
+		default:
+			return { type: 'string', value: text };
 	}
 }
