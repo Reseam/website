@@ -260,6 +260,7 @@ export class Patcher {
 				dry_run: false,
 				install_method: 'install',
 				leave_out_failed: false,
+				trace: false,
 			});
 			this.write(
 				`Engine phases: ${outcome.metrics.phases.map((entry) => `${entry.phase} ${duration(entry.duration_ms)}`).join(', ')}`
