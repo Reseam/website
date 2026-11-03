@@ -9,6 +9,7 @@ import {
 	type MountedFile,
 	type OptionValue,
 	type PatchMetadata,
+	type PatchPhase,
 	type PatchPreset,
 	type PatchResult,
 	type PatchStatus,
@@ -28,7 +29,6 @@ import * as storage from './storage';
 
 export const STAGES = [
 	{ stage: 'starting', label: 'Starting up' },
-	{ stage: 'reading', label: 'Reading the app' },
 	{ stage: 'loading', label: 'Loading patches' },
 	{ stage: 'applying', label: 'Applying patches' },
 	{ stage: 'writing', label: 'Building and signing' },
@@ -79,6 +79,13 @@ export function capability(): string | null {
 }
 
 const draftKey = (patch: string, option: string) => `${patch}#${option}`;
+
+/** The engine's stage for each phase it reports; opening the app happens before the run. */
+const PHASE_STAGES: Partial<Record<PatchPhase, Stage>> = {
+	load_bundles: 'loading',
+	apply_patches: 'applying',
+	write_unsigned_artifacts: 'writing',
+};
 
 export class Patcher {
 	phase = $state<Phase>({ name: 'empty' });
@@ -256,7 +263,7 @@ export class Patcher {
 					ignore_versions: this.ignoreVersions,
 				},
 				output: { kind: 'auto', path: '/output/patched' },
-				signing: { key: '/identity/reseam.pk8', cert: '/identity/reseam.der' },
+				signing: { kind: 'files', key: '/identity/reseam.pk8', cert: '/identity/reseam.der' },
 				dry_run: false,
 				install_method: 'install',
 				leave_out_failed: false,
@@ -480,15 +487,16 @@ export class Patcher {
 		switch (event.type) {
 			case 'info':
 				this.write(event.message);
-				if (event.message.startsWith('Opening APK')) this.reach('reading');
-				else if (event.message.startsWith('Loading bundles')) this.reach('loading');
-				else if (event.message.startsWith('Writing signed output')) this.reach('writing');
 				return;
+			case 'phase_started': {
+				const stage = PHASE_STAGES[event.phase];
+				if (stage) this.reach(stage);
+				return;
+			}
 			case 'patch_log':
 				if (event.level !== 'DEBUG') this.write(`${this.patchName(event.patch)}: ${event.message}`);
 				return;
 			case 'patch_started':
-				this.reach('applying');
 				if (this.phase.name === 'patching' && !this.isHidden(event.patch))
 					this.phase.current = this.patchName(event.patch);
 				return;
@@ -504,7 +512,9 @@ export class Patcher {
 			}
 			case 'patches_reverted': {
 				const reverted = new Set(event.patches);
-				const listed = this.runs.filter((run) => reverted.has(run.reference) && !this.isHidden(run.reference));
+				const listed = this.runs.filter(
+					(run) => reverted.has(run.reference) && !this.isHidden(run.reference)
+				);
 				this.runs = this.runs.filter((run) => !reverted.has(run.reference));
 				this.write(`Running ${event.patches.length} patches again`);
 				if (this.phase.name === 'patching') this.phase.finished -= listed.length;
