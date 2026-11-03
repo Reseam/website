@@ -7,17 +7,17 @@
 	import Checkbox from '#lib/components/ui/Checkbox.svelte';
 	import { plural } from '#lib/format.ts';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
-	import { reference, runnable } from '#lib/patcher/selection.ts';
+	import { reference } from '#lib/patcher/patches.ts';
 	import OptionField from './OptionField.svelte';
 
 	let { patcher, patch }: { patcher: Patcher; patch: PatchMetadata } = $props();
 
 	const key = $derived(reference(patch));
-	const chosen = $derived(patcher.chosen.has(key));
-	const requiredBy = $derived(patcher.running.get(key) ?? []);
-	const included = $derived(!chosen && requiredBy.length > 0);
-	const available = $derived(runnable(patch, patcher.ignoreVersions));
-	const running = $derived(chosen || included);
+	const planned = $derived(patcher.planned.get(key));
+	const running = $derived(patcher.running.has(key));
+	const requiredBy = $derived(planned?.required_by ?? []);
+	const included = $derived(running && !planned?.selected);
+	const available = $derived(!planned?.incompatibility || patcher.choice.ignore_versions);
 	const errors = $derived(
 		patch.options.filter((option) => patcher.optionError(patch, option.key)).length
 	);

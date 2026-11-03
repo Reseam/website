@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import PackageX from '@lucide/svelte/icons/package-x';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type { PatchPreset } from '@reseam/browser';
@@ -11,7 +12,7 @@
 	import SearchField from '#lib/components/ui/SearchField.svelte';
 	import Segmented from '#lib/components/ui/Segmented.svelte';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
-	import { preset, reference, supportedVersions } from '#lib/patcher/selection.ts';
+	import { reference, supportedVersions } from '#lib/patcher/patches.ts';
 	import PatchRow from './PatchRow.svelte';
 
 	let { patcher }: { patcher: Patcher } = $props();
@@ -41,15 +42,24 @@
 						Number(right.compatibility.kind === 'universal') || left.name.localeCompare(right.name)
 			)
 	);
-	const activePreset = $derived(
-		presets.find(({ value }) => {
-			const keys = preset(patcher.listed, value, patcher.ignoreVersions);
-			return keys.length === patcher.chosen.size && keys.every((key) => patcher.chosen.has(key));
-		})?.value
-	);
 </script>
 
-{#if patcher.listed.length === 0}
+{#if patcher.planning?.status === 'failed'}
+	<Panel>
+		<PanelHeader
+			icon={CircleAlert}
+			tone="error"
+			title="These patches can't be combined"
+			subtitle={patcher.planning.problem}
+		>
+			{#snippet aside()}<Button
+					variant="outline"
+					size="sm"
+					onclick={() => patcher.choosePreset('recommended')}>Use Recommended</Button
+				>{/snippet}
+		</PanelHeader>
+	</Panel>
+{:else if patcher.listed.length === 0}
 	<Panel>
 		<PanelHeader
 			icon={PackageX}
@@ -69,7 +79,7 @@
 			<h2 id="patches-title" class="mr-auto text-title-medium">Patches</h2>
 			<Segmented
 				label="Select patches"
-				value={activePreset}
+				value={patcher.activePreset}
 				options={presets}
 				onchange={(value) => patcher.choosePreset(value)}
 			/>
@@ -89,7 +99,7 @@
 					<div class="mt-2.5 flex items-center gap-2.5">
 						<Checkbox
 							id="any-version"
-							checked={patcher.ignoreVersions}
+							checked={patcher.choice.ignore_versions}
 							onCheckedChange={(value) => patcher.allowAnyVersion(value)}
 						/>
 						<Label.Root for="any-version" class="text-on-surface-variant"

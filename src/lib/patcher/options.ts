@@ -1,48 +1,42 @@
-import type { MountedFile, OptionDeclaration, OptionType, OptionValue } from '@reseam/browser';
+import type {
+	EngineTools,
+	MountedFile,
+	OptionDeclaration,
+	OptionProblem,
+	OptionValue,
+} from '@reseam/browser';
 
 export type OptionDraft =
 	| { kind: 'text'; value: string }
 	| { kind: 'toggle'; value: boolean }
 	| { kind: 'path'; files: File[]; folder: boolean };
 
-const LONG_MIN = -9223372036854775808n;
-const LONG_MAX = 9223372036854775807n;
-
-export function initialDraft(option: OptionDeclaration): OptionDraft {
-	const value = option.default_value?.value;
+export function initialDraft(tools: EngineTools, option: OptionDeclaration): OptionDraft {
+	const value = option.default_value;
 	switch (option.option_type) {
 		case 'bool':
-			return { kind: 'toggle', value: value === true };
+			return { kind: 'toggle', value: value?.value === true };
 		case 'path':
 			return { kind: 'path', files: [], folder: false };
-		case 'string_list':
-			return { kind: 'text', value: Array.isArray(value) ? value.join('\n') : '' };
 		default:
-			return { kind: 'text', value: value === undefined ? '' : String(value) };
+			return { kind: 'text', value: value ? tools.optionText(value) : '' };
 	}
 }
 
-export function draftError(option: OptionDeclaration, draft: OptionDraft): string | null {
-	if (draft.kind === 'toggle') return null;
-	const empty = draft.kind === 'path' ? draft.files.length === 0 : draft.value.trim() === '';
-	if (empty) return option.required && option.default_value === null ? 'Required' : null;
-	if (draft.kind === 'path') return null;
-	if (option.option_type === 'int') {
-		if (!/^-?\d+$/.test(draft.value.trim())) return 'Enter a whole number';
-		const value = BigInt(draft.value.trim());
-		if (value < LONG_MIN || value > LONG_MAX) return 'Number is too large';
-	}
-	if (option.option_type === 'float' && !Number.isFinite(Number(draft.value))) {
-		return 'Enter a number';
-	}
-	if (option.valid_values?.length && !option.valid_values.includes(draft.value)) {
-		return `Choose one of ${option.valid_values.join(', ')}`;
-	}
-	return null;
+/** Why typed text is not a value of the option; the engine reads it as the CLI and Manager do. */
+export function draftProblem(
+	tools: EngineTools,
+	option: OptionDeclaration,
+	draft: OptionDraft
+): OptionProblem | null {
+	if (draft.kind !== 'text' || draft.value.trim() === '') return null;
+	const parsed = tools.parseOption(option, draft.value);
+	return parsed.kind === 'problem' ? parsed.problem : null;
 }
 
-/** Null when the patch's default applies. */
+/** Null when the patch's default applies, or the text is not a value yet. */
 export function draftValue(
+	tools: EngineTools,
 	option: OptionDeclaration,
 	draft: OptionDraft,
 	directory: string
@@ -69,21 +63,26 @@ export function draftValue(
 		}
 		case 'text': {
 			if (draft.value.trim() === '') return null;
-			return { value: textValue(option.option_type, draft.value), uploads: [] };
+			const parsed = tools.parseOption(option, draft.value);
+			return parsed.kind === 'value' ? { value: parsed.value, uploads: [] } : null;
 		}
 	}
 }
 
-/** Text drafts hold every type that is neither a toggle nor a path. */
-function textValue(type: OptionType, text: string): OptionValue {
-	switch (type) {
-		case 'int':
-			return { type, value: BigInt(text.trim()) };
-		case 'float':
-			return { type, value: Number(text) };
-		case 'string_list':
-			return { type, value: text.split('\n').filter((line) => line.trim() !== '') };
-		default:
-			return { type: 'string', value: text };
+export function problemText(problem: OptionProblem): string {
+	switch (problem.kind) {
+		case 'missing':
+			return 'Required';
+		case 'not_a_bool':
+			return 'Enter true or false';
+		case 'not_an_integer':
+			return 'Enter a whole number';
+		case 'not_a_number':
+			return 'Enter a number';
+		case 'not_allowed':
+			return `Choose one of ${problem.allowed.join(', ')}`;
+		case 'undeclared':
+		case 'wrong_type':
+			return 'This patch no longer takes this value';
 	}
 }

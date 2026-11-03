@@ -1,5 +1,7 @@
 import {
 	BrowserSession,
+	EngineError,
+	EngineTools,
 	JavaRuntime,
 	runtime,
 	type Artifact,
@@ -11,8 +13,10 @@ import {
 	type PatchPhase,
 	type PatchPreset,
 	type PatchResult,
+	type PatchSelection,
 	type PatchStatus,
 	type RunEvent,
+	type SelectionPlan,
 } from '@reseam/browser';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { asset } from '$app/paths';
@@ -21,9 +25,9 @@ import { duration } from '#lib/format.ts';
 import { fingerprint } from './files';
 import { sortFiles, type AppInput } from './inputs';
 import { fetchOfficialBundle, OFFICIAL_SIGNER, type OfficialBundle } from './official';
-import { draftError, draftValue, initialDraft, type OptionDraft } from './options';
+import { draftProblem, draftValue, initialDraft, problemText, type OptionDraft } from './options';
 import { describe } from './problems';
-import { closure, forPackage, preset, reference, runnable } from './selection';
+import { reference } from './patches';
 import * as storage from './storage';
 
 export const STAGES = [
@@ -70,6 +74,10 @@ export type Phase =
 export type Official =
 	{ status: 'loading' } | { status: 'ready'; bundle: OfficialBundle } | { status: 'failed' };
 
+/** The engine's plan of the choice, or why it cannot plan it, such as two bundles declaring one patch. */
+export type Planning =
+	{ status: 'planned'; plan: SelectionPlan } | { status: 'failed'; problem: string };
+
 export function capability(): string | null {
 	if (!globalThis.crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') {
 		return 'This page could not enable the isolation patching needs. Reload it to try again.';
@@ -89,6 +97,14 @@ const PHASE_STAGES: Partial<Record<PatchPhase, Stage>> = {
 	write_unsigned_artifacts: 'writing',
 };
 
+const recommended = (): PatchSelection => ({
+	preset: 'recommended',
+	enable: [],
+	disable: [],
+	options: {},
+	ignore_versions: false,
+});
+
 export class Patcher {
 	phase = $state<Phase>({ name: 'empty' });
 	official = $state<Official>({ status: 'loading' });
@@ -99,16 +115,41 @@ export class Patcher {
 	bundleCheck = $state<BundleMetadata[] | null>(null);
 	checking = $state(false);
 	notice = $state<string | null>(null);
-	ignoreVersions = $state(false);
-	readonly chosen = new SvelteSet<string>();
+	/** The user's choice: a preset with the patches they turned on or off. Options live in [drafts]. */
+	choice = $state<PatchSelection>(recommended());
 	readonly drafts = new SvelteMap<string, OptionDraft>();
 	readonly trusted = new SvelteSet<string>([OFFICIAL_SIGNER]);
 	signingKey = $state<{ fingerprint: string } | null>(null);
 	log = $state<string[]>([]);
 
-	readonly patches = $derived(this.inspection ? forPackage(this.inspection) : []);
-	readonly listed = $derived(this.patches.filter((patch) => !patch.hidden));
-	readonly running = $derived(closure(this.chosen, this.patches));
+	/** What the choice runs, as the engine plans it. */
+	readonly planning = $derived(this.planChoice());
+	readonly planned = $derived(
+		new Map(
+			(this.planning?.status === 'planned' ? this.planning.plan.patches : []).map((patch) => [
+				patch.patch,
+				patch,
+			])
+		)
+	);
+	readonly listed = $derived(
+		(this.inspection?.patches ?? []).filter(
+			(patch) => !patch.hidden && this.planned.has(reference(patch))
+		)
+	);
+	readonly running = $derived(
+		new Set(
+			[...this.planned.values()]
+				.filter((patch) => patch.run.kind === 'runs')
+				.map((patch) => patch.patch)
+		)
+	);
+	/** The preset the choice is, or none when the user changed it. */
+	readonly activePreset = $derived(
+		this.choice.enable.length === 0 && this.choice.disable.length === 0
+			? this.choice.preset
+			: undefined
+	);
 	readonly untrusted = $derived(
 		(this.inspection?.bundles ?? []).filter(
 			(bundle) => !bundle.problem && !this.trusted.has(bundle.public_key)
@@ -118,10 +159,12 @@ export class Patcher {
 
 	// scripts/copy-runtime.ts serves the package's runtime files as static assets; asset() only
 	// resolves files, so the runtime folder is found through one of them.
-	private readonly java = new JavaRuntime({
-		runtimeBase: new URL('.', new URL(asset(`${runtime.base}methods.json` as const), location.href))
-			.href,
-	});
+	private readonly runtimeBase = new URL(
+		'.',
+		new URL(asset(`${runtime.base}methods.json` as const), location.href)
+	).href;
+	private readonly java = new JavaRuntime({ runtimeBase: this.runtimeBase });
+	private tools = $state.raw<EngineTools | null>(null);
 	private session: BrowserSession | null = null;
 	private controller = new AbortController();
 	private files: MountedFile[] = [];
@@ -132,10 +175,12 @@ export class Patcher {
 	async start() {
 		// Java takes seconds to start cold; starting it with the page hides that.
 		void this.java.warmup().catch((error) => this.write(String(error)));
-		const [trusted, key] = await Promise.all([
+		const [trusted, key, tools] = await Promise.all([
 			storage.load('trusted-signers'),
 			storage.load('identity'),
+			EngineTools.load(this.runtimeBase),
 		]);
+		this.tools = tools;
 		for (const signer of trusted ?? []) this.trusted.add(signer);
 		await this.showKey(key);
 		await this.loadOfficial();
@@ -178,22 +223,25 @@ export class Patcher {
 		this.inspection?.patches.find((patch) => reference(patch) === key)?.name ??
 		key.split('/').at(-1)!;
 
+	/** Turns a chosen patch off, or an unchosen one on, as a change to the choice's preset. */
 	toggle(patch: PatchMetadata) {
 		const key = reference(patch);
-		if (this.chosen.has(key)) this.chosen.delete(key);
-		else this.chosen.add(key);
+		const planned = this.planned.get(key);
+		if (!planned) return;
+		const byPreset = planned.presets.includes(this.choice.preset);
+		const enable = this.choice.enable.filter((entry) => entry !== key);
+		const disable = this.choice.disable.filter((entry) => entry !== key);
+		this.choice = planned.selected
+			? { ...this.choice, enable, disable: byPreset ? [...disable, key] : disable }
+			: { ...this.choice, enable: byPreset ? enable : [...enable, key], disable };
 	}
 
 	choosePreset(value: PatchPreset) {
-		this.chosen.clear();
-		for (const key of preset(this.listed, value, this.ignoreVersions)) this.chosen.add(key);
+		this.choice = { ...this.choice, preset: value, enable: [], disable: [] };
 	}
 
 	allowAnyVersion(value: boolean) {
-		this.ignoreVersions = value;
-		if (value) return;
-		for (const patch of this.listed)
-			if (!runnable(patch, false)) this.chosen.delete(reference(patch));
+		this.choice = { ...this.choice, ignore_versions: value };
 	}
 
 	draft(patch: PatchMetadata, option: string): OptionDraft {
@@ -206,7 +254,12 @@ export class Patcher {
 
 	optionError(patch: PatchMetadata, option: string): string | null {
 		const declaration = patch.options.find((candidate) => candidate.key === option)!;
-		return draftError(declaration, this.draft(patch, option));
+		const typed = this.tools && draftProblem(this.tools, declaration, this.draft(patch, option));
+		const planned = this.planned
+			.get(reference(patch))
+			?.option_problems.find((issue) => issue.key === option)?.problem;
+		const problem = typed ?? planned;
+		return problem ? problemText(problem) : null;
 	}
 
 	async trust(signer: string, value: boolean) {
@@ -257,13 +310,7 @@ export class Patcher {
 				split_paths: this.paths.splits,
 				bundle_paths: this.paths.bundles,
 				trust: { keys: [...this.trusted] },
-				selection: {
-					preset: 'none',
-					enable: [...this.chosen],
-					disable: [],
-					options,
-					ignore_versions: this.ignoreVersions,
-				},
+				selection: { ...$state.snapshot(this.choice), options },
 				// Split apps come out as one .apks file, which the engine writes.
 				output:
 					(this.inspection.apk?.component_count ?? 1) > 1
@@ -348,14 +395,47 @@ export class Patcher {
 		this.signingKey = key ? { fingerprint: await fingerprint(key.cert) } : null;
 	}
 
+	private engineTools(): EngineTools {
+		if (!this.tools) throw new Error('The patcher is still starting.');
+		return this.tools;
+	}
+
+	/** Plans the choice with every option value the user set; the engine ignores those of patches that stay off. */
+	private planChoice(): Planning | null {
+		const inspection = this.inspection;
+		const apk = inspection?.apk;
+		if (!this.tools || !inspection || !apk) return null;
+		try {
+			const plan = this.tools.plan({
+				patches: inspection.patches,
+				app: {
+					package_name: apk.package_name,
+					version_name: apk.version_name,
+					version_code: apk.version_code,
+				},
+				selection: {
+					...$state.snapshot(this.choice),
+					options: this.chosenOptions(inspection.patches).options,
+				},
+				install_method: 'install',
+			});
+			return { status: 'planned', plan };
+		} catch (error) {
+			if (!(error instanceof EngineError)) throw error;
+			return { status: 'failed', problem: describe(error, this.patchName) };
+		}
+	}
+
 	private findBlocker(): string | null {
 		if (!this.inspection) return 'Choose an app first.';
 		if (this.inspection.bundles.some((bundle) => bundle.problem)) {
 			return 'Remove the patch bundle that could not be read.';
 		}
 		if (this.untrusted.length > 0) return 'Trust or remove the other patch signers first.';
-		if (this.chosen.size === 0) return 'Choose at least one patch.';
-		const invalid = this.patches.filter(
+		if (this.planning?.status === 'failed') return "These patches can't be combined.";
+		if (!this.listed.some((patch) => this.running.has(reference(patch))))
+			return 'Choose at least one patch.';
+		const invalid = this.listed.filter(
 			(patch) =>
 				this.running.has(reference(patch)) &&
 				patch.options.some((option) => this.optionError(patch, option.key))
@@ -364,15 +444,32 @@ export class Patcher {
 		return null;
 	}
 
+	/** The options a run takes: only those of the patches the plan takes up. */
 	private selectedOptions() {
+		const taken = new Set(
+			[...this.planned.values()]
+				.filter((patch) => patch.run.kind !== 'off')
+				.map((patch) => patch.patch)
+		);
+		return this.chosenOptions(
+			(this.inspection?.patches ?? []).filter((patch) => taken.has(reference(patch)))
+		);
+	}
+
+	/** The option values the user set on `patches`, and the files they name. */
+	private chosenOptions(patches: PatchMetadata[]) {
 		const options: Record<string, Record<string, OptionValue>> = {};
 		const uploads: MountedFile[] = [];
 		let index = 0;
-		for (const patch of this.patches) {
+		for (const patch of patches) {
 			const key = reference(patch);
-			if (!this.running.has(key)) continue;
 			for (const option of patch.options) {
-				const resolved = draftValue(option, this.draft(patch, option.key), `options/${index++}`);
+				const resolved = draftValue(
+					this.engineTools(),
+					option,
+					this.draft(patch, option.key),
+					`options/${index++}`
+				);
 				if (!resolved) continue;
 				(options[key] ??= {})[option.key] = resolved.value;
 				uploads.push(...resolved.uploads);
@@ -437,13 +534,13 @@ export class Patcher {
 				await this.closeSession();
 				return;
 			}
-			this.inspection = inspection;
-			this.ignoreVersions = false;
 			this.drafts.clear();
 			for (const patch of inspection.patches) {
-				for (const option of patch.options) this.setDraft(patch, option.key, initialDraft(option));
+				for (const option of patch.options)
+					this.setDraft(patch, option.key, initialDraft(this.engineTools(), option));
 			}
-			this.choosePreset('recommended');
+			this.choice = recommended();
+			this.inspection = inspection;
 			this.phase = { name: 'ready' };
 		} catch (error) {
 			if (this.input !== input) return;

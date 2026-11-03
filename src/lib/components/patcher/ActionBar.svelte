@@ -3,7 +3,7 @@
 	import Button from '#lib/components/ui/Button.svelte';
 	import { plural } from '#lib/format.ts';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
-	import { reference } from '#lib/patcher/selection.ts';
+	import { reference } from '#lib/patcher/patches.ts';
 
 	let { patcher }: { patcher: Patcher } = $props();
 
