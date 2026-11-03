@@ -4,6 +4,7 @@
 	import FileArchive from '@lucide/svelte/icons/file-archive';
 	import KeyRound from '@lucide/svelte/icons/key-round';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type { Artifact, PatchResult } from '@reseam/browser';
 	import { Collapsible } from 'bits-ui';
 	import Button from '#lib/components/ui/Button.svelte';
@@ -20,12 +21,14 @@
 		patcher,
 		apks,
 		results,
+		leftOut,
 		report,
 		newKey,
 	}: {
 		patcher: Patcher;
 		apks: Artifact[];
 		results: PatchResult[];
+		leftOut: string[];
 		report: Report;
 		newKey: boolean;
 	} = $props();
@@ -124,6 +127,18 @@
 					</ul>
 				</Collapsible.Content>
 			</Collapsible.Root>
+		{/if}
+		{#if leftOut.length > 0}
+			<Callout
+				icon={TriangleAlert}
+				tone="warning"
+				title="Built without {plural(leftOut.length, 'patch', 'patches')}"
+			>
+				<p class="mt-1 text-on-surface-variant">
+					{leftOut.map(patcher.patchName).join(', ')} could not be applied, so {label} is ready without
+					{leftOut.length === 1 ? 'it' : 'them'}. The run report says why.
+				</p>
+			</Callout>
 		{/if}
 		{#if newKey}
 			<Callout icon={KeyRound} title="Back up your signing key">

@@ -1,6 +1,5 @@
 import {
 	BrowserSession,
-	EngineError,
 	JavaRuntime,
 	runtime,
 	type Artifact,
@@ -57,13 +56,16 @@ export type Phase =
 			total: number;
 			current: string | null;
 	  }
-	| { name: 'done'; apks: Artifact[]; results: PatchResult[]; report: Report; newKey: boolean }
 	| {
-			name: 'failed';
-			message: string;
-			failed: { reference: string; reason: string }[];
+			name: 'done';
+			apks: Artifact[];
+			results: PatchResult[];
+			/** Shown patches that failed, or needed one that did, which the app was built without. */
+			leftOut: string[];
 			report: Report;
-	  };
+			newKey: boolean;
+	  }
+	| { name: 'failed'; message: string; report: Report };
 
 export type Official =
 	{ status: 'loading' } | { status: 'ready'; bundle: OfficialBundle } | { status: 'failed' };
@@ -266,7 +268,7 @@ export class Patcher {
 				signing: { kind: 'files', key: '/identity/reseam.pk8', cert: '/identity/reseam.der' },
 				dry_run: false,
 				install_method: 'install',
-				leave_out_failed: false,
+				leave_out_failed: true,
 				trace: false,
 			});
 			this.write(
@@ -286,6 +288,9 @@ export class Patcher {
 				name: 'done',
 				apks: artifacts.filter((artifact) => !artifact.name.startsWith('identity/')),
 				results: outcome.results,
+				leftOut: outcome.results
+					.filter((result) => !result.hidden && result.status.kind !== 'applied')
+					.map((result) => result.patch),
 				report: this.report(),
 				newKey: !stored,
 			};
@@ -294,23 +299,10 @@ export class Patcher {
 				this.notice = 'Patching was cancelled.';
 				this.phase = { name: 'ready' };
 			} else {
-				const reasons = new Map(
-					this.runs.flatMap((run) =>
-						run.status.kind === 'failed' ? [[run.reference, run.status.reason] as const] : []
-					)
-				);
-				const failed =
-					error instanceof EngineError && error.problem.type === 'patches_failed'
-						? error.problem.patches.map((key) => ({
-								reference: key,
-								reason: reasons.get(key) ?? '',
-							}))
-						: [];
 				this.write(describe(error, this.patchName));
 				this.phase = {
 					name: 'failed',
 					message: describe(error, this.patchName),
-					failed,
 					report: this.report(),
 				};
 			}
@@ -320,14 +312,6 @@ export class Patcher {
 
 	cancel() {
 		this.controller.abort();
-	}
-
-	/** Drops failed patches, and the chosen patches that needed them, then patches again. */
-	async retryWithout(references: string[]) {
-		const dropped = references.flatMap((key) => [key, ...(this.running.get(key) ?? [])]);
-		for (const key of dropped) this.chosen.delete(key);
-		if (this.blocker) await this.edit();
-		else await this.patch();
 	}
 
 	/** Releases the finished run's files. */
