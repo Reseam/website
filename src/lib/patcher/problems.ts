@@ -22,6 +22,12 @@ export function explain(problem: Problem, patchName: PatchName): string | undefi
 			return `${problem.bundle} needs a newer patcher. Reload the page to update.`;
 		case 'patches_failed':
 			return `${problem.patches.map(patchName).join(', ')} could not be applied.`;
+		case 'keystore_locked':
+			return 'The password is wrong, or the file is not a key backup.';
+		case 'keystore_empty':
+			return 'This backup holds no signing key.';
+		case 'unsupported_signing_key':
+			return 'This key cannot sign apps. Use a backup made by Reseam.';
 		default:
 			return undefined;
 	}

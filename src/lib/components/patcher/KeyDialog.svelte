@@ -1,11 +1,13 @@
 <script lang="ts">
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import { Label } from 'bits-ui';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Callout from '#lib/components/ui/Callout.svelte';
 	import Dialog from '#lib/components/ui/Dialog.svelte';
 	import { buttonClass } from '#lib/components/ui/button.ts';
-	import { keyBackup, readKey, save } from '#lib/patcher/files.ts';
+	import { save } from '#lib/patcher/files.ts';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
+	import { describe } from '#lib/patcher/problems.ts';
 	import type { SigningKey } from '#lib/patcher/storage.ts';
 
 	let { patcher, open = $bindable(false) }: { patcher: Patcher; open?: boolean } = $props();
@@ -14,12 +16,19 @@
 	// Raw: IndexedDB cannot clone Svelte's state proxies.
 	let pending = $state.raw<SigningKey | null>(null);
 	let forgetting = $state(false);
+	/** The backup to import, waiting for its password. */
+	let importing = $state.raw<File | null>(null);
+	let backingUp = $state(false);
+	let password = $state('');
 
 	$effect(() => {
 		if (!open) return;
 		error = '';
 		pending = null;
 		forgetting = false;
+		importing = null;
+		backingUp = false;
+		password = '';
 	});
 
 	async function attempt(action: () => Promise<void>) {
@@ -27,7 +36,7 @@
 		try {
 			await action();
 		} catch (cause) {
-			error = cause instanceof Error ? cause.message : String(cause);
+			error = describe(cause, patcher.patchName);
 		}
 	}
 
@@ -43,21 +52,30 @@
 			forgetting = false;
 		});
 
-	const backup = () =>
+	const unlock = () =>
 		attempt(async () => {
-			const key = await patcher.exportKey();
-			if (key) save(keyBackup(key), 'reseam-signing-key.zip');
-		});
-
-	function picked(input: HTMLInputElement) {
-		const files = [...(input.files ?? [])];
-		input.value = '';
-		if (files.length === 0) return;
-		void attempt(async () => {
-			const key = await readKey(files);
+			const key = await patcher.readKey(importing!, password);
+			importing = null;
+			password = '';
 			if (patcher.signingKey) pending = key;
 			else await patcher.importKey(key);
 		});
+
+	const backup = () =>
+		attempt(async () => {
+			const file = await patcher.exportKey(password);
+			if (file) save(file, 'reseam-signing-key.p12');
+			backingUp = false;
+			password = '';
+		});
+
+	function picked(input: HTMLInputElement) {
+		const file = input.files?.[0];
+		input.value = '';
+		if (!file) return;
+		error = '';
+		password = '';
+		importing = file;
 	}
 </script>
 
@@ -66,12 +84,39 @@
 		Import a key
 		<input
 			type="file"
-			multiple
-			accept=".zip,.pk8,.der"
+			accept=".p12,.pfx"
 			class="sr-only"
 			onchange={(event) => picked(event.currentTarget)}
 		/>
 	</label>
+{/snippet}
+
+{#snippet passwordForm(
+	label: string,
+	action: string,
+	submit: () => Promise<void>,
+	cancel: () => void
+)}
+	<form
+		class="grid gap-2"
+		onsubmit={(event) => {
+			event.preventDefault();
+			void submit();
+		}}
+	>
+		<Label.Root for="key-password" class="text-label-large">{label}</Label.Root>
+		<input
+			id="key-password"
+			type="password"
+			autocomplete="off"
+			bind:value={password}
+			class="field"
+		/>
+		<div class="flex gap-2">
+			<Button size="sm" type="submit">{action}</Button>
+			<Button size="sm" variant="ghost" onclick={cancel}>Cancel</Button>
+		</div>
+	</form>
 {/snippet}
 
 <Dialog
@@ -79,7 +124,21 @@
 	title="Signing key"
 	description="Patched apps are signed with a key kept in this browser. Android installs updates only when they are signed with the same key."
 >
-	{#if pending}
+	{#if importing}
+		{@render passwordForm(
+			`Password for ${importing.name}`,
+			'Import',
+			unlock,
+			() => (importing = null)
+		)}
+	{:else if backingUp}
+		{@render passwordForm(
+			'Choose a password for the backup',
+			'Download backup',
+			backup,
+			() => (backingUp = false)
+		)}
+	{:else if pending}
 		<Callout icon={TriangleAlert} tone="warning" title="Replace the current key?">
 			<p class="mt-1 text-on-surface-variant">
 				Apps patched with the current key can then only be updated after uninstalling them, unless
@@ -107,7 +166,7 @@
 			<code class="font-mono text-mono-xs break-all">{patcher.signingKey.fingerprint}</code>
 		</div>
 		<div class="flex flex-wrap gap-2">
-			<Button size="sm" onclick={backup}>Download backup</Button>
+			<Button size="sm" onclick={() => (backingUp = true)}>Back up</Button>
 			{@render importButton()}
 			<Button size="sm" variant="ghost" onclick={() => (forgetting = true)}>Forget</Button>
 		</div>
@@ -117,6 +176,6 @@
 	{/if}
 	{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
 	<p class="text-body-small text-on-surface-variant">
-		Import the backup .zip, or a .pk8 key with its .der certificate.
+		Backups are password-protected .p12 files, which Reseam Manager and the reseam CLI also read.
 	</p>
 </Dialog>

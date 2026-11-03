@@ -92,7 +92,7 @@
 					{#if phase.name === 'patching'}
 						<Progress {patcher} {...phase} />
 					{:else if phase.name === 'done'}
-						<Done {patcher} {...phase} />
+						<Done {patcher} {...phase} onKeyBackup={() => (keyOpen = true)} />
 					{:else if phase.name === 'failed'}
 						<Failed {patcher} {...phase} />
 					{:else}

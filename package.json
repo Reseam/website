@@ -39,8 +39,7 @@
 		"@internationalized/date": "^3.12.4",
 		"@lucide/svelte": "^1.51.0",
 		"@reseam/browser": "0.37.1",
-		"bits-ui": "^2.19.5",
-		"fflate": "^0.8.3"
+		"bits-ui": "^2.19.5"
 	},
 	"imports": {
 		"#lib/*": "./src/lib/*"

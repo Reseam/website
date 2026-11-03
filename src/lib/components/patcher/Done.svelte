@@ -11,7 +11,7 @@
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
 	import PanelSection from '#lib/components/ui/PanelSection.svelte';
 	import { duration, megabytes, plural } from '#lib/format.ts';
-	import { keyBackup, save } from '#lib/patcher/files.ts';
+	import { save } from '#lib/patcher/files.ts';
 	import type { Patcher, Report } from '#lib/patcher/patcher.svelte.ts';
 	import RunReport from './RunReport.svelte';
 
@@ -22,6 +22,7 @@
 		leftOut,
 		report,
 		newKey,
+		onKeyBackup,
 	}: {
 		patcher: Patcher;
 		apks: Artifact[];
@@ -29,6 +30,8 @@
 		leftOut: string[];
 		report: Report;
 		newKey: boolean;
+		/** Opens the signing key dialog, where the backup is made. */
+		onKeyBackup: () => void;
 	} = $props();
 
 	const apk = $derived(patcher.inspection?.apk);
@@ -42,15 +45,6 @@
 	const applied = $derived(
 		results.filter((result) => !result.hidden && result.status.kind === 'applied').length
 	);
-
-	let keySaved = $state(false);
-
-	async function downloadKey() {
-		const key = await patcher.exportKey();
-		if (!key) return;
-		save(keyBackup(key), 'reseam-signing-key.zip');
-		keySaved = true;
-	}
 </script>
 
 <Panel labelledby="done-title">
@@ -100,8 +94,8 @@
 					This browser made the key that signed {label}. Updates must be signed with the same key,
 					so keep a copy somewhere safe.
 				</p>
-				<Button variant="outline" size="sm" class="mt-3" onclick={downloadKey}
-					>{keySaved ? 'Download again' : 'Download key backup'}</Button
+				<Button variant="outline" size="sm" class="mt-3" onclick={onKeyBackup}
+					>Back up the key</Button
 				>
 			</Callout>
 		{/if}

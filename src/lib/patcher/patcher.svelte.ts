@@ -22,7 +22,6 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { asset } from '$app/paths';
 import { settings } from '#lib/settings.svelte.ts';
 import { duration } from '#lib/format.ts';
-import { fingerprint } from './files';
 import { sortFiles, type AppInput } from './inputs';
 import { fetchOfficialBundle, OFFICIAL_SIGNER, type OfficialBundle } from './official';
 import { draftProblem, draftValue, initialDraft, problemText, type OptionDraft } from './options';
@@ -372,13 +371,30 @@ export class Patcher {
 		this.phase = { name: 'ready' };
 	}
 
+	/** Reads a PKCS#12 key backup, the format every Reseam app backs keys up in. */
+	async readKey(file: File, password: string): Promise<storage.SigningKey> {
+		const material = this.engineTools().importPkcs12(
+			new Uint8Array(await file.arrayBuffer()),
+			password
+		);
+		return {
+			key: Uint8Array.from(material.key).buffer,
+			cert: Uint8Array.from(material.cert).buffer,
+		};
+	}
+
 	async importKey(key: storage.SigningKey) {
 		await storage.save('identity', key);
 		await this.showKey(key);
 	}
 
-	async exportKey(): Promise<storage.SigningKey | undefined> {
-		return storage.load('identity');
+	/** The key as a PKCS#12 backup that `password` opens. */
+	async exportKey(password: string): Promise<Blob | undefined> {
+		const key = await storage.load('identity');
+		if (!key) return undefined;
+		const material = { key: [...new Uint8Array(key.key)], cert: [...new Uint8Array(key.cert)] };
+		const backup = this.engineTools().exportPkcs12(material, password);
+		return new Blob([backup as BlobPart], { type: 'application/x-pkcs12' });
 	}
 
 	async forgetKey() {
@@ -392,7 +408,9 @@ export class Patcher {
 	}
 
 	private async showKey(key: storage.SigningKey | undefined) {
-		this.signingKey = key ? { fingerprint: await fingerprint(key.cert) } : null;
+		this.signingKey = key
+			? { fingerprint: this.engineTools().certificateFingerprint(new Uint8Array(key.cert)) }
+			: null;
 	}
 
 	private engineTools(): EngineTools {
