@@ -1,4 +1,5 @@
-import type { Announcement, AppInfo, ReleaseIndex, ReleaseResponse } from '#lib/types.ts';
+import type { ReleaseIndex } from '@reseam/browser';
+import type { Announcement, AppInfo, ReleaseResponse } from '#lib/types.ts';
 
 type Fetch = typeof fetch;
 

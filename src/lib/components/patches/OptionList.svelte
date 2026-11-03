@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { PatchOption } from '#lib/types.ts';
+	import type { OptionDeclaration } from '@reseam/browser';
 
-	let { options }: { options: PatchOption[] } = $props();
+	let { options }: { options: OptionDeclaration[] } = $props();
 
-	const types: Record<PatchOption['option_type'], string> = {
+	const types: Record<OptionDeclaration['option_type'], string> = {
 		string: 'Text',
 		bool: 'On or off',
 		int: 'Whole number',

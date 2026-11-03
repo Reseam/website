@@ -1,6 +1,7 @@
 import { fetchAnnouncements, fetchManagerIndex, fetchPatchesIndex } from '#lib/api.ts';
 import { parseNotes, type ReleaseNotes } from '#lib/notes.ts';
-import type { Announcement, ReleaseIndex } from '#lib/types.ts';
+import type { ReleaseIndex } from '@reseam/browser';
+import type { Announcement } from '#lib/types.ts';
 
 export type ReleaseKind = 'patches' | 'manager';
 

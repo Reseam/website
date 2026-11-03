@@ -1,9 +1,9 @@
-import type { PatchInfo } from '#lib/types.ts';
+import type { PatchSpec } from '@reseam/browser';
 
-export type CatalogPatch = PatchInfo & { versions: string[] };
+export type CatalogPatch = PatchSpec & { versions: string[] };
 
 /** One group per package, largest first, with patches for any app last under the `null` key. */
-export function groupByApp(patches: PatchInfo[]): Map<string | null, CatalogPatch[]> {
+export function groupByApp(patches: PatchSpec[]): Map<string | null, CatalogPatch[]> {
 	const groups = new Map<string | null, CatalogPatch[]>();
 	for (const patch of patches.filter((patch) => !patch.hidden)) {
 		const targets =
@@ -36,7 +36,7 @@ export function versionText(versions: string[]) {
 		: `Versions ${shown}`;
 }
 
-export function matches(patch: PatchInfo, query: string) {
+export function matches(patch: PatchSpec, query: string) {
 	const needle = query.trim().toLocaleLowerCase();
 	return !needle || `${patch.name} ${patch.description}`.toLocaleLowerCase().includes(needle);
 }
