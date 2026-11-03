@@ -1,4 +1,4 @@
-import { strToU8, unzipSync, Zip, ZipPassThrough, zipSync } from 'fflate';
+import { strToU8, unzipSync, zipSync } from 'fflate';
 import type { SigningKey } from './storage';
 
 export function save(file: Blob, name: string) {
@@ -6,29 +6,6 @@ export function save(file: Blob, name: string) {
 	const link = Object.assign(document.createElement('a'), { href: url, download: name });
 	link.click();
 	setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-/** Packs a split set as .apks, the archive split-aware installers and Reseam Manager use. */
-export async function splitArchive(apks: File[]): Promise<Blob> {
-	const chunks: Uint8Array[] = [];
-	const result: { error?: Error } = {};
-	const zip = new Zip((error, chunk) => {
-		if (error) result.error = error;
-		else chunks.push(chunk);
-	});
-	for (const apk of apks.toSorted((left, right) => left.name.localeCompare(right.name))) {
-		// APKs are already compressed, so entries are stored.
-		const entry = new ZipPassThrough(apk.name);
-		zip.add(entry);
-		const reader = apk.stream().getReader();
-		for (let read = await reader.read(); !read.done; read = await reader.read()) {
-			entry.push(read.value);
-		}
-		entry.push(new Uint8Array(), true);
-	}
-	zip.end();
-	if (result.error) throw result.error;
-	return new Blob(chunks as BlobPart[], { type: 'application/zip' });
 }
 
 const KEY = 'reseam.pk8';

@@ -264,7 +264,11 @@ export class Patcher {
 					options,
 					ignore_versions: this.ignoreVersions,
 				},
-				output: { kind: 'auto', path: '/output/patched' },
+				// Split apps come out as one .apks file, which the engine writes.
+				output:
+					(this.inspection.apk?.component_count ?? 1) > 1
+						? { kind: 'split_archive', path: '/output/patched.apks' }
+						: { kind: 'auto', path: '/output/patched' },
 				signing: { kind: 'files', key: '/identity/reseam.pk8', cert: '/identity/reseam.der' },
 				dry_run: false,
 				install_method: 'install',

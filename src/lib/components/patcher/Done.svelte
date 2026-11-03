@@ -3,17 +3,15 @@
 	import Download from '@lucide/svelte/icons/download';
 	import FileArchive from '@lucide/svelte/icons/file-archive';
 	import KeyRound from '@lucide/svelte/icons/key-round';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type { Artifact, PatchResult } from '@reseam/browser';
-	import { Collapsible } from 'bits-ui';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Callout from '#lib/components/ui/Callout.svelte';
 	import Panel from '#lib/components/ui/Panel.svelte';
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
 	import PanelSection from '#lib/components/ui/PanelSection.svelte';
 	import { duration, megabytes, plural } from '#lib/format.ts';
-	import { keyBackup, save, splitArchive } from '#lib/patcher/files.ts';
+	import { keyBackup, save } from '#lib/patcher/files.ts';
 	import type { Patcher, Report } from '#lib/patcher/patcher.svelte.ts';
 	import RunReport from './RunReport.svelte';
 
@@ -35,28 +33,17 @@
 
 	const apk = $derived(patcher.inspection?.apk);
 	const label = $derived(apk?.application_label ?? apk?.package_name ?? 'Your app');
-	const split = $derived(apks.length > 1);
+	// One file: an APK, or every part of a split app in one .apks.
+	const artifact = $derived(apks[0]);
+	const split = $derived(artifact.name.endsWith('.apks'));
 	const fileName = $derived(
 		`${[apk?.package_name ?? 'app', apk?.version_name, 'reseam'].filter(Boolean).join('-')}.${split ? 'apks' : 'apk'}`
 	);
-	const size = $derived(apks.reduce((total, artifact) => total + artifact.file.size, 0));
 	const applied = $derived(
 		results.filter((result) => !result.hidden && result.status.kind === 'applied').length
 	);
-	const apkName = (artifact: Artifact) => artifact.name.split('/').at(-1)!;
 
-	let preparing = $state(false);
 	let keySaved = $state(false);
-
-	async function downloadApp() {
-		if (!split) return save(apks[0].file, fileName);
-		preparing = true;
-		try {
-			save(await splitArchive(apks.map((artifact) => artifact.file)), fileName);
-		} finally {
-			preparing = false;
-		}
-	}
 
 	async function downloadKey() {
 		const key = await patcher.exportKey();
@@ -86,47 +73,14 @@
 			<FileArchive size={20} class="hidden shrink-0 text-on-surface-variant sm:block" />
 			<div class="min-w-0 flex-1">
 				<p class="truncate text-label-large">{fileName}</p>
-				<p class="text-body-small text-on-surface-variant">
-					{megabytes(size)}{split ? ` · ${apks.length} split APKs` : ''}
-				</p>
+				<p class="text-body-small text-on-surface-variant">{megabytes(artifact.file.size)}</p>
 			</div>
-			<Button onclick={downloadApp} disabled={preparing}>
-				{#if preparing}<LoaderCircle size={16} class="animate-spin" /> Preparing{:else}<Download
-						size={16}
-					/> Download{/if}
-			</Button>
+			<Button onclick={() => save(artifact.file, fileName)}><Download size={16} /> Download</Button>
 		</div>
 		{#if split}
 			<p class="text-body-medium text-on-surface-variant">
 				Install the .apks file with a split APK installer.
 			</p>
-			<Collapsible.Root>
-				<Collapsible.Trigger
-					class="text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
-					>Download APKs one by one</Collapsible.Trigger
-				>
-				<Collapsible.Content class="collapsible">
-					<ul
-						class="mt-3 divide-y divide-outline-variant rounded-md border border-outline-variant text-body-medium"
-					>
-						{#each apks as artifact (artifact.name)}
-							<li>
-								<button
-									type="button"
-									onclick={() => save(artifact.file, apkName(artifact))}
-									class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container"
-								>
-									<span class="min-w-0 flex-1 truncate">{apkName(artifact)}</span>
-									<span class="text-on-surface-variant tabular-nums"
-										>{megabytes(artifact.file.size)}</span
-									>
-									<Download size={14} class="text-on-surface-variant" />
-								</button>
-							</li>
-						{/each}
-					</ul>
-				</Collapsible.Content>
-			</Collapsible.Root>
 		{/if}
 		{#if leftOut.length > 0}
 			<Callout
