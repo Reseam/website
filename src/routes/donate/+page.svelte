@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Globe from '@lucide/svelte/icons/globe';
 	import Heart from '@lucide/svelte/icons/heart';
 	import Package from '@lucide/svelte/icons/package';
@@ -9,9 +10,9 @@
 	import { SPONSORS_URL } from '#lib/site.ts';
 
 	const costs = [
-		{ icon: Server, label: 'Server' },
-		{ icon: Globe, label: 'Domains' },
-		{ icon: Package, label: 'Resources' },
+		{ icon: Server, label: m.donate_server },
+		{ icon: Globe, label: m.donate_domains },
+		{ icon: Package, label: m.donate_resources },
 	];
 
 	const wallets = [
@@ -30,10 +31,7 @@
 	];
 </script>
 
-<PageMeta
-	title="Donations · Reseam"
-	description="Support Reseam through GitHub Sponsors, Bitcoin or Ethereum. Donations pay for the server, the domains and other resources."
-/>
+<PageMeta title={m.donate_meta_title()} description={m.donate_meta_description()} />
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-176 gap-6 pt-14 pb-20 text-center sm:pt-20">
@@ -46,9 +44,9 @@
 			</div>
 
 			<div class="grid gap-2">
-				<h1 class="text-headline-large sm:text-display-medium">Support Reseam</h1>
+				<h1 class="text-headline-large sm:text-display-medium">{m.donate_title()}</h1>
 				<p class="text-body-large text-on-surface-variant">
-					Reseam is free. Donations pay for the server, the domains and other resources.
+					{m.donate_lead()}
 				</p>
 			</div>
 
@@ -56,7 +54,7 @@
 				{#each costs as cost (cost.label)}
 					<li class="flex items-center gap-2">
 						<cost.icon size={18} class="text-primary" />
-						<span class="text-label-large">{cost.label}</span>
+						<span class="text-label-large">{cost.label()}</span>
 					</li>
 				{/each}
 			</ul>
@@ -65,12 +63,13 @@
 				<Heart
 					size={17}
 					class="transition-transform duration-300 ease-spring group-hover:scale-125"
-				/> Sponsor on GitHub
+				/>
+				{m.donate_sponsor()}
 			</Button>
 		</header>
 
 		<section aria-labelledby="crypto" class="grid gap-6">
-			<h2 id="crypto" class="text-title-large">Or send crypto</h2>
+			<h2 id="crypto" class="text-title-large">{m.donate_crypto()}</h2>
 			<ul class="grid gap-6 sm:grid-cols-2">
 				{#each wallets as wallet (wallet.symbol)}
 					<WalletCard {...wallet} />

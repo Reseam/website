@@ -4,7 +4,7 @@
 	import Button from '#lib/components/ui/Button.svelte';
 	import Panel from '#lib/components/ui/Panel.svelte';
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
-	import { plural } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
 
 	let { patcher, file }: { patcher: Patcher; file: File } = $props();
@@ -24,16 +24,18 @@
 			? [
 					apk.version_name,
 					apk.package_name,
-					apk.component_count > 1 && plural(apk.component_count, 'APK'),
+					apk.component_count > 1 && m.patcher_apk_count({ count: apk.component_count }),
 				]
 					.filter(Boolean)
 					.join(' · ')
 			: reading
-				? 'Reading the app…'
-				: 'Waiting for patches'}
+				? m.patcher_reading()
+				: m.patcher_waiting()}
 	>
 		{#snippet aside()}
-			<Button variant="outline" size="sm" onclick={() => patcher.clearApp()}>Change</Button>
+			<Button variant="outline" size="sm" onclick={() => patcher.clearApp()}
+				>{m.action_change()}</Button
+			>
 		{/snippet}
 	</PanelHeader>
 </Panel>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { Label } from 'bits-ui';
 	import Button from '#lib/components/ui/Button.svelte';
@@ -81,7 +82,7 @@
 
 {#snippet importButton()}
 	<label class={buttonClass('outline', 'sm')}>
-		Import a key
+		{m.key_import()}
 		<input
 			type="file"
 			accept=".p12,.pfx"
@@ -114,68 +115,65 @@
 		/>
 		<div class="flex gap-2">
 			<Button size="sm" type="submit">{action}</Button>
-			<Button size="sm" variant="ghost" onclick={cancel}>Cancel</Button>
+			<Button size="sm" variant="ghost" onclick={cancel}>{m.action_cancel()}</Button>
 		</div>
 	</form>
 {/snippet}
 
-<Dialog
-	bind:open
-	title="Signing key"
-	description="Patched apps are signed with a key kept in this browser. Android installs updates only when they are signed with the same key."
->
+<Dialog bind:open title={m.key_title()} description={m.key_description()}>
 	{#if importing}
 		{@render passwordForm(
-			`Password for ${importing.name}`,
-			'Import',
+			m.key_password_for({ file: importing.name }),
+			m.key_import_action(),
 			unlock,
 			() => (importing = null)
 		)}
 	{:else if backingUp}
 		{@render passwordForm(
-			'Choose a password for the backup',
-			'Download backup',
+			m.key_backup_password(),
+			m.key_backup_download(),
 			backup,
 			() => (backingUp = false)
 		)}
 	{:else if pending}
-		<Callout icon={TriangleAlert} tone="warning" title="Replace the current key?">
+		<Callout icon={TriangleAlert} tone="warning" title={m.key_replace_title()}>
 			<p class="mt-1 text-on-surface-variant">
-				Apps patched with the current key can then only be updated after uninstalling them, unless
-				you keep its backup.
+				{m.key_replace_text()}
 			</p>
 			<div class="mt-3 flex gap-2">
-				<Button size="sm" onclick={replace}>Replace</Button>
-				<Button size="sm" variant="ghost" onclick={() => (pending = null)}>Keep current key</Button>
+				<Button size="sm" onclick={replace}>{m.key_replace()}</Button>
+				<Button size="sm" variant="ghost" onclick={() => (pending = null)}>{m.key_keep()}</Button>
 			</div>
 		</Callout>
 	{:else if forgetting}
-		<Callout icon={TriangleAlert} tone="warning" title="Forget this key?">
+		<Callout icon={TriangleAlert} tone="warning" title={m.key_forget_title()}>
 			<p class="mt-1 text-on-surface-variant">
-				A new key is made on the next patch. Apps signed with this one can then only be updated
-				after uninstalling them.
+				{m.key_forget_text()}
 			</p>
 			<div class="mt-3 flex gap-2">
-				<Button size="sm" onclick={forget}>Forget key</Button>
-				<Button size="sm" variant="ghost" onclick={() => (forgetting = false)}>Cancel</Button>
+				<Button size="sm" onclick={forget}>{m.key_forget_action()}</Button>
+				<Button size="sm" variant="ghost" onclick={() => (forgetting = false)}
+					>{m.action_cancel()}</Button
+				>
 			</div>
 		</Callout>
 	{:else if patcher.signingKey}
 		<div class="grid gap-1.5">
-			<p class="text-label-medium text-on-surface-variant">Certificate SHA-256</p>
+			<p class="text-label-medium text-on-surface-variant">{m.key_certificate()}</p>
 			<code class="font-mono text-mono-xs break-all">{patcher.signingKey.fingerprint}</code>
 		</div>
 		<div class="flex flex-wrap gap-2">
-			<Button size="sm" onclick={() => (backingUp = true)}>Back up</Button>
+			<Button size="sm" onclick={() => (backingUp = true)}>{m.key_backup()}</Button>
 			{@render importButton()}
-			<Button size="sm" variant="ghost" onclick={() => (forgetting = true)}>Forget</Button>
+			<Button size="sm" variant="ghost" onclick={() => (forgetting = true)}>{m.key_forget()}</Button
+			>
 		</div>
 	{:else}
-		<p class="text-body-medium">No key yet. One is made the first time you patch.</p>
+		<p class="text-body-medium">{m.key_none()}</p>
 		<div>{@render importButton()}</div>
 	{/if}
 	{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
 	<p class="text-body-small text-on-surface-variant">
-		Backups are password-protected .p12 files, which Reseam Manager and the reseam CLI also read.
+		{m.key_backup_note()}
 	</p>
 </Dialog>

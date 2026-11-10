@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Upload from '@lucide/svelte/icons/upload';
 	import { buttonClass } from '#lib/components/ui/button.ts';
 
@@ -40,11 +41,9 @@
 			dragging && '-translate-y-1 scale-110',
 		]}
 	/>
-	<span class="text-title-medium">Drop an APK, APKM or XAPK</span>
-	<span class="text-body-medium text-on-surface-variant"
-		>Split APKs and patch bundles can come along.</span
-	>
-	<span class="mt-3 {buttonClass('outline', 'sm')}">Choose file</span>
+	<span class="text-title-medium">{m.patcher_drop_title()}</span>
+	<span class="text-body-medium text-on-surface-variant">{m.patcher_drop_text()}</span>
+	<span class="mt-3 {buttonClass('outline', 'sm')}">{m.action_choose_file()}</span>
 	<input
 		type="file"
 		multiple

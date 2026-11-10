@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import card from '#lib/assets/og-card.jpg';
+	import { m } from '#lib/paraglide/messages.js';
+	import { baseLocale, getLocale, locales, localizeHref } from '#lib/paraglide/runtime.js';
 	import { SITE_URL, type ImageAsset } from '#lib/site.ts';
 
 	let {
 		title,
 		description,
-		image = { src: card, alt: 'Reseam: a better way to use your apps', width: 1200, height: 630 },
+		image = { src: card, alt: m.home_meta_title(), width: 1200, height: 630 },
 		type = 'website',
 		noindex = false,
 	}: {
@@ -26,6 +28,19 @@
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="canonical" href={url} />
+	{#each locales as locale (locale)}
+		<link
+			rel="alternate"
+			hreflang={locale}
+			href={SITE_URL + localizeHref(page.url.pathname, { locale })}
+		/>
+	{/each}
+	<link
+		rel="alternate"
+		hreflang="x-default"
+		href={SITE_URL + localizeHref(page.url.pathname, { locale: baseLocale })}
+	/>
+	<meta property="og:locale" content={getLocale()} />
 	{#if noindex}<meta name="robots" content="noindex" />{/if}
 	<meta property="og:title" content={title} />
 	<meta property="og:description" content={description} />

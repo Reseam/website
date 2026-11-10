@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import { reading } from '#lib/announcements.svelte.ts';
 	import EarlierEntry from '#lib/components/updates/EarlierEntry.svelte';
@@ -30,20 +31,21 @@
 	});
 </script>
 
-<PageMeta
-	title="Updates · Reseam"
-	description="Releases of Reseam Patches and Reseam Manager, and news from Reseam."
-/>
+<PageMeta title={m.updates_meta_title()} description={m.updates_lead()} />
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-232 gap-8 pt-10 pb-20 sm:pt-14">
 		<header class="grid gap-3">
-			<h1 class="text-headline-large sm:text-display-medium">Updates</h1>
+			<h1 class="text-headline-large sm:text-display-medium">{m.updates_title()}</h1>
 			<p class="text-body-large text-on-surface-variant">
-				Releases of Reseam Patches and Reseam Manager, and news from Reseam.
+				{m.updates_lead()}
 			</p>
 		</header>
-		<FilterChips options={KINDS} bind:value={kind} label="Show" />
+		<FilterChips
+			options={KINDS.map((option) => ({ value: option.value, label: option.label() }))}
+			bind:value={kind}
+			label={m.updates_show()}
+		/>
 
 		{#if latest.length > 0}
 			{#each latest as entry, i (entryPath(entry))}
@@ -75,7 +77,9 @@
 
 			{#if earlier.length > 0}
 				<section aria-labelledby="earlier" class="grid gap-1 border-t border-outline-variant pt-6">
-					<h2 id="earlier" class="text-label-large text-on-surface-variant">Earlier updates</h2>
+					<h2 id="earlier" class="text-label-large text-on-surface-variant">
+						{m.updates_earlier()}
+					</h2>
 					<ul class="divide-y divide-outline-variant">
 						{#each earlier.slice(0, shown) as entry (entryPath(entry))}<EarlierEntry
 								{entry}
@@ -83,7 +87,7 @@
 					</ul>
 					{#if earlier.length > shown}
 						<Button variant="outline" class="justify-self-start" onclick={() => (shown += PAGE)}>
-							Show older updates
+							{m.updates_show_older()}
 						</Button>
 					{/if}
 				</section>
@@ -93,7 +97,7 @@
 				class="grid justify-items-center gap-3 rounded-xl border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
 			>
 				<Megaphone size={28} class="opacity-40" />
-				<p>Nothing here yet.</p>
+				<p>{m.updates_empty()}</p>
 			</div>
 		{/if}
 	</div>

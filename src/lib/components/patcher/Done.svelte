@@ -10,7 +10,9 @@
 	import Panel from '#lib/components/ui/Panel.svelte';
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
 	import PanelSection from '#lib/components/ui/PanelSection.svelte';
-	import { duration, megabytes, plural } from '#lib/format.ts';
+	import { duration, megabytes } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
+	import { getLocale } from '#lib/paraglide/runtime.js';
 	import { save } from '#lib/patcher/files.ts';
 	import type { Patcher, Report } from '#lib/patcher/patcher.svelte.ts';
 	import RunReport from './RunReport.svelte';
@@ -35,7 +37,7 @@
 	} = $props();
 
 	const apk = $derived(patcher.inspection?.apk);
-	const label = $derived(apk?.application_label ?? apk?.package_name ?? 'Your app');
+	const label = $derived(apk?.application_label ?? apk?.package_name ?? m.patcher_your_app());
 	// One file: an APK, or every part of a split app in one .apks.
 	const artifact = $derived(apks[0]);
 	const split = $derived(artifact.name.endsWith('.apks'));
@@ -51,10 +53,10 @@
 	<PanelHeader
 		id="done-title"
 		icon={CircleCheck}
-		title="{label} is ready"
+		title={m.patcher_ready({ app: label })}
 		subtitle={[
-			apk?.version_name && `Version ${apk.version_name}`,
-			plural(applied, 'patch', 'patches'),
+			apk?.version_name && m.version({ version: apk.version_name }),
+			m.patcher_patch_count({ count: applied }),
 			duration(report.milliseconds),
 		]
 			.filter(Boolean)
@@ -69,40 +71,48 @@
 				<p class="truncate text-label-large">{fileName}</p>
 				<p class="text-body-small text-on-surface-variant">{megabytes(artifact.file.size)}</p>
 			</div>
-			<Button onclick={() => save(artifact.file, fileName)}><Download size={16} /> Download</Button>
+			<Button onclick={() => save(artifact.file, fileName)}
+				><Download size={16} /> {m.action_download()}</Button
+			>
 		</div>
 		{#if split}
 			<p class="text-body-medium text-on-surface-variant">
-				Install the .apks file with a split APK installer.
+				{m.patcher_split_install()}
 			</p>
 		{/if}
 		{#if leftOut.length > 0}
 			<Callout
 				icon={TriangleAlert}
 				tone="warning"
-				title="Built without {plural(leftOut.length, 'patch', 'patches')}"
+				title={m.patcher_left_out_title({ count: leftOut.length })}
 			>
 				<p class="mt-1 text-on-surface-variant">
-					{leftOut.map(patcher.patchName).join(', ')} could not be applied, so {label} is ready without
-					{leftOut.length === 1 ? 'it' : 'them'}. The run report says why.
+					{m.patcher_left_out_text({
+						count: leftOut.length,
+						patches: new Intl.ListFormat(getLocale()).format(leftOut.map(patcher.patchName)),
+						app: label,
+					})}
 				</p>
 			</Callout>
 		{/if}
 		{#if newKey}
-			<Callout icon={KeyRound} title="Back up your signing key">
+			<Callout icon={KeyRound} title={m.patcher_backup_title()}>
 				<p class="mt-1 text-on-surface-variant">
-					This browser made the key that signed {label}. Updates must be signed with the same key,
-					so keep a copy somewhere safe.
+					{m.patcher_backup_text({ app: label })}
 				</p>
 				<Button variant="outline" size="sm" class="mt-3" onclick={onKeyBackup}
-					>Back up the key</Button
+					>{m.patcher_backup_action()}</Button
 				>
 			</Callout>
 		{/if}
 	</PanelSection>
 	<PanelSection><RunReport {patcher} {report} /></PanelSection>
 	<PanelSection class="flex flex-col-reverse gap-2 py-4 sm:flex-row sm:justify-end">
-		<Button variant="ghost" size="lg" onclick={() => patcher.clearApp()}>Patch another app</Button>
-		<Button variant="outline" size="lg" onclick={() => patcher.edit()}>Change patches</Button>
+		<Button variant="ghost" size="lg" onclick={() => patcher.clearApp()}
+			>{m.patcher_patch_another()}</Button
+		>
+		<Button variant="outline" size="lg" onclick={() => patcher.edit()}
+			>{m.patcher_change_patches()}</Button
+		>
 	</PanelSection>
 </Panel>

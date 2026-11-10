@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import User from '@lucide/svelte/icons/user';
 	import Logo from '#lib/components/layout/Logo.svelte';
 	import Markdown from '#lib/components/ui/Markdown.svelte';
@@ -42,26 +43,26 @@
 	<div class="grid min-w-0 flex-1 gap-2">
 		<div class="flex flex-wrap items-baseline gap-x-2 text-body-small text-on-surface-variant">
 			{#if comment.team}
-				<span class="text-label-large text-primary">Reseam team</span>
+				<span class="text-label-large text-primary">{m.comment_team()}</span>
 			{:else if comment.requester}
-				<span class="text-label-large text-on-surface">Requester</span>
+				<span class="text-label-large text-on-surface">{m.comment_requester()}</span>
 			{:else}
-				<span class="text-label-large">Anonymous</span>
+				<span class="text-label-large">{m.comment_anonymous()}</span>
 			{/if}
 			<time datetime={comment.created_at}>{recentDate(comment.created_at)}</time>
-			{#if comment.hidden}<span class="text-warning">Hidden</span>{/if}
+			{#if comment.hidden}<span class="text-warning">{m.comment_hidden()}</span>{/if}
 			<span class="flex gap-3">
 				{#if moderating}
 					<button type="button" class={comment.hidden ? action : danger} onclick={ontoggle}
-						>{comment.hidden ? 'Show' : 'Hide'}</button
+						>{comment.hidden ? m.comment_show() : m.comment_hide()}</button
 					>
-					<button type="button" class={danger} onclick={onremove}>Delete</button>
+					<button type="button" class={danger} onclick={onremove}>{m.comment_delete()}</button>
 				{:else if mine}
-					<button type="button" class={danger} onclick={onremove}>Delete</button>
+					<button type="button" class={danger} onclick={onremove}>{m.comment_delete()}</button>
 				{:else if reported}
-					<span>Reported</span>
+					<span>{m.comment_reported()}</span>
 				{:else if canReport && !comment.team}
-					<button type="button" class={danger} onclick={onreport}>Report</button>
+					<button type="button" class={danger} onclick={onreport}>{m.request_report()}</button>
 				{/if}
 			</span>
 		</div>
@@ -74,7 +75,7 @@
 		/>
 		{#if comment.hidden && !moderating}
 			<p class="text-body-small text-on-surface-variant">
-				Held as possible spam. Only you can see it.
+				{m.comment_held()}
 			</p>
 		{/if}
 	</div>

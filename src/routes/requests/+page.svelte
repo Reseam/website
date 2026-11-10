@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { onMount } from 'svelte';
 	import { TURNSTILE_SITE_KEY } from '$app/env/public';
@@ -66,22 +67,18 @@
 	}
 </script>
 
-<PageMeta
-	title="Requests · Reseam"
-	description="Ask for a patch, a fix, or support for an app, and vote on what others asked for."
-/>
+<PageMeta title={m.requests_meta_title()} description={m.requests_meta_description()} />
 
 <div class="container-page">
 	<header class="flex flex-wrap items-end justify-between gap-x-8 gap-y-5 pt-10 pb-8 sm:pt-14">
 		<div class="grid gap-2">
-			<h1 class="text-headline-large sm:text-display-small">Requests</h1>
+			<h1 class="text-headline-large sm:text-display-small">{m.requests_title()}</h1>
 			<p class="text-body-large text-on-surface-variant">
-				Ask for a patch, a fix, or support for an app, and vote on what others asked for. No account
-				needed.
+				{m.requests_lead()}
 			</p>
 		</div>
 		{#if canWrite}<Button size="lg" onclick={() => (creating = true)}
-				><Plus size={18} /> New request</Button
+				><Plus size={18} /> {m.requests_new()}</Button
 			>{/if}
 	</header>
 
@@ -92,7 +89,7 @@
 			apps={requestApps(matching, names.value)}
 			total={matching.length}
 			bind:selected={app}
-			noneLabel="Other app"
+			noneLabel={m.requests_other_app()}
 		/>
 		<div class="grid min-w-0 gap-5">
 			<RequestNotices mine={board.mine()} {held} />

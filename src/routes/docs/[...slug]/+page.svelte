@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import DocContent from '#lib/components/docs/DocContent.svelte';
 	import PageNav from '#lib/components/docs/PageNav.svelte';
@@ -11,7 +12,7 @@
 </script>
 
 <PageMeta
-	title="{page.title} · {group?.label ?? 'Docs'} · Reseam"
+	title={m.docs_page_title({ page: page.title, group: group?.label ?? m.docs_title() })}
 	description={page.description ?? group?.summary ?? page.title}
 	type="article"
 />
@@ -27,7 +28,8 @@
 			href={page.editUrl}
 			class="inline-flex items-center gap-1.5 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 		>
-			<Pencil size={14} /> Edit this page
+			<Pencil size={14} />
+			{m.docs_edit()}
 		</a>
 		<PageNav previous={data.previous} next={data.next} />
 	</article>

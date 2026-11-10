@@ -1,10 +1,9 @@
 export type Change = { app: string | null; text: string };
-export type NoteSection = { kind: ChangeKind; title: string; changes: Change[] };
+export type NoteSection = { kind: ChangeKind; changes: Change[] };
 export type ReleaseNotes = { sections: NoteSection[]; prose: string; engine: string | null };
 
-type ChangeKind = 'feat' | 'fix' | 'perf';
-
-const SECTIONS: Record<ChangeKind, string> = { feat: 'New', fix: 'Fixed', perf: 'Faster' };
+const CHANGE_KINDS = ['feat', 'fix', 'perf'] as const;
+type ChangeKind = (typeof CHANGE_KINDS)[number];
 const CONVENTIONAL = /^\s*[-*+]\s+(\w+)(?:\(([^)]+)\))?!?:\s+(.+)$/;
 const ENGINE = /^\s*[-*+]\s+build:\s+require engine\s+(\S+)/m;
 const APP_NAMES: Record<string, string> = {
@@ -40,7 +39,7 @@ export function parseNotes(description: string): ReleaseNotes {
 		}
 		const [, type, scope, text] = match;
 		const kind = type.toLowerCase();
-		if (!(kind in SECTIONS)) continue;
+		if (!CHANGE_KINDS.includes(kind as ChangeKind)) continue;
 		const changes = sections.get(kind as ChangeKind) ?? [];
 		changes.push({
 			app: scope ? scopeName(scope) : null,
@@ -49,9 +48,10 @@ export function parseNotes(description: string): ReleaseNotes {
 		sections.set(kind as ChangeKind, changes);
 	}
 	return {
-		sections: (Object.keys(SECTIONS) as ChangeKind[])
-			.filter((kind) => sections.has(kind))
-			.map((kind) => ({ kind, title: SECTIONS[kind], changes: sections.get(kind)! })),
+		sections: CHANGE_KINDS.filter((kind) => sections.has(kind)).map((kind) => ({
+			kind,
+			changes: sections.get(kind)!,
+		})),
 		prose: prose.join('\n').trim(),
 		engine: ENGINE.exec(description)?.[1] ?? null,
 	};

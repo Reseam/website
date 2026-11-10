@@ -1,3 +1,4 @@
+import { m } from '#lib/paraglide/messages.js';
 export type SigningKey = { key: ArrayBuffer; cert: ArrayBuffer };
 
 type Preferences = { identity: SigningKey; 'trusted-signers': string[] };
@@ -19,7 +20,7 @@ function open(): Promise<IDBDatabase> {
 			database = undefined;
 			reject(request.error);
 		};
-		request.onblocked = () => reject(new Error('Close other Reseam tabs, then reload this page.'));
+		request.onblocked = () => reject(new Error(m.storage_blocked()));
 	}));
 }
 

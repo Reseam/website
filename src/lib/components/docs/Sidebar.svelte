@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
+	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Collapsible } from 'bits-ui';
@@ -15,7 +17,7 @@
 	const currentTitle = $derived(
 		groups
 			.flatMap((group) => group.sections.flatMap((section) => section.pages))
-			.find(({ slug }) => slug === current)?.title ?? 'Docs'
+			.find(({ slug }) => slug === current)?.title ?? m.docs_title()
 	);
 	const filtered = $derived(
 		groups
@@ -40,8 +42,8 @@
 </script>
 
 {#snippet links()}
-	<nav aria-label="Docs" class="grid gap-1">
-		<div class="mb-3"><SearchField bind:value={query} label="Search docs" /></div>
+	<nav aria-label={m.docs_title()} class="grid gap-1">
+		<div class="mb-3"><SearchField bind:value={query} label={m.docs_search()} /></div>
 		{#each filtered as group (group.slug)}
 			<Collapsible.Root
 				open={query.trim() !== '' || current.startsWith(`${group.slug}/`) || current === ''}
@@ -66,7 +68,7 @@
 							{#each section.pages as link (link.slug)}
 								<li>
 									<a
-										href="/docs/{link.slug}/"
+										href={localizeHref(`/docs/${link.slug}/`)}
 										aria-current={link.slug === current ? 'page' : undefined}
 										class="block rounded-sm px-3 py-1.5 text-body-medium text-on-surface-variant transition-colors hover:text-on-surface aria-[current=page]:bg-surface-container aria-[current=page]:text-on-surface"
 									>
@@ -80,7 +82,7 @@
 			</Collapsible.Root>
 		{:else}
 			<p class="px-2.5 py-4 text-body-medium text-on-surface-variant">
-				No pages match “{query.trim()}”.
+				{m.docs_no_match({ query: query.trim() })}
 			</p>
 		{/each}
 	</nav>

@@ -2,6 +2,7 @@ import Discord from '#lib/components/brand/Discord.svelte';
 import Reddit from '#lib/components/brand/Reddit.svelte';
 import Telegram from '#lib/components/brand/Telegram.svelte';
 import X from '#lib/components/brand/X.svelte';
+import { m } from '#lib/paraglide/messages.js';
 
 export const SITE_URL = 'https://reseam.app';
 export const SOURCE_URL = 'https://git.reseam.app';
@@ -18,9 +19,9 @@ export const SOCIALS = [
 export type ImageAsset = { src: string; alt: string; width: number; height: number };
 
 export const NAV = [
-	{ label: 'Patches', href: '/patches/' },
-	{ label: 'Patch online', href: '/patch/' },
-	{ label: 'Download', href: '/download/' },
-	{ label: 'Requests', href: '/requests/' },
-	{ label: 'Docs', href: '/docs/' },
+	{ label: m.nav_patches, href: '/patches/' },
+	{ label: m.nav_patch_online, href: '/patch/' },
+	{ label: m.nav_download, href: '/download/' },
+	{ label: m.nav_requests, href: '/requests/' },
+	{ label: m.nav_docs, href: '/docs/' },
 ] as const;

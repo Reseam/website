@@ -12,11 +12,13 @@
 		"docs:local": "bun run scripts/build-docs-local.ts",
 		"runtime:copy": "bun run scripts/copy-runtime.ts",
 		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"check": "bun run i18n && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "bun run i18n && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"i18n": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy url baseLocale --silent",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@inlang/paraglide-js": "^3.2.1",
 		"@sveltejs/adapter-static": "^4.0.0",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",

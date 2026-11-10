@@ -2,6 +2,8 @@ import { fetchAnnouncements, fetchManagerIndex, fetchPatchesIndex } from '#lib/a
 import { parseNotes, type ReleaseNotes } from '#lib/notes.ts';
 import type { ReleaseIndex } from '@reseam/browser';
 import type { Announcement } from '#lib/types.ts';
+import { m } from '#lib/paraglide/messages.js';
+import { localizeHref } from '#lib/paraglide/runtime.js';
 
 export type ReleaseKind = 'patches' | 'manager';
 
@@ -25,9 +27,9 @@ export type NewsEntry = {
 export type UpdateEntry = ReleaseEntry | NewsEntry;
 
 export const KINDS = [
-	{ value: 'patches', label: 'Patches' },
-	{ value: 'manager', label: 'Reseam Manager' },
-	{ value: 'news', label: 'Announcements' },
+	{ value: 'patches', label: m.updates_patches },
+	{ value: 'manager', label: () => 'Reseam Manager' },
+	{ value: 'news', label: m.updates_announcements },
 ] as const;
 
 const PRODUCTS: Record<ReleaseKind, string> = {
@@ -73,7 +75,7 @@ export async function loadUpdates(apiUrl: string, fetcher: typeof fetch = fetch)
 }
 
 export const entryPath = (entry: Pick<UpdateEntry, 'kind' | 'key'>) =>
-	`/updates/${entry.kind}/${entry.key}/`;
+	localizeHref(`/updates/${entry.kind}/${entry.key}/`);
 
 export function summary(entry: UpdateEntry) {
 	if (entry.kind === 'news') return entry.announcement.content ?? '';

@@ -7,6 +7,7 @@
 	import { Collapsible } from 'bits-ui';
 	import { buttonClass } from '#lib/components/ui/button.ts';
 	import { duration } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
 	import { STAGES, type Patcher, type Report } from '#lib/patcher/patcher.svelte.ts';
 
 	let { patcher, report }: { patcher: Patcher; report: Report } = $props();
@@ -14,7 +15,7 @@
 	// One shade per stage, in run order, so the bar and its legend read together.
 	const shades = ['opacity-100', 'opacity-80', 'opacity-60', 'opacity-40', 'opacity-25'];
 	const shade = (stage: string) => shades[STAGES.findIndex((entry) => entry.stage === stage)];
-	const label = (stage: string) => STAGES.find((entry) => entry.stage === stage)!.label;
+	const label = (stage: string) => STAGES.find((entry) => entry.stage === stage)!.label();
 	// Stages that took no measurable time, such as a Java runtime already started, are noise here.
 	const stages = $derived(report.stages.filter((entry) => entry.milliseconds >= 100));
 
@@ -28,9 +29,9 @@
 
 <div class="grid grid-cols-1 gap-3">
 	<div class="flex items-baseline justify-between gap-4">
-		<h3 class="text-label-large">Time</h3>
+		<h3 class="text-label-large">{m.report_time()}</h3>
 		<span class="text-body-medium text-on-surface-variant tabular-nums"
-			>{duration(report.milliseconds)} total</span
+			>{m.report_total({ duration: duration(report.milliseconds) })}</span
 		>
 	</div>
 	<div class="flex h-2 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
@@ -52,7 +53,8 @@
 		<Collapsible.Trigger
 			class="group mt-2 inline-flex items-center gap-1 text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 		>
-			Details <ChevronDown
+			{m.report_details()}
+			<ChevronDown
 				size={14}
 				class="transition-transform duration-200 group-aria-expanded:rotate-180"
 			/>
@@ -93,7 +95,7 @@
 					<button
 						type="button"
 						onclick={copy}
-						aria-label={copied ? 'Copied' : 'Copy log'}
+						aria-label={copied ? m.action_copied() : m.report_copy_log()}
 						class="absolute top-2 right-2 {buttonClass('ghost', 'icon-sm')}"
 					>
 						{#if copied}<Check size={14} />{:else}<Copy size={14} />{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Dialog from '#lib/components/ui/Dialog.svelte';
 	import Turnstile from './Turnstile.svelte';
 
@@ -23,14 +24,7 @@
 	}
 </script>
 
-<Dialog
-	bind:open
-	title="One quick check"
-	description="Voting needs no account. This check keeps bots out, and this browser remembers it."
->
-	{#if open}<Turnstile
-			onverified={verified}
-			onfailed={() => (error = 'The check did not load. Try again.')}
-		/>{/if}
+<Dialog bind:open title={m.verify_title()} description={m.verify_description()}>
+	{#if open}<Turnstile onverified={verified} onfailed={() => (error = m.verify_failed())} />{/if}
 	{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
 </Dialog>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
+	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Download from '@lucide/svelte/icons/download';
@@ -32,30 +34,26 @@
 	}
 </script>
 
-<PageMeta
-	title="Add patch source · Reseam"
-	description="Add a patch source to Reseam Manager."
-	noindex
-/>
+<PageMeta title={m.add_meta_title()} description={m.add_meta_description()} noindex />
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-176 gap-6 pt-10 pb-20 sm:pt-14">
-		<h1 class="text-headline-large sm:text-display-medium">Add patch source</h1>
+		<h1 class="text-headline-large sm:text-display-medium">{m.add_title()}</h1>
 
 		{#if link === null}
 			<Panel>
 				<PanelHeader
 					icon={TriangleAlert}
 					tone="error"
-					title="This link is incomplete"
-					subtitle="It doesn't say which patch source to add. Ask whoever shared it for the full link."
+					title={m.add_incomplete_title()}
+					subtitle={m.add_incomplete_text()}
 				/>
 			</Panel>
 		{:else if link}
 			<Panel>
-				<PanelHeader icon={Layers} title={link.host} subtitle="Patch source for Reseam Manager" />
+				<PanelHeader icon={Layers} title={link.host} subtitle={m.add_source_subtitle()} />
 				<PanelSection class="grid gap-3">
-					<p class="text-label-medium text-on-surface-variant">Link</p>
+					<p class="text-label-medium text-on-surface-variant">{m.add_link()}</p>
 					<div
 						class="flex min-w-0 items-center gap-3 rounded-lg border border-outline-variant bg-surface-container px-4 py-2"
 					>
@@ -64,35 +62,39 @@
 							{link.url}
 						</p>
 						<Button variant="ghost" size="sm" onclick={() => copy(link!.url)}>
-							{#if copied}<Check size={16} /> Copied{:else}<Copy size={16} /> Copy{/if}
+							{#if copied}<Check size={16} /> {m.action_copied()}{:else}<Copy size={16} />
+								{m.action_copy()}{/if}
 						</Button>
 					</div>
 				</PanelSection>
 				<PanelSection class="grid gap-4">
 					{#if android}
 						<p class="text-body-medium text-on-surface-variant">
-							Reseam Manager shows what the source patches before adding anything.
+							{m.add_preview()}
 						</p>
 						<div class="flex flex-wrap gap-3">
-							<Button href={managerIntent(link.url)} size="lg">Open in Reseam Manager</Button>
-							<Button href="/download/" size="lg" variant="outline"
-								><Download size={17} /> Get Reseam Manager</Button
+							<Button href={managerIntent(link.url)} size="lg">{m.add_open()}</Button>
+							<Button href={localizeHref('/download/')} size="lg" variant="outline"
+								><Download size={17} /> {m.action_get_manager()}</Button
 							>
 						</div>
 					{:else}
 						<ol class="grid list-decimal gap-2 ps-5 text-body-medium">
-							<li>Copy the link above.</li>
-							<li>In Reseam Manager, open Settings › Patch sources › Add patch source.</li>
-							<li>Paste the link and choose Add.</li>
+							<li>{m.add_step_copy()}</li>
+							<li>{m.add_step_open()}</li>
+							<li>{m.add_step_paste()}</li>
 						</ol>
-						<Button href="/download/" size="lg" variant="outline" class="justify-self-start"
-							><Download size={17} /> Get Reseam Manager</Button
+						<Button
+							href={localizeHref('/download/')}
+							size="lg"
+							variant="outline"
+							class="justify-self-start"><Download size={17} /> {m.action_get_manager()}</Button
 						>
 					{/if}
 				</PanelSection>
 			</Panel>
 			<Callout icon={ShieldAlert}>
-				Only add patch sources from people you trust. Their patches run inside the apps you patch.
+				{m.add_trust()}
 			</Callout>
 		{/if}
 	</div>

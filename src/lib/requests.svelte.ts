@@ -1,16 +1,30 @@
 import { fetchJson } from '#lib/api.ts';
+import { m } from '#lib/paraglide/messages.js';
+import { localizeHref } from '#lib/paraglide/runtime.js';
 import type { PatchRequest, RequestComment, RequestStatus } from '#lib/types.ts';
 
 const VOTER_KEY = 'reseam.voter';
 const SEEN_KEY = 'reseam.seenRequests';
 const SEEN_COMMENTS_KEY = 'reseam.seenComments';
 
-export const STATUSES: Record<Exclude<RequestStatus, 'hidden'>, string> = {
-	open: 'Open',
-	planned: 'Planned',
-	shipped: 'Shipped',
-	declined: 'Declined',
-	duplicate: 'Duplicate',
+export const STATUSES: Record<Exclude<RequestStatus, 'hidden'>, () => string> = {
+	open: m.status_open,
+	planned: m.status_planned,
+	shipped: m.status_shipped,
+	declined: m.status_declined,
+	duplicate: m.status_duplicate,
+};
+
+/** The notice that the user's own request reached a status. */
+export const STATUS_NOTICES: Record<
+	Exclude<RequestStatus, 'hidden'>,
+	(inputs: { title: string }) => string
+> = {
+	open: m.notice_open,
+	planned: m.notice_planned,
+	shipped: m.notice_shipped,
+	declined: m.notice_declined,
+	duplicate: m.notice_duplicate,
 };
 
 export type RequestQuery = {
@@ -53,7 +67,7 @@ export function shippedEntry(shippedIn: string) {
 	if (!version || (kind !== 'patches' && kind !== 'manager')) return undefined;
 	return {
 		label: `${kind === 'patches' ? 'Reseam Patches' : 'Reseam Manager'} ${version}`,
-		href: `/updates/${kind}/${version}/`,
+		href: localizeHref(`/updates/${kind}/${version}/`),
 	};
 }
 

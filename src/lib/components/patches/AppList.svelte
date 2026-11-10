@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import type { AppInfo } from '#lib/types.ts';
 	import AppIcon from './AppIcon.svelte';
 
@@ -6,7 +7,7 @@
 		apps,
 		total,
 		selected = $bindable(),
-		noneLabel = 'Any app',
+		noneLabel = m.catalog_any_app(),
 	}: {
 		apps: { id: string | null; count: number; info?: AppInfo }[];
 		total: number;
@@ -26,14 +27,14 @@
 		<span
 			class={['flex-1 truncate max-lg:overflow-visible', id && !info && 'font-mono text-mono-xs']}
 			title={info ? id : undefined}
-			>{id === undefined ? 'All apps' : (info?.name ?? id ?? noneLabel)}</span
+			>{id === undefined ? m.catalog_all_apps() : (info?.name ?? id ?? noneLabel)}</span
 		>
 		<span class="text-body-small tabular-nums">{count}</span>
 	</button>
 {/snippet}
 
 <nav
-	aria-label="Apps"
+	aria-label={m.catalog_apps()}
 	class="flex gap-2 overflow-x-auto max-lg:-mx-(--gutter) max-lg:px-(--gutter) max-lg:[scrollbar-width:none] lg:sticky lg:top-6 lg:grid lg:gap-0.5"
 >
 	{@render item(undefined, total)}

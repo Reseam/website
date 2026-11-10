@@ -18,3 +18,7 @@ Files that carry a copyright header use the project's collective notice:
     SPDX-License-Identifier: AGPL-3.0-or-later
 
 The commit history records who wrote what. A file that names another copyright holder falls outside the NOTICE terms, so new files use this header unchanged.
+
+## Translations
+
+The site's text is in `messages/en.json`, as ICU MessageFormat strings: `{name}` for values and `{count, plural, one {# patch} other {# patches}}` for counts. Use messages through `m.<key>()` from `#lib/paraglide/messages.js`, and pass internal links through `localizeHref`. Translations come from Weblate as `messages/<locale>.json`. A language goes live when its tag is added to `locales` in `project.inlang/settings.json`, which also prerenders its pages under `/<locale>/`. The docs pages stay in English.

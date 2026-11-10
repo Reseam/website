@@ -1,3 +1,5 @@
+import { m } from '#lib/paraglide/messages.js';
+
 export type ManagerBuild = {
 	id: string;
 	platform: 'Android' | 'Windows' | 'Linux';
@@ -15,32 +17,32 @@ export function managerBuilds(apiUrl: string, version: string): ManagerBuild[] {
 		url: file(`reseam-manager-${version}-${abi}.apk`),
 	});
 	return [
-		android('arm64-v8a', '64-bit ARM, most phones'),
-		android('armeabi-v7a', '32-bit ARM, older phones'),
-		android('x86_64', '64-bit x86, emulators and Chromebooks'),
-		android('x86', '32-bit x86'),
+		android('arm64-v8a', m.build_arm64()),
+		android('armeabi-v7a', m.build_arm32()),
+		android('x86_64', m.build_x86_64()),
+		android('x86', m.build_x86()),
 		{
 			id: 'windows',
 			platform: 'Windows',
-			detail: '64-bit installer',
+			detail: m.build_windows(),
 			url: file(`reseam-manager-${version}-windows-x64.exe`),
 		},
 		{
 			id: 'linux-deb',
 			platform: 'Linux',
-			detail: 'Debian and Ubuntu (.deb)',
+			detail: m.build_deb(),
 			url: file(`app.reseam.manager_${version}_amd64.deb`),
 		},
 		{
 			id: 'linux-rpm',
 			platform: 'Linux',
-			detail: 'Fedora and openSUSE (.rpm)',
+			detail: m.build_rpm(),
 			url: file(`app.reseam.manager-${version}-1.x86_64.rpm`),
 		},
 		{
 			id: 'linux-arch',
 			platform: 'Linux',
-			detail: 'Arch (.pkg.tar.zst)',
+			detail: m.build_arch(),
 			url: file(`app.reseam.manager-${version}-1-x86_64.pkg.tar.zst`),
 		},
 	];

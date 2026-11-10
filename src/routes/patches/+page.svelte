@@ -8,6 +8,7 @@
 	import PatchItem from '#lib/components/patches/PatchItem.svelte';
 	import SearchField from '#lib/components/ui/SearchField.svelte';
 	import { fresh } from '#lib/fresh.svelte.ts';
+	import { m } from '#lib/paraglide/messages.js';
 
 	let { data } = $props();
 
@@ -36,15 +37,12 @@
 	);
 </script>
 
-<PageMeta
-	title="Patches · Reseam"
-	description="Every patch in the official Reseam bundle, by app."
-/>
+<PageMeta title={m.patches_meta_title()} description={m.patches_meta_description()} />
 
-<h1 class="sr-only">Patches</h1>
+<h1 class="sr-only">{m.patches_title()}</h1>
 <div class="container-page">
 	<div class="py-8 sm:py-10">
-		<SearchField bind:value={query} label="Search patches" size="lg" />
+		<SearchField bind:value={query} label={m.patches_search()} size="lg" />
 	</div>
 	<div
 		class="grid grid-cols-1 items-start gap-6 pb-20 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-14"
@@ -53,7 +51,7 @@
 		<div class="grid gap-9">
 			{#each filtered as [app, patches] (app)}
 				{@const info = app === null ? undefined : names.value[app]}
-				<section aria-label={info?.name ?? app ?? 'Any app'}>
+				<section aria-label={info?.name ?? app ?? m.catalog_any_app()}>
 					<header class="flex items-center justify-between gap-3 px-1 pb-2.5">
 						{#if info}
 							<div class="flex min-w-0 items-center gap-3">
@@ -65,7 +63,7 @@
 							</div>
 						{:else}
 							<h2 class={app ? 'truncate font-mono text-mono-sm-semibold' : 'text-title-small'}>
-								{app ?? 'Any app'}
+								{app ?? m.catalog_any_app()}
 							</h2>
 						{/if}
 						<span class="text-body-medium text-on-surface-variant tabular-nums"
@@ -83,21 +81,21 @@
 					class="grid justify-items-center gap-3 rounded-lg border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
 				>
 					{#if groups.size === 0}
-						<p>The current release has no patches to list.</p>
+						<p>{m.patches_empty()}</p>
 					{:else}
-						<p>No patches match “{query.trim()}”.</p>
+						<p>{m.patches_no_match({ query: query.trim() })}</p>
 						<button
 							type="button"
 							onclick={() => (query = '')}
-							class="text-label-large text-on-surface hover:text-primary">Clear search</button
+							class="text-label-large text-on-surface hover:text-primary"
+							>{m.action_clear_search()}</button
 						>
 					{/if}
 				</div>
 			{/each}
 			{#if release.failed}
 				<p role="status" class="text-body-medium text-on-surface-variant">
-					Showing the patches from when this site was built. The API at your configured address did
-					not answer.
+					{m.patches_stale()}
 				</p>
 			{/if}
 		</div>

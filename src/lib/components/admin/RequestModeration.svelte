@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import type { AdminApi } from '#lib/admin.ts';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
@@ -76,7 +77,8 @@
 				id="status-{request.id}"
 				value={status}
 				items={CHOICES}
-				labelOf={(item) => (item === 'hidden' ? 'Hidden' : STATUSES[item as keyof typeof STATUSES])}
+				labelOf={(item) =>
+					item === 'hidden' ? m.status_hidden() : STATUSES[item as keyof typeof STATUSES]()}
 				onchange={(next) => (status = next as RequestStatus)}
 			/>
 		</div>

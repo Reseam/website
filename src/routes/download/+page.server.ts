@@ -37,12 +37,12 @@ export async function load({ fetch }) {
 			builds: [
 				{
 					title: 'Android',
-					detail: 'Most phones',
+					variant: 'standard' as const,
 					url: gmscoreFile(`reseam-gmscore-${gmscoreVersion}.apk`),
 				},
 				{
 					title: 'Huawei',
-					detail: 'Huawei phones',
+					variant: 'huawei' as const,
 					url: gmscoreFile(`reseam-gmscore-${gmscoreVersion}-huawei.apk`),
 				},
 			],

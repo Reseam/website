@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import X from '@lucide/svelte/icons/x';
 	import { Dialog } from 'bits-ui';
 	import type { Snippet } from 'svelte';
@@ -46,7 +47,10 @@
 						>
 					{/if}
 				</div>
-				<Dialog.Close class="-mt-1.5 -mr-2 {buttonClass('ghost', 'icon')}" aria-label="Close">
+				<Dialog.Close
+					class="-mt-1.5 -mr-2 {buttonClass('ghost', 'icon')}"
+					aria-label={m.ui_close()}
+				>
 					<X size={18} />
 				</Dialog.Close>
 			</header>

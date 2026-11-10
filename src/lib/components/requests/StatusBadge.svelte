@@ -9,5 +9,5 @@
 </script>
 
 {#if status !== 'open' && status !== 'hidden'}
-	<Badge tone={TONES[status] ?? 'outline'}>{STATUSES[status]}</Badge>
+	<Badge tone={TONES[status] ?? 'outline'}>{STATUSES[status]()}</Badge>
 {/if}

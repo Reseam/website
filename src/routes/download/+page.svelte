@@ -15,6 +15,8 @@
 	import { fresh } from '#lib/fresh.svelte.ts';
 	import { shortDate } from '#lib/format.ts';
 	import { settings } from '#lib/settings.svelte.ts';
+	import { m } from '#lib/paraglide/messages.js';
+	import { localizeHref } from '#lib/paraglide/runtime.js';
 
 	let { data } = $props();
 
@@ -33,22 +35,22 @@
 	const others = $derived(builds.filter((build) => !suggestion.ids.includes(build.id)));
 </script>
 
-<PageMeta
-	title="Download · Reseam"
-	description="Download Reseam Manager for Android, Windows and Linux, GmsCore, or the Reseam CLI."
-/>
+<PageMeta title={m.download_meta_title()} description={m.download_meta_description()} />
 
 {#snippet logo()}<Logo class="size-7" />{/snippet}
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-232 gap-6 pt-10 pb-20 sm:pt-14">
-		<h1 class="text-headline-large sm:text-display-medium">Download</h1>
+		<h1 class="text-headline-large sm:text-display-medium">{m.download_title()}</h1>
 
 		<Panel>
 			<PanelHeader
 				tile={logo}
 				title="Reseam Manager"
-				subtitle="Version {version} · Released {shortDate(manager.value.release.created_at)}"
+				subtitle={m.download_released({
+					version,
+					date: shortDate(manager.value.release.created_at),
+				})}
 			/>
 			<PanelSection class="grid gap-3">
 				<p class="text-title-medium">{main[0].platform}</p>
@@ -59,18 +61,18 @@
 							href={build.url}
 							size="lg"
 							variant={build.id === suggestion.highlight ? 'primary' : 'outline'}
-							><Download size={17} /> Download</Button
+							><Download size={17} /> {m.action_download()}</Button
 						>
 					</div>
 				{/each}
 				{#if main[0].platform === 'Android'}
 					<p class="text-body-medium text-on-surface-variant">
-						Your phone may ask you to allow installs from your browser.
+						{m.download_android_installs()}
 					</p>
 				{/if}
 			</PanelSection>
 			<PanelSection class="grid gap-3">
-				<p class="text-label-medium text-on-surface-variant">Other downloads</p>
+				<p class="text-label-medium text-on-surface-variant">{m.download_other()}</p>
 				<ul
 					class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant"
 				>
@@ -88,19 +90,23 @@
 				id="gmscore"
 				icon={KeyRound}
 				title="GmsCore"
-				subtitle="Version {data.gmscore.version} · Released {shortDate(data.gmscore.publishedAt)}"
+				subtitle={m.download_released({
+					version: data.gmscore.version,
+					date: shortDate(data.gmscore.publishedAt),
+				})}
 			/>
 			<PanelSection class="grid gap-3">
 				<p class="text-body-medium text-on-surface-variant">
-					Patched apps that sign in with a Google account need GmsCore. It installs next to
-					Google Play Services and doesn't replace it.
+					{m.download_gmscore_text()}
 				</p>
 				<ul
 					class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant"
 				>
 					{#each data.gmscore.builds as build (build.url)}<DownloadRow
 							title={build.title}
-							detail={build.detail}
+							detail={build.variant === 'huawei'
+								? m.download_gmscore_huawei()
+								: m.download_gmscore_standard()}
 							href={build.url}
 						/>{/each}
 				</ul>
@@ -111,9 +117,10 @@
 			<PanelHeader
 				icon={SquareTerminal}
 				title="Reseam CLI"
-				subtitle="Version {data.cli.version} · Released {shortDate(
-					data.cli.publishedAt
-				)} · For patch authors"
+				subtitle={m.download_cli_released({
+					version: data.cli.version,
+					date: shortDate(data.cli.publishedAt),
+				})}
 			/>
 			<PanelSection class="grid gap-3">
 				<ul
@@ -121,21 +128,24 @@
 				>
 					{#each data.cli.builds as build (build.url)}<DownloadRow
 							title={build.platform}
-							detail="64-bit"
+							detail={m.download_cli_detail()}
 							href={build.url}
 						/>{/each}
 				</ul>
-				<p class="text-body-medium text-on-surface-variant">Needs 64-bit Java 17 or newer.</p>
+				<p class="text-body-medium text-on-surface-variant">{m.download_cli_java()}</p>
 			</PanelSection>
 			<PanelSection class="flex flex-wrap items-center justify-between gap-3 py-4 text-body-medium">
-				<span class="text-on-surface-variant">New to the CLI?</span>
+				<span class="text-on-surface-variant">{m.download_cli_new()}</span>
 				<span class="flex gap-5">
-					<a href="/docs/cli/install/" class="text-label-large transition-colors hover:text-primary"
-						>Install guide</a
+					<a
+						href={localizeHref('/docs/cli/install/')}
+						class="text-label-large transition-colors hover:text-primary"
+						>{m.download_cli_guide()}</a
 					>
 					<a
 						href={data.cli.releasesUrl}
-						class="text-label-large transition-colors hover:text-primary">All releases</a
+						class="text-label-large transition-colors hover:text-primary"
+						>{m.download_cli_releases()}</a
 					>
 				</span>
 			</PanelSection>

@@ -6,7 +6,8 @@
 	import PanelHeader from '#lib/components/ui/PanelHeader.svelte';
 	import PanelSection from '#lib/components/ui/PanelSection.svelte';
 	import ProgressBar from '#lib/components/ui/Progress.svelte';
-	import { duration, plural } from '#lib/format.ts';
+	import { duration } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
 	import { STAGES, type Patcher, type Stage } from '#lib/patcher/patcher.svelte.ts';
 
 	let {
@@ -26,6 +27,7 @@
 	} = $props();
 
 	const apk = $derived(patcher.inspection?.apk);
+	const name = $derived(apk?.application_label ?? apk?.package_name);
 	const index = $derived(STAGES.findIndex((entry) => entry.stage === stage));
 	const percent = $derived(stage === 'applying' && total > 0 ? (finished / total) * 100 : null);
 
@@ -50,10 +52,10 @@
 		id="progress-title"
 		icon={LoaderCircle}
 		spinning
-		title="Patching {apk?.application_label ?? apk?.package_name ?? 'app'}"
+		title={name ? m.patcher_patching({ app: name }) : m.patcher_patching_app()}
 		subtitle={[
-			apk?.version_name && `Version ${apk.version_name}`,
-			plural(total, 'patch', 'patches'),
+			apk?.version_name && m.version({ version: apk.version_name }),
+			m.patcher_patch_count({ count: total }),
 		]
 			.filter(Boolean)
 			.join(' · ')}
@@ -64,7 +66,7 @@
 			>{/snippet}
 	</PanelHeader>
 	<PanelSection class="grid gap-5">
-		<ProgressBar value={percent} label="Patching progress" />
+		<ProgressBar value={percent} label={m.patcher_progress()} />
 		<ol class="grid gap-3.5 text-body-large" aria-live="polite">
 			{#each STAGES as entry, position (entry.stage)}
 				{@const time = spent(position)}
@@ -79,11 +81,13 @@
 					</span>
 					<span class="min-w-0">
 						<span class={position > index ? 'text-on-surface-variant' : undefined}
-							>{entry.label}</span
+							>{entry.label()}</span
 						>
 						{#if entry.stage === 'applying' && position === index}
 							<span class="block truncate text-body-medium text-on-surface-variant"
-								>{finished} of {total}{current ? ` · ${current}` : ''}</span
+								>{m.patcher_progress_count({ finished, total })}{current
+									? ` · ${current}`
+									: ''}</span
 							>
 						{/if}
 					</span>
@@ -100,6 +104,7 @@
 		</ol>
 	</PanelSection>
 	<PanelSection class="flex justify-end py-4">
-		<Button variant="outline" size="lg" onclick={() => patcher.cancel()}>Cancel</Button>
+		<Button variant="outline" size="lg" onclick={() => patcher.cancel()}>{m.action_cancel()}</Button
+		>
 	</PanelSection>
 </Panel>

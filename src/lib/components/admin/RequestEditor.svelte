@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { localizeHref } from '#lib/paraglide/runtime.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import type { AdminApi } from '#lib/admin.ts';
 	import StatusBadge from '#lib/components/requests/StatusBadge.svelte';
-	import { plural, recentDate } from '#lib/format.ts';
+	import { recentDate } from '#lib/format.ts';
 	import type { PatchRequest } from '#lib/types.ts';
 	import CommentsAdmin from './CommentsAdmin.svelte';
 	import RequestModeration from './RequestModeration.svelte';
@@ -25,7 +27,7 @@
 	<div class="flex flex-wrap items-center gap-2.5">
 		<span class="text-body-medium text-on-surface-variant tabular-nums">#{request.id}</span>
 		<a
-			href="/requests/?id={request.id}"
+			href={localizeHref(`/requests/?id=${request.id}`)}
 			class="min-w-0 flex-1 text-title-medium transition-colors hover:text-primary"
 			>{request.title}</a
 		>
@@ -36,13 +38,14 @@
 			{request.body}
 		</p>{/if}
 	<p class="flex flex-wrap gap-3 text-body-small text-on-surface-variant">
-		<span class="font-mono">{request.app ?? 'no app'}</span>
-		<span>{plural(request.votes, 'vote')}</span>
+		<span class="font-mono">{request.app ?? m.admin_no_app()}</span>
+		<span>{m.requests_vote_count({ count: request.votes })}</span>
 		<button
 			type="button"
 			aria-expanded={showComments}
 			onclick={() => (showComments = !showComments)}
-			class="text-primary hover:underline">{plural(request.comments, 'comment')}</button
+			class="text-primary hover:underline"
+			>{m.requests_comment_count({ count: request.comments })}</button
 		>
 		<span>{recentDate(request.created_at)}</span>
 	</p>

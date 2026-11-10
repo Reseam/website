@@ -1,3 +1,4 @@
+import { m } from '#lib/paraglide/messages.js';
 export type AppInput = { app: File; splits: File[] };
 
 const extension = (file: File) => file.name.split('.').at(-1)?.toLowerCase() ?? '';
@@ -11,10 +12,9 @@ export function sortFiles(files: File[]): {
 	const containers = files.filter((file) => ['apkm', 'xapk'].includes(extension(file)));
 	const apks = files.filter((file) => extension(file) === 'apk');
 	const others = files.length - bundles.length - containers.length - apks.length;
-	if (others > 0)
-		return { input: null, bundles, error: 'Choose APK, APKM, XAPK or .reseam files.' };
+	if (others > 0) return { input: null, bundles, error: m.input_wrong_files() };
 	if (containers.length > 1 || (containers.length === 1 && apks.length > 0)) {
-		return { input: null, bundles, error: 'Choose one app at a time.' };
+		return { input: null, bundles, error: m.input_one_app() };
 	}
 	if (containers.length === 1) return { input: { app: containers[0], splits: [] }, bundles };
 	if (apks.length === 0) return { input: null, bundles };

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import AppIcon from '#lib/components/patches/AppIcon.svelte';
-	import { plural, recentDate } from '#lib/format.ts';
+	import { recentDate } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
 	import type { AppInfo, PatchRequest } from '#lib/types.ts';
 	import StatusBadge from './StatusBadge.svelte';
 	import VoteButton from './VoteButton.svelte';
@@ -46,7 +47,7 @@
 			{#if request.comments > 0}
 				<span class="flex items-center gap-1.5">
 					<MessageSquare size={14} aria-hidden="true" />
-					{plural(request.comments, 'comment')}
+					{m.requests_comment_count({ count: request.comments })}
 				</span>
 			{/if}
 		</span>

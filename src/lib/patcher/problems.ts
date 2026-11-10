@@ -1,4 +1,6 @@
 import { EngineError, type Problem } from '@reseam/browser';
+import { m } from '#lib/paraglide/messages.js';
+import { getLocale } from '#lib/paraglide/runtime.js';
 
 type PatchName = (reference: string) => string;
 
@@ -11,23 +13,25 @@ export function describe(error: unknown, patchName: PatchName): string {
 export function explain(problem: Problem, patchName: PatchName): string | undefined {
 	switch (problem.type) {
 		case 'unreadable_apk':
-			return 'This app file could not be read. Download it again and retry.';
+			return m.problem_unreadable_apk();
 		case 'unreadable_bundle':
-			return 'A patch bundle could not be read. Download it again and retry.';
+			return m.problem_unreadable_bundle();
 		case 'untrusted_bundle':
-			return 'A patch bundle is signed by a signer you have not trusted.';
+			return m.problem_untrusted_bundle();
 		case 'bundle_too_old':
-			return `${problem.bundle} is too old for this patcher. Use a newer bundle.`;
+			return m.problem_bundle_too_old({ bundle: problem.bundle });
 		case 'engine_too_old':
-			return `${problem.bundle} needs a newer patcher. Reload the page to update.`;
+			return m.problem_engine_too_old({ bundle: problem.bundle });
 		case 'patches_failed':
-			return `${problem.patches.map(patchName).join(', ')} could not be applied.`;
+			return m.problem_patches_failed({
+				patches: new Intl.ListFormat(getLocale()).format(problem.patches.map(patchName)),
+			});
 		case 'keystore_locked':
-			return 'The password is wrong, or the file is not a key backup.';
+			return m.problem_keystore_locked();
 		case 'keystore_empty':
-			return 'This backup holds no signing key.';
+			return m.problem_keystore_empty();
 		case 'unsupported_signing_key':
-			return 'This key cannot sign apps. Use a backup made by Reseam.';
+			return m.problem_unsupported_signing_key();
 		default:
 			return undefined;
 	}

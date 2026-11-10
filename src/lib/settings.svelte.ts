@@ -1,4 +1,5 @@
 import { API_URL } from '$app/env/public';
+import { m } from '#lib/paraglide/messages.js';
 
 export const DEFAULT_API_URL = API_URL;
 const STORAGE_KEY = 'reseam.apiUrl';
@@ -22,7 +23,7 @@ export const settings = {
 		}
 		const url = URL.canParse(trimmed) ? new URL(trimmed) : null;
 		if (!url || !/^https?:$/.test(url.protocol)) {
-			return 'Enter a full http or https address, such as https://api.reseam.app';
+			return m.settings_invalid_url({ example: 'https://api.reseam.app' });
 		}
 		localStorage.setItem(STORAGE_KEY, trimmed);
 		apiUrl = trimmed;

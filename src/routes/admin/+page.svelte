@@ -93,7 +93,7 @@
 				bind:value={status}
 				options={[
 					{ value: 'hidden', label: 'Hidden' },
-					...Object.entries(STATUSES).map(([value, label]) => ({ value, label })),
+					...Object.entries(STATUSES).map(([value, label]) => ({ value, label: label() })),
 				]}
 			/>
 			{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}

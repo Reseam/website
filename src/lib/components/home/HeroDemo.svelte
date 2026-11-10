@@ -8,12 +8,13 @@
 	import { fly, scale, slide } from 'svelte/transition';
 	import { Label } from 'bits-ui';
 	import Switch from '#lib/components/ui/Switch.svelte';
+	import { m } from '#lib/paraglide/messages.js';
 
 	const patches = $state([
-		{ id: 'ads', label: 'Block ads', on: false },
-		{ id: 'dark', label: 'AMOLED dark', on: false },
-		{ id: 'play', label: 'Background play', on: false },
-		{ id: 'tracking', label: 'No tracking', on: false },
+		{ id: 'ads', label: m.steps_toggle_ads, on: false },
+		{ id: 'dark', label: m.steps_toggle_dark, on: false },
+		{ id: 'play', label: m.steps_toggle_background, on: false },
+		{ id: 'tracking', label: m.steps_toggle_tracking, on: false },
 	]);
 	const on = (id: string) => patches.find((patch) => patch.id === id)!.on;
 
@@ -65,7 +66,7 @@
 		aria-hidden="true"
 		class="dark-phone absolute top-6 left-1/2 hidden h-88 w-56 -translate-x-[calc(50%+170px)] -rotate-6 flex-col overflow-hidden rounded-xl-increased border-6 border-(--line) bg-(--screen) p-3 shadow-elevation-3 sm:flex"
 	>
-		{@render screen('App 2', 'bg-app-violet', 'bg-app-violet/25')}
+		{@render screen(m.steps_app_name({ number: 2 }), 'bg-app-violet', 'bg-app-violet/25')}
 		{@render feed()}
 	</div>
 
@@ -76,7 +77,7 @@
 			on('dark') ? 'dark-phone' : 'light-phone',
 		]}
 	>
-		{@render screen('App 1', 'bg-app-blue', 'bg-app-blue/20')}
+		{@render screen(m.steps_app_name({ number: 1 }), 'bg-app-blue', 'bg-app-blue/20')}
 		{#if on('tracking')}
 			<span
 				in:scale={{ start: 0.6, duration: 280, easing: cubicOut }}
@@ -90,7 +91,9 @@
 				<div
 					class="mb-3 grid justify-items-center gap-1.5 rounded-lg border border-error/30 bg-error/10 p-2.5"
 				>
-					<span class="text-label-small tracking-widest text-error uppercase">Sponsored ad</span>
+					<span class="text-label-small tracking-widest text-error uppercase"
+						>{m.demo_sponsored()}</span
+					>
 					<span class="h-9 w-full rounded-sm bg-error/25"></span>
 				</div>
 			</div>
@@ -120,12 +123,12 @@
 			<span class="grid size-6 place-items-center rounded-sm bg-primary-container text-primary"
 				><Smartphone size={14} /></span
 			>
-			Apply patches
+			{m.demo_apply()}
 		</p>
 		<ul class="grid gap-1">
 			{#each patches as patch (patch.id)}
 				<li class="flex items-center justify-between gap-4 py-1">
-					<Label.Root for="demo-{patch.id}" class="text-label-large">{patch.label}</Label.Root>
+					<Label.Root for="demo-{patch.id}" class="text-label-large">{patch.label()}</Label.Root>
 					<Switch
 						id="demo-{patch.id}"
 						bind:checked={patch.on}
@@ -140,7 +143,7 @@
 				!playing && 'opacity-0',
 			]}
 		>
-			Try the switches
+			{m.demo_try()}
 		</p>
 	</div>
 </div>

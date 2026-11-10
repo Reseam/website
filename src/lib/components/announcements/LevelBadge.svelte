@@ -6,4 +6,4 @@
 	let { level }: { level: AnnouncementLevel } = $props();
 </script>
 
-<Badge tone={LEVELS[level].tone}>{LEVELS[level].label}</Badge>
+<Badge tone={LEVELS[level].tone}>{LEVELS[level].label()}</Badge>

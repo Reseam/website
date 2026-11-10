@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Inbox from '@lucide/svelte/icons/inbox';
 	import FilterChips from '#lib/components/ui/FilterChips.svelte';
 	import SearchField from '#lib/components/ui/SearchField.svelte';
@@ -32,22 +33,22 @@
 
 <div class="flex flex-wrap items-center gap-3">
 	<div class="min-w-0 flex-1 basis-40">
-		<SearchField bind:value={query} label="Search requests" />
+		<SearchField bind:value={query} label={m.requests_search()} />
 	</div>
 	<Segmented
-		label="Sort"
+		label={m.requests_sort()}
 		value={sort}
 		options={[
-			{ value: 'top', label: 'Top' },
-			{ value: 'new', label: 'New' },
+			{ value: 'top', label: m.requests_sort_top() },
+			{ value: 'new', label: m.requests_sort_new() },
 		]}
 		onchange={(next) => (sort = next)}
 	/>
 </div>
 <FilterChips
-	label="Status"
+	label={m.requests_status()}
 	bind:value={status}
-	options={Object.entries(STATUSES).map(([value, label]) => ({ value, label }))}
+	options={Object.entries(STATUSES).map(([value, label]) => ({ value, label: label() }))}
 />
 
 {#if shown.length > 0}
@@ -69,15 +70,14 @@
 		class="grid justify-items-center gap-3 rounded-xl border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
 	>
 		<Inbox size={28} class="opacity-40" />
-		<p>{board.requests.length === 0 ? 'No requests yet.' : 'No requests match.'}</p>
+		<p>{board.requests.length === 0 ? m.requests_none() : m.requests_no_match()}</p>
 	</div>
 {/if}
 {#if failed}
 	<p role="status" class="text-body-medium text-on-surface-variant">
-		Showing requests from when this site was built. The API at your configured address did not
-		answer.
+		{m.requests_stale()}
 	</p>
 {/if}
 {#if !canWrite}
-	<p class="text-body-medium text-on-surface-variant">Posting and voting are off on this site.</p>
+	<p class="text-body-medium text-on-surface-variant">{m.requests_read_only()}</p>
 {/if}

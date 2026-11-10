@@ -84,7 +84,7 @@
 				id="announcement-level"
 				value={String(level)}
 				items={Object.keys(LEVELS)}
-				labelOf={(item) => LEVELS[Number(item) as AnnouncementLevel].label}
+				labelOf={(item) => LEVELS[Number(item) as AnnouncementLevel].label()}
 				onchange={(next) => (level = Number(next) as AnnouncementLevel)}
 			/>
 		</div>

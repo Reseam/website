@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import { Select } from 'bits-ui';
@@ -7,7 +8,7 @@
 		id,
 		value,
 		items,
-		placeholder = 'Choose…',
+		placeholder = m.ui_choose(),
 		invalid = false,
 		describedby,
 		labelOf = (item) => item,

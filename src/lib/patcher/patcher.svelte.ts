@@ -3,6 +3,7 @@ import {
 	EngineError,
 	EngineTools,
 	JavaRuntime,
+	patchText,
 	runtime,
 	type Artifact,
 	type BundleMetadata,
@@ -22,6 +23,8 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { asset } from '$app/paths';
 import { settings } from '#lib/settings.svelte.ts';
 import { duration } from '#lib/format.ts';
+import { m } from '#lib/paraglide/messages.js';
+import { getLocale } from '#lib/paraglide/runtime.js';
 import { sortFiles, type AppInput } from './inputs';
 import { fetchOfficialBundle, OFFICIAL_SIGNER, type OfficialBundle } from './official';
 import { draftProblem, draftValue, initialDraft, problemText, type OptionDraft } from './options';
@@ -30,10 +33,10 @@ import { reference } from './patches';
 import * as storage from './storage';
 
 export const STAGES = [
-	{ stage: 'starting', label: 'Starting up' },
-	{ stage: 'loading', label: 'Loading patches' },
-	{ stage: 'applying', label: 'Applying patches' },
-	{ stage: 'writing', label: 'Building and signing' },
+	{ stage: 'starting', label: m.stage_starting },
+	{ stage: 'loading', label: m.stage_loading },
+	{ stage: 'applying', label: m.stage_applying },
+	{ stage: 'writing', label: m.stage_writing },
 ] as const;
 
 export type Stage = (typeof STAGES)[number]['stage'];
@@ -79,10 +82,10 @@ export type Planning =
 
 export function capability(): string | null {
 	if (!globalThis.crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') {
-		return 'This page could not enable the isolation patching needs. Reload it to try again.';
+		return m.patcher_no_isolation();
 	}
 	if (!navigator.storage?.getDirectory || !navigator.locks || !globalThis.WebAssembly) {
-		return 'This browser cannot patch apps. Use a recent Chrome, Edge or Firefox.';
+		return m.patcher_unsupported_browser();
 	}
 	return null;
 }
@@ -218,9 +221,10 @@ export class Patcher {
 		await this.refresh();
 	}
 
-	patchName = (key: string) =>
-		this.inspection?.patches.find((patch) => reference(patch) === key)?.name ??
-		key.split('/').at(-1)!;
+	patchName = (key: string) => {
+		const patch = this.inspection?.patches.find((patch) => reference(patch) === key);
+		return patch ? patchText(patch, [getLocale()]).name : key.split('/').at(-1)!;
+	};
 
 	/** Turns a chosen patch off, or an unchosen one on, as a change to the choice's preset. */
 	toggle(patch: PatchMetadata) {
@@ -322,7 +326,11 @@ export class Patcher {
 				trace: false,
 			});
 			this.write(
-				`Engine phases: ${outcome.metrics.phases.map((entry) => `${entry.phase} ${duration(entry.duration_ms)}`).join(', ')}`
+				m.patcher_log_phases({
+					phases: outcome.metrics.phases
+						.map((entry) => `${entry.phase} ${duration(entry.duration_ms)}`)
+						.join(', '),
+				})
 			);
 			const artifacts = await this.session!.artifacts();
 			if (!stored) {
@@ -346,7 +354,7 @@ export class Patcher {
 			};
 		} catch (error) {
 			if (this.controller.signal.aborted) {
-				this.notice = 'Patching was cancelled.';
+				this.notice = m.patcher_cancelled();
 				this.phase = { name: 'ready' };
 			} else {
 				this.write(describe(error, this.patchName));
@@ -414,7 +422,7 @@ export class Patcher {
 	}
 
 	private engineTools(): EngineTools {
-		if (!this.tools) throw new Error('The patcher is still starting.');
+		if (!this.tools) throw new Error(m.patcher_starting());
 		return this.tools;
 	}
 
@@ -445,20 +453,21 @@ export class Patcher {
 	}
 
 	private findBlocker(): string | null {
-		if (!this.inspection) return 'Choose an app first.';
+		if (!this.inspection) return m.patcher_blocker_no_app();
 		if (this.inspection.bundles.some((bundle) => bundle.problem)) {
-			return 'Remove the patch bundle that could not be read.';
+			return m.patcher_blocker_unreadable_bundle();
 		}
-		if (this.untrusted.length > 0) return 'Trust or remove the other patch signers first.';
-		if (this.planning?.status === 'failed') return "These patches can't be combined.";
+		if (this.untrusted.length > 0) return m.patcher_blocker_untrusted();
+		if (this.planning?.status === 'failed') return m.patcher_blocker_uncombinable();
 		if (!this.listed.some((patch) => this.running.has(reference(patch))))
-			return 'Choose at least one patch.';
+			return m.patcher_blocker_none_chosen();
 		const invalid = this.listed.filter(
 			(patch) =>
 				this.running.has(reference(patch)) &&
 				patch.options.some((option) => this.optionError(patch, option.key))
 		);
-		if (invalid.length > 0) return `Fill in the options for ${invalid[0].name}.`;
+		if (invalid.length > 0)
+			return m.patcher_blocker_options({ patch: this.patchName(reference(invalid[0])) });
 		return null;
 	}
 
@@ -533,7 +542,7 @@ export class Patcher {
 		};
 		if (bundles.length === 0) {
 			this.phase = { name: 'empty' };
-			this.notice = 'Add a patch bundle, or retry the Reseam patches.';
+			this.notice = m.patcher_no_bundle();
 			return;
 		}
 		this.checking = true;
@@ -597,7 +606,10 @@ export class Patcher {
 				return;
 			}
 			case 'patch_log':
-				if (event.level !== 'DEBUG') this.write(`${this.patchName(event.patch)}: ${event.message}`);
+				if (event.level !== 'DEBUG')
+					this.write(
+						m.patcher_log_patch({ patch: this.patchName(event.patch), message: event.message })
+					);
 				return;
 			case 'patch_started':
 				if (this.phase.name === 'patching' && !this.isHidden(event.patch))
@@ -619,7 +631,7 @@ export class Patcher {
 					(run) => reverted.has(run.reference) && !this.isHidden(run.reference)
 				);
 				this.runs = this.runs.filter((run) => !reverted.has(run.reference));
-				this.write(`Running ${event.patches.length} patches again`);
+				this.write(m.patcher_log_rerun({ count: event.patches.length }));
 				if (this.phase.name === 'patching') this.phase.finished -= listed.length;
 				return;
 			}
@@ -630,12 +642,12 @@ export class Patcher {
 		const name = this.patchName(patch);
 		switch (status.kind) {
 			case 'applied':
-				return `Applied ${name}`;
+				return m.patcher_log_applied({ patch: name });
 			case 'skipped':
 			case 'unmountable':
-				return `Skipped ${name}: ${status.reason}`;
+				return m.patcher_log_skipped({ patch: name, reason: status.reason });
 			case 'failed':
-				return `Failed ${name}: ${status.reason}`;
+				return m.patcher_log_failed({ patch: name, reason: status.reason });
 		}
 	}
 

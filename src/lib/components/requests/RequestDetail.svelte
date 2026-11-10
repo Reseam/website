@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import type { AdminApi } from '#lib/admin.ts';
 	import RequestModeration from '#lib/components/admin/RequestModeration.svelte';
@@ -44,7 +45,8 @@
 		href="?"
 		class="inline-flex items-center gap-1 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 	>
-		<ChevronLeft size={16} /> All requests
+		<ChevronLeft size={16} />
+		{m.request_all()}
 	</a>
 	<div class="flex items-start gap-6">
 		<div class="grid min-w-0 flex-1 gap-2">
@@ -59,16 +61,17 @@
 						{app?.name ?? request.app}
 					</span>
 				{:else}
-					<span>Any app</span>
+					<span>{m.catalog_any_app()}</span>
 				{/if}
 				<time datetime={request.created_at}>{longDate(request.created_at)}</time>
 				{#if reported}
-					<span>Reported, thanks</span>
+					<span>{m.request_reported()}</span>
 				{:else if canVote && !admin}
 					<button
 						type="button"
 						onclick={onreport}
-						class="text-error transition-colors hover:text-on-error-container">Report</button
+						class="text-error transition-colors hover:text-on-error-container"
+						>{m.request_report()}</button
 					>
 				{/if}
 			</p>
@@ -78,15 +81,15 @@
 				{/if}
 				{#if shipped}
 					<p class="text-body-large">
-						Shipped in <a href={shipped.href} class="text-primary hover:underline"
-							>{shipped.label}</a
-						>.
+						<a href={shipped.href} class="text-primary hover:underline"
+							>{m.request_shipped_in({ release: shipped.label })}</a
+						>
 					</p>
 				{:else if duplicateOf}
 					<p class="text-body-large">
-						Same as <a href="?id={duplicateOf.id}" class="text-primary hover:underline"
-							>{duplicateOf.title}</a
-						>.
+						<a href="?id={duplicateOf.id}" class="text-primary hover:underline"
+							>{m.request_same_as({ title: duplicateOf.title })}</a
+						>
 					</p>
 				{/if}
 				{#if admin}

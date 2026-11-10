@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import { Label } from 'bits-ui';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { AdminApi } from '#lib/admin.ts';
@@ -104,17 +105,17 @@
 
 <section class="grid gap-6" aria-labelledby="comments-heading">
 	<h2 id="comments-heading" class="flex items-baseline gap-2 text-title-large">
-		Comments
+		{m.comments_title()}
 		{#if phase === 'ready' && comments.length > 0}<span
 				class="text-title-medium text-on-surface-variant tabular-nums">{comments.length}</span
 			>{/if}
 	</h2>
 
 	{#if phase === 'loading'}
-		<p class="text-body-medium text-on-surface-variant" role="status">Loading comments…</p>
+		<p class="text-body-medium text-on-surface-variant" role="status">{m.comments_loading()}</p>
 	{:else if phase === 'failed'}
 		<p class="text-body-medium text-on-surface-variant" role="status">
-			Comments didn't load. The API at your configured address did not answer.
+			{m.comments_failed()}
 		</p>
 	{:else if comments.length > 0}
 		<ol class="grid gap-6">
@@ -136,17 +137,17 @@
 	{#if canWrite || admin}
 		<form onsubmit={send} class="grid gap-2">
 			<Label.Root for="comment-body" class="text-title-small"
-				>{admin ? 'Reply as the Reseam team' : 'Add a comment'}</Label.Root
+				>{admin ? m.comments_reply_team() : m.comments_add()}</Label.Root
 			>
 			<textarea
 				id="comment-body"
 				bind:value={draft}
 				maxlength="1000"
 				rows="3"
-				placeholder={comments.length === 0 && phase === 'ready' ? 'Be the first to comment' : ''}
+				placeholder={comments.length === 0 && phase === 'ready' ? m.comments_first() : ''}
 				class="field resize-y"></textarea>
 			<Button type="submit" class="justify-self-end" disabled={!draft.trim() || sending}
-				>{admin ? 'Reply as team' : 'Comment'}</Button
+				>{admin ? m.comments_send_team() : m.comments_send()}</Button
 			>
 		</form>
 	{/if}

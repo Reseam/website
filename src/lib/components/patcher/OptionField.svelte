@@ -2,30 +2,33 @@
 	import FileIcon from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
 	import X from '@lucide/svelte/icons/x';
-	import type { OptionDeclaration } from '@reseam/browser';
+	import type { OptionDeclaration, OptionText } from '@reseam/browser';
 	import { Label } from 'bits-ui';
 	import Checkbox from '#lib/components/ui/Checkbox.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
 	import { buttonClass } from '#lib/components/ui/button.ts';
 	import type { OptionDraft } from '#lib/patcher/options.ts';
+	import { m } from '#lib/paraglide/messages.js';
 
 	let {
 		option,
+		text,
 		draft,
 		error,
 		id,
 		onchange,
 	}: {
 		option: OptionDeclaration;
+		text: OptionText;
 		draft: OptionDraft;
 		error: string | null;
 		id: string;
 		onchange: (draft: OptionDraft) => void;
 	} = $props();
 
-	const title = $derived(option.title || option.key);
+	const title = $derived(text.title || option.key);
 	const describedby = $derived(
-		[option.description && `${id}-description`, error && `${id}-error`].filter(Boolean).join(' ') ||
+		[text.description && `${id}-description`, error && `${id}-error`].filter(Boolean).join(' ') ||
 			undefined
 	);
 
@@ -51,13 +54,14 @@
 		<Label.Root for={id} class="text-label-large">
 			{title}
 			{#if option.required && option.default_value === null}<span
-					class="text-body-medium text-on-surface-variant">· Required</span
+					class="text-body-medium text-on-surface-variant">{m.option_required_label()}</span
 				>{/if}
 		</Label.Root>
 		{#if draft.kind === 'path'}
 			<div class="flex flex-wrap items-center gap-2">
 				<label class={buttonClass('outline', 'sm')}>
-					<FileIcon size={14} /> Choose file
+					<FileIcon size={14} />
+					{m.action_choose_file()}
 					<input
 						{id}
 						type="file"
@@ -67,7 +71,8 @@
 					/>
 				</label>
 				<label class={buttonClass('outline', 'sm')}>
-					<Folder size={14} /> Choose folder
+					<Folder size={14} />
+					{m.action_choose_folder()}
 					<input
 						type="file"
 						webkitdirectory
@@ -79,12 +84,15 @@
 					<span class="inline-flex min-w-0 items-center gap-1 text-on-surface-variant">
 						<span class="truncate">
 							{draft.folder
-								? `${draft.files[0].webkitRelativePath.split('/')[0]} (${draft.files.length} files)`
+								? m.option_folder_files({
+										folder: draft.files[0].webkitRelativePath.split('/')[0],
+										count: draft.files.length,
+									})
 								: draft.files[0].name}
 						</span>
 						<button
 							type="button"
-							aria-label="Clear {title}"
+							aria-label={m.action_clear({ name: title })}
 							onclick={() => onchange({ kind: 'path', files: [], folder: false })}
 							class="rounded-full p-1 hover:bg-surface-container hover:text-on-surface"
 						>
@@ -107,7 +115,7 @@
 				{id}
 				rows="3"
 				value={draft.value}
-				placeholder="One per line"
+				placeholder={m.option_one_per_line()}
 				aria-describedby={describedby}
 				aria-invalid={error ? true : undefined}
 				oninput={(event) => onchange({ kind: 'text', value: event.currentTarget.value })}
@@ -129,12 +137,12 @@
 			/>
 		{/if}
 	{/if}
-	{#if option.description}
+	{#if text.description}
 		<p
 			id="{id}-description"
 			class={['text-on-surface-variant', draft.kind === 'toggle' && 'pl-7.5']}
 		>
-			{option.description}
+			{text.description}
 		</p>
 	{/if}
 	{#if error}<p id="{id}-error" class="text-error">{error}</p>{/if}

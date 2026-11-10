@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
+	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import KeyRound from '@lucide/svelte/icons/key-round';
 	import { cubicOut } from 'svelte/easing';
@@ -43,18 +45,15 @@
 	const enter = { y: 8, duration: 250, easing: cubicOut };
 </script>
 
-<PageMeta
-	title="Patch an app · Reseam"
-	description="Patch Android apps in your browser when you can't install Reseam Manager. Your files stay on your device."
-/>
+<PageMeta title={m.patcher_meta_title()} description={m.patcher_meta_description()} />
 
 <div class="container-page">
 	<div class="mx-auto grid max-w-232 grid-cols-1 gap-6 pt-10 pb-6 sm:pt-14">
 		<header class="flex flex-wrap items-start justify-between gap-4">
 			<div>
-				<h1 class="text-headline-large sm:text-display-medium">Patch an app</h1>
+				<h1 class="text-headline-large sm:text-display-medium">{m.patcher_title()}</h1>
 				<p class="mt-3 text-body-large text-on-surface-variant">
-					Runs in this browser. It's slower than Reseam Manager, and your files stay on this device.
+					{m.patcher_lead()}
 				</p>
 			</div>
 			{#if patcher}
@@ -63,7 +62,8 @@
 					onclick={() => (keyOpen = true)}
 					disabled={phase?.name === 'patching'}
 				>
-					<KeyRound size={16} /> Signing key
+					<KeyRound size={16} />
+					{m.patcher_signing_key()}
 				</Button>
 			{/if}
 		</header>
@@ -73,17 +73,18 @@
 				<PanelHeader
 					icon={CircleAlert}
 					tone="error"
-					title={unsupported ? "This browser can't patch apps" : 'The patcher could not start'}
+					title={unsupported ? m.patcher_unsupported_title() : m.patcher_start_failed()}
 					subtitle={unsupported ?? failure ?? undefined}
 				>
-					{#snippet aside()}<Button href="/download/" size="sm">Get Reseam Manager</Button
+					{#snippet aside()}<Button href={localizeHref('/download/')} size="sm"
+							>{m.action_get_manager()}</Button
 						>{/snippet}
 				</PanelHeader>
 			</Panel>
 		{:else if !patcher || !phase}
 			<div
 				class="h-72 animate-pulse rounded-xl bg-surface-container-low"
-				aria-label="Loading the patcher"
+				aria-label={m.patcher_loading()}
 				role="status"
 			></div>
 		{:else}
@@ -118,10 +119,11 @@
 
 		<!-- The CheerpJ Community License asks for credit. -->
 		<p class="py-6 text-center text-body-small text-on-surface-variant">
-			Powered by <a
+			<a
 				href="https://cheerpj.com/"
 				rel="noopener noreferrer"
-				class="underline-offset-2 hover:text-on-surface hover:underline">CheerpJ</a
+				class="underline-offset-2 hover:text-on-surface hover:underline"
+				>{m.patcher_powered_by({ name: 'CheerpJ' })}</a
 			>
 		</p>
 	</div>

@@ -31,3 +31,6 @@ vite.config.ts.timestamp-*
 
 # Local agent settings
 /.claude/settings.local.json
+# Paraglide
+src/lib/paraglide
+project.inlang/cache/

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import { shortDate } from '#lib/format.ts';
 	import { entryPath, summary, type UpdateEntry } from '#lib/updates.ts';
 	import EntryBadge from './EntryBadge.svelte';
@@ -25,7 +26,7 @@
 			<span class="line-clamp-2 text-body-medium text-on-surface-variant">{text}</span>
 		{:else if entry.kind !== 'news' && entry.notes.engine}
 			<span class="text-body-medium text-on-surface-variant"
-				>Runs on engine {entry.notes.engine}</span
+				>{m.update_runs_on_engine({ engine: entry.notes.engine })}</span
 			>
 		{/if}
 	</a>

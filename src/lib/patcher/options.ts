@@ -5,6 +5,7 @@ import type {
 	OptionProblem,
 	OptionValue,
 } from '@reseam/browser';
+import { m } from '#lib/paraglide/messages.js';
 
 export type OptionDraft =
 	| { kind: 'text'; value: string }
@@ -72,17 +73,17 @@ export function draftValue(
 export function problemText(problem: OptionProblem): string {
 	switch (problem.kind) {
 		case 'missing':
-			return 'Required';
+			return m.option_problem_missing();
 		case 'not_a_bool':
-			return 'Enter true or false';
+			return m.option_problem_not_a_bool();
 		case 'not_an_integer':
-			return 'Enter a whole number';
+			return m.option_problem_not_an_integer();
 		case 'not_a_number':
-			return 'Enter a number';
+			return m.option_problem_not_a_number();
 		case 'not_allowed':
-			return `Choose one of ${problem.allowed.join(', ')}`;
+			return m.option_problem_not_allowed({ values: problem.allowed.join(', ') });
 		case 'undeclared':
 		case 'wrong_type':
-			return 'This patch no longer takes this value';
+			return m.option_problem_undeclared();
 	}
 }

@@ -3,7 +3,7 @@
 	import { Collapsible } from 'bits-ui';
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import { versionText, type CatalogPatch } from '#lib/catalog.ts';
-	import { plural } from '#lib/format.ts';
+	import { m } from '#lib/paraglide/messages.js';
 	import OptionList from './OptionList.svelte';
 
 	let { patch }: { patch: CatalogPatch } = $props();
@@ -11,11 +11,11 @@
 
 <li class="grid gap-1 px-5 py-4 sm:px-6">
 	<div class="flex flex-wrap items-center gap-2.5">
-		<h3 class="text-title-medium">{patch.name}</h3>
-		{#if !patch.enabled_by_default}<Badge>Optional</Badge>{/if}
+		<h3 class="text-title-medium">{patch.text.name}</h3>
+		{#if !patch.enabled_by_default}<Badge>{m.catalog_optional()}</Badge>{/if}
 	</div>
-	{#if patch.description}<p class="max-w-[90ch] text-body-medium text-on-surface-variant">
-			{patch.description}
+	{#if patch.text.description}<p class="max-w-[90ch] text-body-medium text-on-surface-variant">
+			{patch.text.description}
 		</p>{/if}
 	<Collapsible.Root>
 		<div
@@ -26,7 +26,7 @@
 				<Collapsible.Trigger
 					class="group inline-flex items-center gap-1 text-label-medium text-on-surface transition-colors hover:text-primary"
 				>
-					{plural(patch.options.length, 'setting')}
+					{m.patches_settings_count({ count: patch.options.length })}
 					<ChevronDown
 						size={14}
 						class="transition-transform duration-200 group-aria-expanded:rotate-180"
@@ -36,7 +36,7 @@
 		</div>
 		{#if patch.options.length > 0}
 			<Collapsible.Content class="collapsible">
-				<OptionList options={patch.options} />
+				<OptionList options={patch.options} texts={patch.text.options} />
 			</Collapsible.Content>
 		{/if}
 	</Collapsible.Root>

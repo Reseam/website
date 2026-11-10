@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import type { DocHeading } from '#lib/docs/types.ts';
 
 	let { headings }: { headings: DocHeading[] } = $props();
@@ -20,7 +21,9 @@
 </script>
 
 <nav aria-labelledby="toc-title" class="sticky top-6 grid gap-2 text-body-medium">
-	<p id="toc-title" class="mb-1 text-label-medium text-on-surface-variant">On this page</p>
+	<p id="toc-title" class="mb-1 text-label-medium text-on-surface-variant">
+		{m.docs_on_this_page()}
+	</p>
 	{#each headings as heading (heading.id)}
 		<a
 			href="#{heading.id}"

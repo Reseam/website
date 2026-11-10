@@ -1,38 +1,45 @@
-const relative = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-const day = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
-const dayYear = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' });
-const long = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric' });
+import { getLocale } from '#lib/paraglide/runtime.js';
+
+const dateFormat = (options: Intl.DateTimeFormatOptions) =>
+	new Intl.DateTimeFormat(getLocale(), options);
+
+const unit = (value: number, unit: string, maximumFractionDigits = 0) =>
+	new Intl.NumberFormat(getLocale(), {
+		style: 'unit',
+		unit,
+		unitDisplay: 'narrow',
+		maximumFractionDigits,
+	}).format(value);
 
 export function shortDate(iso: string) {
 	const date = new Date(iso);
-	return (date.getFullYear() === new Date().getFullYear() ? day : dayYear).format(date);
+	return dateFormat(
+		date.getFullYear() === new Date().getFullYear()
+			? { month: 'short', day: 'numeric' }
+			: { month: 'short', day: 'numeric', year: 'numeric' }
+	).format(date);
 }
 
 export function longDate(iso: string) {
-	return long.format(new Date(iso));
+	return dateFormat({ month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(iso));
 }
 
 /** "Today", "Yesterday" or "3 days ago" within a month, the date after that. */
 export function recentDate(iso: string) {
 	const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
-	if (days < 30) return capitalize(relative.format(-days, 'day'));
-	return shortDate(iso);
+	if (days >= 30) return shortDate(iso);
+	const text = new Intl.RelativeTimeFormat(getLocale(), { numeric: 'auto' }).format(-days, 'day');
+	return text[0].toLocaleUpperCase(getLocale()) + text.slice(1);
 }
 
 export function duration(milliseconds: number) {
 	const seconds = milliseconds / 1000;
-	if (seconds < 10) return `${seconds.toFixed(1)}s`;
-	if (seconds < 60) return `${Math.round(seconds)}s`;
+	if (seconds < 10) return unit(seconds, 'second', 1);
+	if (seconds < 60) return unit(Math.round(seconds), 'second');
 	const whole = Math.round(seconds);
-	return `${Math.floor(whole / 60)}m ${String(whole % 60).padStart(2, '0')}s`;
+	return `${unit(Math.floor(whole / 60), 'minute')} ${unit(whole % 60, 'second')}`;
 }
 
 export function megabytes(bytes: number) {
-	return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+	return unit(bytes / 1024 / 1024, 'megabyte', 1);
 }
-
-export function plural(count: number, one: string, many = `${one}s`) {
-	return `${count} ${count === 1 ? one : many}`;
-}
-
-const capitalize = (text: string) => text[0].toUpperCase() + text.slice(1);

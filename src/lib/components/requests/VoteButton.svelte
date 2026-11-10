@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 
 	let {
@@ -14,7 +15,7 @@
 	{onclick}
 	{disabled}
 	aria-pressed={voted}
-	aria-label="{voted ? 'Remove your vote' : 'Vote'}, {votes} {votes === 1 ? 'vote' : 'votes'}"
+	aria-label={voted ? m.vote_remove({ count: votes }) : m.vote_add({ count: votes })}
 	class={[
 		'grid h-14 w-12 shrink-0 place-items-center content-center rounded-md border text-label-large tabular-nums transition-colors duration-150 disabled:opacity-50',
 		voted

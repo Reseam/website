@@ -11,6 +11,7 @@
 	import { OFFICIAL_SIGNER } from '#lib/patcher/official.ts';
 	import type { Patcher } from '#lib/patcher/patcher.svelte.ts';
 	import { explain } from '#lib/patcher/problems.ts';
+	import { m } from '#lib/paraglide/messages.js';
 
 	let { patcher }: { patcher: Patcher } = $props();
 
@@ -24,23 +25,25 @@
 	);
 </script>
 
-<p class="px-1 pb-2.5 text-label-medium text-on-surface-variant">Patches from</p>
+<p class="px-1 pb-2.5 text-label-medium text-on-surface-variant">{m.sources_title()}</p>
 <ul
 	class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low"
 >
 	{#if patcher.official.status !== 'failed' || !officialAdded}
 		<li class="flex items-center gap-3 px-4 py-3.5 sm:px-5">
 			<div class="min-w-0 flex-1">
-				<p class="text-title-medium">Official patches</p>
+				<p class="text-title-medium">{m.sources_official()}</p>
 				<p class="text-body-medium text-on-surface-variant" role="status">
-					{#if patcher.official.status === 'ready'}Reseam · {patcher.official.bundle.version}
-					{:else if patcher.official.status === 'loading'}Downloading…
-					{:else}Could not be downloaded.{/if}
+					{#if patcher.official.status === 'ready'}{m.sources_official_version({
+							version: patcher.official.bundle.version,
+						})}
+					{:else if patcher.official.status === 'loading'}{m.sources_downloading()}
+					{:else}{m.sources_download_failed()}{/if}
 				</p>
 			</div>
 			{#if patcher.official.status === 'ready'}
 				<span class="inline-flex items-center gap-1.5 text-label-large text-primary"
-					><Check size={15} strokeWidth={3} /> Ready</span
+					><Check size={15} strokeWidth={3} /> {m.sources_ready()}</span
 				>
 			{:else if patcher.official.status === 'loading'}
 				<LoaderCircle size={18} class="animate-spin text-on-surface-variant" />
@@ -48,7 +51,7 @@
 				<button
 					type="button"
 					onclick={() => patcher.loadOfficial()}
-					class={buttonClass('ghost', 'sm')}><RotateCcw size={14} /> Retry</button
+					class={buttonClass('ghost', 'sm')}><RotateCcw size={14} /> {m.action_retry()}</button
 				>
 			{/if}
 		</li>
@@ -61,16 +64,20 @@
 				<p class="text-title-medium break-words">{bundle?.name || file.name}</p>
 				<p class="text-body-medium text-on-surface-variant">
 					{bundle
-						? [bundle.version, bundle.author && `by ${bundle.author}`, official && 'Official']
+						? [
+								bundle.version,
+								bundle.author && m.by_author({ author: bundle.author }),
+								official && m.sources_official_badge(),
+							]
 								.filter(Boolean)
 								.join(' · ')
 						: patcher.checking
-							? 'Checking bundle…'
+							? m.sources_checking()
 							: ''}
 				</p>
 				{#if bundle?.problem}
 					<p class="mt-1.5 text-body-medium text-error">
-						{explain(bundle.problem, patcher.patchName) ?? 'This bundle could not be read.'}
+						{explain(bundle.problem, patcher.patchName) ?? m.sources_unreadable()}
 					</p>
 				{:else if bundle && !official}
 					<div class="mt-2.5 flex items-start gap-2.5">
@@ -83,7 +90,7 @@
 							for="trust-{index}"
 							class="min-w-0 text-body-medium text-on-surface-variant"
 						>
-							I trust this signer. Its patches run code while patching.
+							{m.sources_trust()}
 							<code class="mt-1 block font-mono text-mono-xs break-all opacity-70"
 								>{bundle.public_key}</code
 							>
@@ -94,7 +101,7 @@
 			<button
 				type="button"
 				onclick={() => patcher.removeBundle(file)}
-				aria-label="Remove {bundle?.name || file.name}"
+				aria-label={m.sources_remove({ name: bundle?.name || file.name })}
 				class="-mt-1 -mr-2 {buttonClass('ghost', 'icon')}"
 			>
 				<X size={16} />
@@ -105,7 +112,8 @@
 		<label
 			class="flex cursor-pointer items-center gap-3 px-4 py-3.5 text-label-large transition-colors hover:bg-surface-container has-focus-visible:bg-surface-container sm:px-5"
 		>
-			<Plus size={16} class="text-on-surface-variant" /> Add a patch bundle
+			<Plus size={16} class="text-on-surface-variant" />
+			{m.sources_add()}
 			<input
 				type="file"
 				multiple
