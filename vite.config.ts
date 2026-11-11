@@ -8,8 +8,10 @@ import { defineConfig, type Plugin } from 'vite';
 
 // Patching needs SharedArrayBuffer, so the patcher page and its workers are cross-origin isolated.
 // nginx.conf sends the same headers in production; the rest of the site stays unisolated.
+const patcherPath = new RegExp(`^/((${inlang.locales.join('|')})/)?patch/`);
+
 const isolate: Connect.NextHandleFunction = (request, response, next) => {
-	if (request.url?.startsWith('/patch/') || request.headers['sec-fetch-dest'] === 'worker') {
+	if (patcherPath.test(request.url ?? '') || request.headers['sec-fetch-dest'] === 'worker') {
 		response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
 		response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
 	}
