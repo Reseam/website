@@ -43,15 +43,11 @@
 	<Select.Portal>
 		<Select.Content
 			sideOffset={6}
-			class="z-50 max-h-72 w-(--bits-select-anchor-width) overflow-hidden rounded-md border border-outline-variant bg-surface-container-low shadow-elevation-3 transition-[opacity,scale] duration-150 data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0"
+			class="menu max-h-72 w-(--bits-select-anchor-width) overflow-hidden"
 		>
 			<Select.Viewport class="p-1">
 				{#each items as item (item)}
-					<Select.Item
-						value={item}
-						label={labelOf(item)}
-						class="flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-body-medium outline-none data-highlighted:bg-surface-container"
-					>
+					<Select.Item value={item} label={labelOf(item)} class="menu-item">
 						{#snippet children({ selected })}
 							<span class="truncate">{labelOf(item)}</span>
 							{#if selected}<Check size={15} class="text-primary" />{/if}

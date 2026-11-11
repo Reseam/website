@@ -10,6 +10,7 @@
 	import Footer from '#lib/components/layout/Footer.svelte';
 	import Header from '#lib/components/layout/Header.svelte';
 	import { fresh } from '#lib/fresh.svelte.ts';
+	import { deLocalizeUrl } from '#lib/paraglide/runtime.js';
 
 	let { data, children } = $props();
 
@@ -21,10 +22,10 @@
 	onMount(reading.restore);
 
 	// The patcher page is cross-origin isolated, which only a full page load can switch on or off.
-	const isolated = (path: string) => path.startsWith('/patch/');
+	const isolated = (url: URL) => deLocalizeUrl(url).pathname.startsWith('/patch/');
 	beforeNavigate(({ from, to, cancel, type }) => {
 		if (type !== 'link' || !from || !to) return;
-		if (isolated(from.url.pathname) === isolated(to.url.pathname)) return;
+		if (isolated(from.url) === isolated(to.url)) return;
 		cancel();
 		location.href = to.url.href;
 	});

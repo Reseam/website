@@ -28,13 +28,13 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit({
 			adapter: adapter({ strict: true, fallback: '404.html' }),
-			// Each locale's root starts a crawl; its pages link on to the rest in that locale.
+			// Each locale's root starts a crawl; its pages link on to the rest in that locale, except the add page.
 			prerender: {
 				entries: [
 					'*',
 					...inlang.locales
 						.filter((locale) => locale !== inlang.baseLocale)
-						.map((locale) => `/${locale}/` as const),
+						.flatMap((locale) => [`/${locale}/`, `/${locale}/add/`] as const),
 				],
 			},
 			compilerOptions: {

@@ -309,3 +309,11 @@
 @utility field {
 	@apply w-full rounded-md border border-outline-variant bg-surface px-3.5 py-2.5 text-body-medium text-on-surface transition-colors placeholder:text-on-surface-variant focus:border-primary focus:outline-none aria-invalid:border-error;
 }
+
+@utility menu {
+	@apply z-50 rounded-md border border-outline-variant bg-surface-container-low shadow-elevation-3 transition-[opacity,scale] duration-150 data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0;
+}
+
+@utility menu-item {
+	@apply flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-body-medium outline-none data-highlighted:bg-surface-container;
+}

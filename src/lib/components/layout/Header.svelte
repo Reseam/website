@@ -7,9 +7,10 @@
 	import { page } from '$app/state';
 	import { buttonClass } from '#lib/components/ui/button.ts';
 	import { m } from '#lib/paraglide/messages.js';
-	import { localizeHref } from '#lib/paraglide/runtime.js';
+	import { locales, localizeHref } from '#lib/paraglide/runtime.js';
 	import { NAV } from '#lib/site.ts';
 	import IconLink from './IconLink.svelte';
+	import LanguageMenu from './LanguageMenu.svelte';
 	import Logo from './Logo.svelte';
 	import SettingsDialog from './SettingsDialog.svelte';
 
@@ -59,6 +60,7 @@
 				href={localizeHref('/updates/')}
 				dot={unread}
 			/>
+			{#if locales.length > 1}<LanguageMenu />{/if}
 			<IconLink label={m.nav_settings()} icon={Settings} onclick={() => (settingsOpen = true)} />
 			<Collapsible.Trigger
 				class="md:hidden {buttonClass('ghost', 'icon')}"
