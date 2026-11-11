@@ -9,13 +9,20 @@ import {
 
 const STORAGE_KEY = 'reseam.language';
 
-const language = (tag: string) => tag.toLowerCase().split('-')[0];
+const language = (tag: string) => new Intl.Locale(tag).language;
 
-/** The first of the browser's languages the site has, by exact tag and then by language alone. */
+/** Language and script, filled in where the tag leaves them out: zh-HK and zh-TW are both zh-Hant. */
+const writing = (tag: string) => {
+	const { language, script } = new Intl.Locale(tag).maximize();
+	return `${language}-${script}`;
+};
+
+/** The first of the browser's languages the site has, by exact tag, then by writing system, then by language alone. */
 function browserLocale(): Locale | undefined {
 	for (const tag of navigator.languages) {
 		const match =
 			locales.find((locale) => locale.toLowerCase() === tag.toLowerCase()) ??
+			locales.find((locale) => writing(locale) === writing(tag)) ??
 			locales.find((locale) => language(locale) === language(tag));
 		if (match) return match;
 	}
