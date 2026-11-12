@@ -317,3 +317,30 @@
 @utility menu-item {
 	@apply flex h-9 items-center justify-between gap-2 rounded-sm px-2.5 text-body-medium outline-none data-highlighted:bg-surface-container;
 }
+
+/* GitHub alerts, from marked-alert in the docs and in community READMEs. */
+.markdown-alert {
+	padding: 0.8rem 1rem;
+	border: 1px solid var(--color-outline-variant);
+	border-left: 3px solid var(--color-primary);
+	border-radius: var(--radius-md);
+	background: var(--color-surface-container-low);
+}
+.markdown-alert-warning,
+.markdown-alert-caution {
+	border-left-color: var(--color-warning);
+}
+.markdown-alert-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.3rem;
+	color: var(--color-on-surface);
+	font-weight: 600;
+}
+.markdown-alert-title svg {
+	fill: currentColor;
+}
+.markdown-alert > :last-child {
+	margin-bottom: 0;
+}

@@ -7,6 +7,7 @@
 	import EntryBody from '#lib/components/updates/EntryBody.svelte';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
+	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import FilterChips from '#lib/components/ui/FilterChips.svelte';
 	import { fresh } from '#lib/fresh.svelte.ts';
 	import { shortDate } from '#lib/format.ts';
@@ -93,12 +94,9 @@
 				</section>
 			{/if}
 		{:else}
-			<div
-				class="grid justify-items-center gap-3 rounded-xl border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
-			>
-				<Megaphone size={28} class="opacity-40" />
+			<EmptyState icon={Megaphone}>
 				<p>{m.updates_empty()}</p>
-			</div>
+			</EmptyState>
 		{/if}
 	</div>
 </div>

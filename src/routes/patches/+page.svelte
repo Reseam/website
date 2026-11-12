@@ -3,9 +3,10 @@
 	import { appNames } from '#lib/apps.svelte.ts';
 	import { groupByApp, matches, packagesOf } from '#lib/catalog.ts';
 	import PageMeta from '#lib/components/layout/PageMeta.svelte';
-	import AppIcon from '#lib/components/patches/AppIcon.svelte';
+	import AppGroup from '#lib/components/patches/AppGroup.svelte';
 	import AppList from '#lib/components/patches/AppList.svelte';
-	import PatchItem from '#lib/components/patches/PatchItem.svelte';
+	import PatchViews from '#lib/components/patches/PatchViews.svelte';
+	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import SearchField from '#lib/components/ui/SearchField.svelte';
 	import { fresh } from '#lib/fresh.svelte.ts';
 	import { m } from '#lib/paraglide/messages.js';
@@ -41,7 +42,11 @@
 
 <h1 class="sr-only">{m.patches_title()}</h1>
 <div class="container-page">
-	<div class="py-8 sm:py-10">
+	<div class="grid gap-6 py-8 sm:py-10">
+		<div class="grid gap-3">
+			<PatchViews current="official" />
+			<p class="text-body-medium text-on-surface-variant">{m.patches_meta_description()}</p>
+		</div>
 		<SearchField bind:value={query} label={m.patches_search()} size="lg" />
 	</div>
 	<div
@@ -50,36 +55,9 @@
 		<AppList {apps} total={apps.reduce((sum, app) => sum + app.count, 0)} bind:selected />
 		<div class="grid gap-9">
 			{#each filtered as [app, patches] (app)}
-				{@const info = app === null ? undefined : names.value[app]}
-				<section aria-label={info?.name ?? app ?? m.catalog_any_app()}>
-					<header class="flex items-center justify-between gap-3 px-1 pb-2.5">
-						{#if info}
-							<div class="flex min-w-0 items-center gap-3">
-								<AppIcon icon={info.icon} size={32} />
-								<div class="grid min-w-0">
-									<h2 class="truncate text-title-small">{info.name}</h2>
-									<span class="truncate font-mono text-mono-xs text-on-surface-variant">{app}</span>
-								</div>
-							</div>
-						{:else}
-							<h2 class={app ? 'truncate font-mono text-mono-sm-semibold' : 'text-title-small'}>
-								{app ?? m.catalog_any_app()}
-							</h2>
-						{/if}
-						<span class="text-body-medium text-on-surface-variant tabular-nums"
-							>{patches.length}</span
-						>
-					</header>
-					<ul
-						class="divide-y divide-outline-variant overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low"
-					>
-						{#each patches as patch (patch.id)}<PatchItem {patch} />{/each}
-					</ul>
-				</section>
+				<AppGroup {app} info={app === null ? undefined : names.value[app]} {patches} />
 			{:else}
-				<div
-					class="grid justify-items-center gap-3 rounded-lg border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
-				>
+				<EmptyState>
 					{#if groups.size === 0}
 						<p>{m.patches_empty()}</p>
 					{:else}
@@ -91,7 +69,7 @@
 							>{m.action_clear_search()}</button
 						>
 					{/if}
-				</div>
+				</EmptyState>
 			{/each}
 			{#if release.failed}
 				<p role="status" class="text-body-medium text-on-surface-variant">

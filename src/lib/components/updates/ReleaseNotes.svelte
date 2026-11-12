@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Markdown from '#lib/components/ui/Markdown.svelte';
+	import { renderDocument } from '#lib/markdown.ts';
 	import type { ReleaseNotes } from '#lib/notes.ts';
 	import { m } from '#lib/paraglide/messages.js';
 
@@ -13,7 +15,11 @@
 	</p>
 {:else}
 	<div class="grid max-w-[72ch] gap-6 text-article">
-		{#if notes.prose}<p class="whitespace-pre-wrap text-on-surface">{notes.prose}</p>{/if}
+		{#if notes.prose}<Markdown
+				text={notes.prose}
+				render={renderDocument}
+				class="text-on-surface"
+			/>{/if}
 		{#each notes.sections as section (section.kind)}
 			<section class="grid gap-2">
 				<h3 class="text-title-medium">{titles[section.kind]()}</h3>

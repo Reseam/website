@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import Inbox from '@lucide/svelte/icons/inbox';
+	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import FilterChips from '#lib/components/ui/FilterChips.svelte';
 	import SearchField from '#lib/components/ui/SearchField.svelte';
 	import Segmented from '#lib/components/ui/Segmented.svelte';
@@ -66,12 +67,9 @@
 		{/each}
 	</ul>
 {:else}
-	<div
-		class="grid justify-items-center gap-3 rounded-xl border border-dashed border-outline-variant px-6 py-16 text-center text-on-surface-variant"
-	>
-		<Inbox size={28} class="opacity-40" />
+	<EmptyState icon={Inbox}>
 		<p>{board.requests.length === 0 ? m.requests_none() : m.requests_no_match()}</p>
-	</div>
+	</EmptyState>
 {/if}
 {#if failed}
 	<p role="status" class="text-body-medium text-on-surface-variant">

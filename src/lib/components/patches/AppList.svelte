@@ -35,7 +35,7 @@
 
 <nav
 	aria-label={m.catalog_apps()}
-	class="flex gap-2 overflow-x-auto max-lg:-mx-(--gutter) max-lg:px-(--gutter) max-lg:[scrollbar-width:none] lg:sticky lg:top-6 lg:grid lg:gap-0.5"
+	class="flex gap-2 overflow-x-auto max-lg:-mx-(--gutter) max-lg:px-(--gutter) max-lg:[scrollbar-width:none] lg:sticky lg:top-6 lg:grid lg:grid-cols-[minmax(0,1fr)] lg:gap-0.5"
 >
 	{@render item(undefined, total)}
 	{#each apps as app (app.id)}

@@ -117,29 +117,4 @@
 		border-left: 2px solid var(--color-outline-variant);
 		color: var(--color-on-surface-variant);
 	}
-	.prose :global(.markdown-alert) {
-		padding: 0.8rem 1rem;
-		border: 1px solid var(--color-outline-variant);
-		border-left: 3px solid var(--color-primary);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-container-low);
-	}
-	.prose :global(.markdown-alert-warning),
-	.prose :global(.markdown-alert-caution) {
-		border-left-color: var(--color-warning);
-	}
-	.prose :global(.markdown-alert-title) {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-bottom: 0.3rem;
-		color: var(--color-on-surface);
-		font-weight: 600;
-	}
-	.prose :global(.markdown-alert-title svg) {
-		fill: currentColor;
-	}
-	.prose :global(.markdown-alert > :last-child) {
-		margin-bottom: 0;
-	}
 </style>

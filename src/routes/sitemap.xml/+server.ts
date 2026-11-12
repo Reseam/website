@@ -1,5 +1,6 @@
 import { docs } from '#lib/server/docs.ts';
-import { announcements, managerIndex, patchesIndex } from '#lib/server/api.ts';
+import { communityPath } from '#lib/community.ts';
+import { announcements, community, managerIndex, patchesIndex } from '#lib/server/api.ts';
 import { entryPath, updateEntries } from '#lib/updates.ts';
 import { SITE_URL } from '#lib/site.ts';
 
@@ -8,6 +9,7 @@ export const prerender = true;
 const PAGES = [
 	'/',
 	'/patches/',
+	'/patches/community/',
 	'/patch/',
 	'/download/',
 	'/docs/',
@@ -20,6 +22,10 @@ export async function GET() {
 	const today = new Date().toISOString().slice(0, 10);
 	const urls = [
 		...PAGES.map((path) => ({ path, lastmod: today })),
+		...(await community()).map((bundle) => ({
+			path: communityPath(bundle.slug),
+			lastmod: bundle.published_at.slice(0, 10),
+		})),
 		...docs.pages.map(({ slug }) => ({ path: `/docs/${slug}/`, lastmod: today })),
 		...updateEntries(await patchesIndex(), await managerIndex(), await announcements()).map(
 			(entry) => ({ path: entryPath(entry), lastmod: entry.date.slice(0, 10) })
