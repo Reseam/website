@@ -311,6 +311,8 @@ export class Patcher {
 			const outcome = await this.session!.patch({
 				apk_path: this.paths.apk,
 				split_paths: this.paths.splits,
+				// The download may go to any phone, so it keeps every ABI.
+				device_abis: [],
 				bundle_paths: this.paths.bundles,
 				trust: { keys: [...this.trusted] },
 				selection: { ...$state.snapshot(this.choice), options },
@@ -552,6 +554,7 @@ export class Patcher {
 			const inspection = await this.session!.inspect({
 				apk_path: input ? this.paths.apk : null,
 				split_paths: this.paths.splits,
+				device_abis: [],
 				bundle_paths: this.paths.bundles,
 				trust: { keys: [...this.trusted] },
 			});
