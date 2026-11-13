@@ -1,13 +1,23 @@
 <script lang="ts">
 	import Badge, { type BadgeTone } from '#lib/components/ui/Badge.svelte';
-	import { STATUSES } from '#lib/requests.svelte.ts';
-	import type { RequestStatus } from '#lib/types.ts';
+	import { PRIORITIES, STATUSES } from '#lib/requests.svelte.ts';
+	import type { PatchRequest, RequestPriority } from '#lib/types.ts';
 
-	let { status }: { status: RequestStatus } = $props();
+	let { request }: { request: PatchRequest } = $props();
 
-	const TONES: Partial<Record<RequestStatus, BadgeTone>> = { planned: 'info', shipped: 'primary' };
+	const PRIORITY_TONES: Record<RequestPriority, BadgeTone> = {
+		high: 'warning',
+		medium: 'info',
+		low: 'outline',
+	};
 </script>
 
-{#if status !== 'open' && status !== 'hidden'}
-	<Badge tone={TONES[status] ?? 'outline'}>{STATUSES[status]()}</Badge>
+{#if request.status === 'open'}
+	{#if request.priority}
+		<Badge tone={PRIORITY_TONES[request.priority]}>{PRIORITIES[request.priority]()}</Badge>
+	{/if}
+{:else if request.status !== 'hidden'}
+	<Badge tone={request.status === 'shipped' ? 'primary' : 'outline'}
+		>{STATUSES[request.status]()}</Badge
+	>
 {/if}

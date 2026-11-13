@@ -50,7 +50,7 @@
 	</a>
 	<div class="flex items-start gap-6">
 		<div class="grid min-w-0 flex-1 gap-2">
-			{#if request.status !== 'open'}<div><StatusBadge status={request.status} /></div>{/if}
+			{#if request.status !== 'open' || request.priority}<div><StatusBadge {request} /></div>{/if}
 			<h1 class="text-headline-large">{request.title}</h1>
 			<p
 				class="flex flex-wrap items-center gap-x-3 gap-y-1 text-body-medium text-on-surface-variant"

@@ -3,8 +3,8 @@
 	import type { AdminApi } from '#lib/admin.ts';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
-	import { STATUSES } from '#lib/requests.svelte.ts';
-	import type { PatchRequest, RequestStatus } from '#lib/types.ts';
+	import { PRIORITIES, STATUSES } from '#lib/requests.svelte.ts';
+	import type { PatchRequest, RequestPriority, RequestStatus } from '#lib/types.ts';
 
 	let {
 		request,
@@ -19,8 +19,10 @@
 	} = $props();
 
 	const CHOICES = [...Object.keys(STATUSES), 'hidden'] as RequestStatus[];
+	const NO_PRIORITY = 'none';
 
 	let status = $state<RequestStatus>('open');
+	let priority = $state<RequestPriority | null>(null);
 	let shippedIn = $state('');
 	let duplicateOf = $state('');
 	let error = $state('');
@@ -28,6 +30,7 @@
 
 	$effect(() => {
 		status = request.status;
+		priority = request.priority;
 		shippedIn = request.shipped_in ?? '';
 		duplicateOf = request.duplicate_of ? String(request.duplicate_of) : '';
 	});
@@ -49,8 +52,9 @@
 			onchange(
 				await api.updateRequest(request.id, {
 					status,
+					priority: status === 'open' ? priority : null,
 					shipped_in: status === 'shipped' && shippedIn ? shippedIn.trim() : null,
-					duplicate_of: status === 'duplicate' && duplicateOf ? Number(duplicateOf) : null,
+					duplicate_of: status === 'closed' && duplicateOf ? Number(duplicateOf) : null,
 				})
 			)
 		);
@@ -82,18 +86,29 @@
 				onchange={(next) => (status = next as RequestStatus)}
 			/>
 		</div>
-		{#if status === 'shipped'}
+		{#if status === 'open'}
+			<div class="w-36">
+				<Select
+					id="priority-{request.id}"
+					value={priority ?? NO_PRIORITY}
+					items={[NO_PRIORITY, ...Object.keys(PRIORITIES)]}
+					labelOf={(item) =>
+						item === NO_PRIORITY ? 'No priority' : PRIORITIES[item as RequestPriority]()}
+					onchange={(next) => (priority = next === NO_PRIORITY ? null : (next as RequestPriority))}
+				/>
+			</div>
+		{:else if status === 'shipped'}
 			<input
 				bind:value={shippedIn}
 				placeholder="patches@0.48.0"
 				aria-label="Shipped in"
 				class="field w-44"
 			/>
-		{:else if status === 'duplicate'}
+		{:else if status === 'closed'}
 			<input
 				bind:value={duplicateOf}
 				inputmode="numeric"
-				placeholder="Request id"
+				placeholder="Duplicate of"
 				aria-label="Duplicate of"
 				class="field w-32"
 			/>

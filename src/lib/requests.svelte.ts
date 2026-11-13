@@ -1,7 +1,7 @@
 import { fetchJson } from '#lib/api.ts';
 import { m } from '#lib/paraglide/messages.js';
 import { localizeHref } from '#lib/paraglide/runtime.js';
-import type { PatchRequest, RequestComment, RequestStatus } from '#lib/types.ts';
+import type { PatchRequest, RequestComment, RequestPriority, RequestStatus } from '#lib/types.ts';
 
 const VOTER_KEY = 'reseam.voter';
 const SEEN_KEY = 'reseam.seenRequests';
@@ -9,10 +9,14 @@ const SEEN_COMMENTS_KEY = 'reseam.seenComments';
 
 export const STATUSES: Record<Exclude<RequestStatus, 'hidden'>, () => string> = {
 	open: m.status_open,
-	planned: m.status_planned,
 	shipped: m.status_shipped,
-	declined: m.status_declined,
-	duplicate: m.status_duplicate,
+	closed: m.status_closed,
+};
+
+export const PRIORITIES: Record<RequestPriority, () => string> = {
+	high: m.priority_high,
+	medium: m.priority_medium,
+	low: m.priority_low,
 };
 
 /** The notice that the user's own request reached a status. */
@@ -21,16 +25,14 @@ export const STATUS_NOTICES: Record<
 	(inputs: { title: string }) => string
 > = {
 	open: m.notice_open,
-	planned: m.notice_planned,
 	shipped: m.notice_shipped,
-	declined: m.notice_declined,
-	duplicate: m.notice_duplicate,
+	closed: m.notice_closed,
 };
 
 export type RequestQuery = {
 	app?: string;
 	status?: RequestStatus;
-	sort?: 'top' | 'new';
+	sort?: 'top' | 'new' | 'priority';
 	q?: string;
 };
 export type RequestDraft = { app?: string; title: string; body?: string; force?: boolean };

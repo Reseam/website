@@ -31,7 +31,7 @@
 			class="min-w-0 flex-1 text-title-medium transition-colors hover:text-primary"
 			>{request.title}</a
 		>
-		<StatusBadge status={request.status} />
+		<StatusBadge {request} />
 		{#if request.status === 'hidden'}<span class="text-label-medium text-error">Hidden</span>{/if}
 	</div>
 	{#if request.body}<p class="text-body-medium whitespace-pre-wrap text-on-surface-variant">

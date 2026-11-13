@@ -3,6 +3,7 @@ import type {
 	AnnouncementLevel,
 	PatchRequest,
 	RequestComment,
+	RequestPriority,
 	RequestStatus,
 } from '#lib/types.ts';
 
@@ -10,6 +11,7 @@ export const ADMIN_TOKEN_KEY = 'reseam.adminToken';
 
 export type RequestChanges = {
 	status?: RequestStatus;
+	priority?: RequestPriority | null;
 	shipped_in?: string | null;
 	duplicate_of?: number | null;
 };

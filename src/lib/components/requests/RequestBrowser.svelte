@@ -42,6 +42,7 @@
 		options={[
 			{ value: 'top', label: m.requests_sort_top() },
 			{ value: 'new', label: m.requests_sort_new() },
+			{ value: 'priority', label: m.requests_sort_priority() },
 		]}
 		onchange={(next) => (sort = next)}
 	/>

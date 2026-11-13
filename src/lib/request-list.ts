@@ -1,6 +1,9 @@
 import type { AppInfo, PatchRequest } from '#lib/types.ts';
 
-export type RequestSort = 'top' | 'new';
+export type RequestSort = 'top' | 'new' | 'priority';
+
+const PRIORITY_RANK = { high: 0, medium: 1, low: 2 };
+const rank = (request: PatchRequest) => (request.priority ? PRIORITY_RANK[request.priority] : 3);
 
 export function matchingRequests(
 	requests: PatchRequest[],
@@ -14,10 +17,11 @@ export function matchingRequests(
 	return requests
 		.filter((request) => !status || request.status === status)
 		.filter((request) => words.every((word) => text(request).includes(word)))
-		.toSorted((a, b) =>
-			sort === 'top' && a.votes !== b.votes
-				? b.votes - a.votes
-				: b.created_at.localeCompare(a.created_at)
+		.toSorted(
+			(a, b) =>
+				(sort === 'priority' ? rank(a) - rank(b) : 0) ||
+				(sort === 'new' ? 0 : b.votes - a.votes) ||
+				b.created_at.localeCompare(a.created_at)
 		);
 }
 

@@ -43,7 +43,9 @@ export type Announcement = {
 	tags: string[];
 };
 
-export type RequestStatus = 'open' | 'planned' | 'shipped' | 'declined' | 'duplicate' | 'hidden';
+export type RequestStatus = 'open' | 'shipped' | 'closed' | 'hidden';
+
+export type RequestPriority = 'high' | 'medium' | 'low';
 
 export type PatchRequest = {
 	id: number;
@@ -51,6 +53,7 @@ export type PatchRequest = {
 	title: string;
 	body: string | null;
 	status: RequestStatus;
+	priority: RequestPriority | null;
 	shipped_in: string | null;
 	duplicate_of: number | null;
 	votes: number;

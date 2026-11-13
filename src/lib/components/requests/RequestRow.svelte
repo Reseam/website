@@ -29,7 +29,7 @@
 			<span class="min-w-0 text-title-medium transition-colors group-hover:text-primary"
 				>{request.title}</span
 			>
-			<StatusBadge status={request.status} />
+			<StatusBadge {request} />
 		</span>
 		{#if request.body}<span class="line-clamp-2 text-body-medium text-on-surface-variant"
 				>{request.body}</span
