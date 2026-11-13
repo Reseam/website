@@ -44,7 +44,7 @@
 	);
 
 	let query = $state('');
-	let status = $state('');
+	let status = $state('open');
 	let sort = $state<RequestSort>('top');
 	let app = $state<string | null | undefined>();
 	$effect(() => {
