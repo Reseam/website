@@ -19,6 +19,7 @@
 		canVote,
 		reported,
 		onvote,
+		onback,
 		onreport,
 		admin,
 		onchange,
@@ -31,6 +32,7 @@
 		canVote: boolean;
 		reported: boolean;
 		onvote: () => void;
+		onback: (() => void) | undefined;
 		onreport: () => void;
 		admin: AdminApi | undefined;
 		onchange: (request: PatchRequest) => void;
@@ -43,6 +45,11 @@
 <article class="grid gap-6">
 	<a
 		href="?"
+		onclick={(event) => {
+			if (!onback) return;
+			event.preventDefault();
+			onback();
+		}}
 		class="inline-flex items-center gap-1 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 	>
 		<ChevronLeft size={16} />

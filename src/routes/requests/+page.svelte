@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { TURNSTILE_SITE_KEY } from '$app/env/public';
 	import { afterNavigate, goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { storedAdminApi, type AdminApi } from '#lib/admin.ts';
 	import { appNames } from '#lib/apps.svelte.ts';
 	import AppList from '#lib/components/patches/AppList.svelte';
@@ -30,14 +31,19 @@
 	);
 	const board = new RequestBoard(() => list.value, voterFor(settings.apiUrl));
 	let admin = $state<AdminApi>();
+	let mounted = $state(false);
 	onMount(() => {
+		mounted = true;
 		board.loadActivity();
 		admin = storedAdminApi(settings.apiUrl);
 	});
 
 	// Prerendered pages hydrate without their query, so ?id= and ?app= are read once the page runs.
-	let params = $state(new URLSearchParams());
-	afterNavigate(() => (params = new URLSearchParams(location.search)));
+	const params = $derived(mounted ? page.url.searchParams : new URLSearchParams());
+	let openedFromList = $state(false);
+	afterNavigate(({ from, to }) => {
+		openedFromList = from?.url.pathname === to?.url.pathname && !from?.url.searchParams.has('id');
+	});
 	const linkedApp = $derived(params.get('app'));
 	const selected = $derived(
 		board.requests.find((request) => request.id === Number(params.get('id')))
@@ -103,6 +109,7 @@
 						canVote={canWrite}
 						reported={board.reported.has(selected.id)}
 						onvote={() => board.vote(selected)}
+						onback={openedFromList ? () => history.back() : undefined}
 						onreport={() => board.report(selected)}
 						{admin}
 						onchange={(updated) => board.replace(updated)}
