@@ -26,12 +26,12 @@
 	<VoteButton votes={request.votes} {voted} disabled={!canVote} onclick={onvote} />
 	<a href="?id={request.id}" class="group grid min-w-0 flex-1 content-start gap-1.5">
 		<span class="flex flex-wrap items-center gap-2.5">
-			<span class="min-w-0 text-title-medium transition-colors group-hover:text-primary"
+			<span class="min-w-0 text-title-medium transition-colors group-hover:text-primary" dir="auto"
 				>{request.title}</span
 			>
 			<StatusBadge {request} />
 		</span>
-		{#if request.body}<span class="line-clamp-2 text-body-medium text-on-surface-variant"
+		{#if request.body}<span class="line-clamp-2 text-body-medium text-on-surface-variant" dir="auto"
 				>{request.body}</span
 			>{/if}
 		<span

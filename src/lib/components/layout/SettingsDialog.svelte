@@ -41,7 +41,7 @@
 		{#if error}<p class="text-body-medium text-error" role="alert">{error}</p>{/if}
 	</form>
 	{#snippet footer()}
-		<Button variant="ghost" class="mr-auto" onclick={() => (value = DEFAULT_API_URL)}
+		<Button variant="ghost" class="me-auto" onclick={() => (value = DEFAULT_API_URL)}
 			>{m.action_reset()}</Button
 		>
 		<Button variant="outline" onclick={() => (open = false)}>{m.action_cancel()}</Button>

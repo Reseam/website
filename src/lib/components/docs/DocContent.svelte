@@ -3,7 +3,7 @@
 	let { html, variant = 'prose' }: { html: string; variant?: 'prose' | 'lead' } = $props();
 </script>
 
-<div class={['prose', variant === 'lead' && 'lead']}>
+<div class={['prose', variant === 'lead' && 'lead']} lang="en" dir="ltr">
 	{@html html}
 </div>
 
@@ -45,7 +45,7 @@
 		margin-block: 1.5em 0.4em;
 	}
 	.prose :global(:where(ul, ol)) {
-		padding-left: 1.4em;
+		padding-inline-start: 1.4em;
 	}
 	.prose :global(ul) {
 		list-style: disc;
@@ -100,9 +100,10 @@
 		line-height: var(--text-body-medium--line-height);
 	}
 	.prose :global(:where(th, td)) {
-		padding: 0.5rem 0.9rem 0.5rem 0;
+		padding-block: 0.5rem;
+		padding-inline: 0 0.9rem;
 		border-bottom: 1px solid var(--color-outline-variant);
-		text-align: left;
+		text-align: start;
 	}
 	.prose :global(th) {
 		color: var(--color-on-surface);
@@ -113,8 +114,8 @@
 		border-radius: var(--radius-lg);
 	}
 	.prose :global(blockquote) {
-		padding-left: 1rem;
-		border-left: 2px solid var(--color-outline-variant);
+		padding-inline-start: 1rem;
+		border-inline-start: 2px solid var(--color-outline-variant);
 		color: var(--color-on-surface-variant);
 	}
 </style>

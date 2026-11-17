@@ -85,7 +85,7 @@
 		<div
 			class="flex flex-wrap items-center gap-3 border-b border-outline-variant px-5 py-4 sm:px-6"
 		>
-			<h2 id="patches-title" class="mr-auto text-title-medium">{m.patches_title()}</h2>
+			<h2 id="patches-title" class="me-auto text-title-medium">{m.patches_title()}</h2>
 			<Segmented
 				label={m.patcher_select_patches()}
 				value={patcher.activePreset}

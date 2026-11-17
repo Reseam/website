@@ -145,6 +145,7 @@
 				maxlength="1000"
 				rows="3"
 				placeholder={comments.length === 0 && phase === 'ready' ? m.comments_first() : ''}
+				dir="auto"
 				class="field resize-y"></textarea>
 			<Button type="submit" class="justify-self-end" disabled={!draft.trim() || sending}
 				>{admin ? m.comments_send_team() : m.comments_send()}</Button

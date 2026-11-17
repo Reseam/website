@@ -19,7 +19,7 @@
 <section
 	class="container-page grid items-center gap-12 py-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:py-20"
 >
-	<div class="text-center lg:text-left">
+	<div class="text-center lg:text-start">
 		<h1 class="text-display-small lg:text-display-large">{m.home_title()}</h1>
 		<p
 			class="mx-auto mt-5 mb-12 max-w-xs text-body-large text-on-surface-variant lg:mx-0 lg:max-w-100"
@@ -28,7 +28,7 @@
 		</p>
 		<div class="flex flex-wrap justify-center gap-3 lg:justify-start">
 			<Button href={localizeHref('/download/')} size="lg"
-				>{m.action_download()} <ArrowRight size={18} /></Button
+				>{m.action_download()} <ArrowRight size={18} class="rtl:-scale-x-100" /></Button
 			>
 			<Button href={localizeHref('/patches/')} size="lg" variant="outline"
 				>{m.action_browse_patches()}</Button
@@ -85,7 +85,7 @@
 	</p>
 	{#snippet action()}
 		<Button href={localizeHref('/download/')} size="lg"
-			>{m.action_download()} <ArrowRight size={18} /></Button
+			>{m.action_download()} <ArrowRight size={18} class="rtl:-scale-x-100" /></Button
 		>
 	{/snippet}
 </CallToAction>

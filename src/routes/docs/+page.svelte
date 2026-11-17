@@ -24,7 +24,7 @@
 			class="grid overflow-hidden rounded-lg border border-outline-variant bg-surface-container-low xl:grid-cols-2"
 		>
 			{#each group.sections.flatMap((section) => section.pages) as link, index (link.slug)}
-				<li class="-mb-px border-b border-outline-variant xl:odd:border-r">
+				<li class="-mb-px border-b border-outline-variant xl:odd:border-e">
 					<a
 						href={localizeHref(`/docs/${link.slug}/`)}
 						class="group flex h-full items-center gap-4 px-5 py-3.5 transition-colors hover:bg-surface-container"
@@ -40,7 +40,7 @@
 						</span>
 						<ChevronRight
 							size={16}
-							class="shrink-0 text-on-surface-variant transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-on-surface"
+							class="shrink-0 text-on-surface-variant transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-on-surface rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
 						/>
 					</a>
 				</li>

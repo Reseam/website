@@ -44,7 +44,7 @@
 
 <Collapsible.Root bind:open={menuOpen}>
 	<header class="container-page flex h-18 items-center gap-6">
-		<a href={localizeHref('/')} class="group mr-auto flex items-center gap-2.5 text-title-large">
+		<a href={localizeHref('/')} class="group me-auto flex items-center gap-2.5 text-title-large">
 			<Logo
 				class="size-7 transition-transform duration-300 ease-spring group-hover:scale-110 group-hover:-rotate-6"
 			/>

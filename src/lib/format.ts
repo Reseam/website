@@ -43,3 +43,8 @@ export function duration(milliseconds: number) {
 export function megabytes(bytes: number) {
 	return unit(bytes / 1024 / 1024, 'megabyte', 1);
 }
+
+/** Text of unknown direction, such as a user's title, set apart so it cannot reorder the sentence around it. */
+export function isolate(text: string) {
+	return `⁨${text}⁩`;
+}

@@ -110,6 +110,7 @@
 					bind:value={title}
 					maxlength="100"
 					placeholder={m.new_request_example()}
+					dir="auto"
 					class="field"
 				/>
 				<p class="text-body-small text-on-surface-variant">{m.new_request_min_length()}</p>
@@ -123,6 +124,7 @@
 					bind:value={body}
 					maxlength="1000"
 					rows="6"
+					dir="auto"
 					class="field resize-y"></textarea>
 			</div>
 			{#if !voter.ready}

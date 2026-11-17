@@ -87,16 +87,16 @@
 						{/each}
 					</ul>
 				{/if}
-				<div class="relative">
+				<div class="relative" dir="ltr">
 					<pre
-						class="max-h-72 overflow-auto rounded-md border border-outline-variant bg-surface p-4 pr-12 font-mono text-mono-xs text-on-surface-variant">{patcher.log.join(
+						class="max-h-72 overflow-auto rounded-md border border-outline-variant bg-surface p-4 pe-12 font-mono text-mono-xs text-on-surface-variant">{patcher.log.join(
 							'\n'
 						)}</pre>
 					<button
 						type="button"
 						onclick={copy}
 						aria-label={copied ? m.action_copied() : m.report_copy_log()}
-						class="absolute top-2 right-2 {buttonClass('ghost', 'icon-sm')}"
+						class="absolute end-2 top-2 {buttonClass('ghost', 'icon-sm')}"
 					>
 						{#if copied}<Check size={14} />{:else}<Copy size={14} />{/if}
 					</button>

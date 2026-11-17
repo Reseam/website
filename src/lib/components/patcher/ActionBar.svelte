@@ -15,7 +15,7 @@
 </script>
 
 <div
-	class="sticky bottom-4 z-10 flex flex-col gap-3 rounded-xl border border-outline-variant bg-surface-container-low py-3 pr-3 pl-5 shadow-elevation-3 sm:flex-row sm:items-center"
+	class="sticky bottom-4 z-10 flex flex-col gap-3 rounded-xl border border-outline-variant bg-surface-container-low py-3 ps-5 pe-3 shadow-elevation-3 sm:flex-row sm:items-center"
 >
 	<p class="flex-1 text-body-medium text-on-surface-variant" aria-live="polite">
 		{patcher.blocker ?? m.patcher_selected({ count: selected })}

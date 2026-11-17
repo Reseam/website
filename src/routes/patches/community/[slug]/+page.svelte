@@ -53,7 +53,7 @@
 				href={localizeHref('/patches/community/')}
 				class="inline-flex items-center gap-1 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 			>
-				<ChevronLeft size={16} />
+				<ChevronLeft size={16} class="rtl:-scale-x-100" />
 				{m.community_all()}
 			</a>
 			<div class="grid gap-2">

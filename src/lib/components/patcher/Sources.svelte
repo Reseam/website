@@ -102,7 +102,7 @@
 				type="button"
 				onclick={() => patcher.removeBundle(file)}
 				aria-label={m.sources_remove({ name: bundle?.name || file.name })}
-				class="-mt-1 -mr-2 {buttonClass('ghost', 'icon')}"
+				class="-mt-1 -me-2 {buttonClass('ghost', 'icon')}"
 			>
 				<X size={16} />
 			</button>

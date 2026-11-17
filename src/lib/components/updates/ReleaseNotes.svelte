@@ -23,7 +23,7 @@
 		{#each notes.sections as section (section.kind)}
 			<section class="grid gap-2">
 				<h3 class="text-title-medium">{titles[section.kind]()}</h3>
-				<ul class="grid list-disc gap-1.5 pl-5 text-on-surface-variant marker:text-outline">
+				<ul class="grid list-disc gap-1.5 ps-5 text-on-surface-variant marker:text-outline">
 					{#each section.changes as change, i (i)}
 						<li>
 							{#if change.app}<span class="font-semibold text-on-surface">{change.app}:</span>{/if}

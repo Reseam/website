@@ -48,7 +48,7 @@
 					{/if}
 				</div>
 				<Dialog.Close
-					class="-mt-1.5 -mr-2 {buttonClass('ghost', 'icon')}"
+					class="-mt-1.5 -me-2 {buttonClass('ghost', 'icon')}"
 					aria-label={m.ui_close()}
 				>
 					<X size={18} />

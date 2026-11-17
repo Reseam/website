@@ -21,8 +21,8 @@
 		{@const text = textOf(option.key)}
 		<div class="grid gap-0.5">
 			<dt class="text-title-small">
-				{text?.title || option.key}
-				<span class="ml-1.5 text-body-small text-on-surface-variant">
+				<bdi>{text?.title || option.key}</bdi>
+				<span class="ms-1.5 text-body-small text-on-surface-variant">
 					{[
 						types[option.option_type](),
 						option.required && m.option_required(),
@@ -35,7 +35,7 @@
 				</span>
 			</dt>
 			{#if text?.description}<dd class="text-body-medium text-on-surface-variant">
-					{text.description}
+					<bdi>{text.description}</bdi>
 				</dd>{/if}
 		</div>
 	{/each}

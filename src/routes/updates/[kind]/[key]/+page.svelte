@@ -34,7 +34,7 @@
 			href={localizeHref('/updates/')}
 			class="inline-flex items-center gap-1 justify-self-start text-body-medium text-on-surface-variant transition-colors hover:text-on-surface"
 		>
-			<ChevronLeft size={16} />
+			<ChevronLeft size={16} class="rtl:-scale-x-100" />
 			{m.update_all()}
 		</a>
 		{#if entry.kind === 'news'}<div><EntryBadge {entry} /></div>{/if}

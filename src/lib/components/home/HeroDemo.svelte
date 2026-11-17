@@ -64,7 +64,7 @@
 <div class="relative mx-auto h-[33rem] w-full max-w-xl select-none sm:h-[28rem]">
 	<div
 		aria-hidden="true"
-		class="dark-phone absolute top-6 left-1/2 hidden h-88 w-56 -translate-x-[calc(50%+170px)] -rotate-6 flex-col overflow-hidden rounded-xl-increased border-6 border-(--line) bg-(--screen) p-3 shadow-elevation-3 sm:flex"
+		class="dark-phone absolute top-6 left-1/2 hidden h-88 w-56 -translate-x-[calc(50%+170px)] -rotate-6 flex-col rtl:translate-x-[calc(-50%+170px)] rtl:rotate-6 overflow-hidden rounded-xl-increased border-6 border-(--line) bg-(--screen) p-3 shadow-elevation-3 sm:flex"
 	>
 		{@render screen(m.steps_app_name({ number: 2 }), 'bg-app-violet', 'bg-app-violet/25')}
 		{@render feed()}
@@ -73,7 +73,7 @@
 	<div
 		aria-hidden="true"
 		class={[
-			'absolute top-6 left-1/2 z-10 flex h-80 w-48 -translate-x-1/2 flex-col overflow-hidden rounded-xl-increased border-6 border-(--line) bg-(--screen) p-3 shadow-elevation-3 transition-colors duration-700 sm:h-88 sm:w-56 sm:-translate-x-[calc(50%+90px)]',
+			'absolute top-6 left-1/2 z-10 flex h-80 w-48 -translate-x-1/2 flex-col overflow-hidden rounded-xl-increased border-6 border-(--line) bg-(--screen) p-3 shadow-elevation-3 transition-colors duration-700 sm:h-88 sm:w-56 sm:-translate-x-[calc(50%+90px)] sm:rtl:translate-x-[calc(-50%+90px)]',
 			on('dark') ? 'dark-phone' : 'light-phone',
 		]}
 	>
@@ -81,7 +81,7 @@
 		{#if on('tracking')}
 			<span
 				in:scale={{ start: 0.6, duration: 280, easing: cubicOut }}
-				class="absolute top-9 right-4 grid size-6 place-items-center rounded-full bg-primary/20 text-primary"
+				class="absolute end-4 top-9 grid size-6 place-items-center rounded-full bg-primary/20 text-primary"
 			>
 				<ShieldCheck size={12} />
 			</span>
@@ -117,7 +117,7 @@
 	</div>
 
 	<div
-		class="absolute bottom-0 left-1/2 z-20 w-60 -translate-x-1/2 rounded-xl border border-outline-variant bg-surface-container-low p-5 shadow-elevation-3 sm:top-1/2 sm:bottom-auto sm:translate-x-[calc(-50%+150px)] sm:-translate-y-1/2"
+		class="absolute bottom-0 left-1/2 z-20 w-60 -translate-x-1/2 rounded-xl border border-outline-variant bg-surface-container-low p-5 shadow-elevation-3 sm:top-1/2 sm:bottom-auto sm:translate-x-[calc(-50%+150px)] sm:-translate-y-1/2 sm:rtl:-translate-x-[calc(50%+150px)]"
 	>
 		<p class="mb-3 flex items-center gap-2 border-b border-outline-variant pb-3 text-label-large">
 			<span class="grid size-6 place-items-center rounded-sm bg-primary-container text-primary"

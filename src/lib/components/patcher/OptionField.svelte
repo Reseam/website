@@ -48,11 +48,11 @@
 				aria-describedby={describedby}
 				onCheckedChange={(value) => onchange({ kind: 'toggle', value })}
 			/>
-			<Label.Root for={id} class="text-label-large">{title}</Label.Root>
+			<Label.Root for={id} class="text-label-large"><bdi>{title}</bdi></Label.Root>
 		</div>
 	{:else}
 		<Label.Root for={id} class="text-label-large">
-			{title}
+			<bdi>{title}</bdi>
 			{#if option.required && option.default_value === null}<span
 					class="text-body-medium text-on-surface-variant">{m.option_required_label()}</span
 				>{/if}
@@ -140,9 +140,9 @@
 	{#if text.description}
 		<p
 			id="{id}-description"
-			class={['text-on-surface-variant', draft.kind === 'toggle' && 'pl-7.5']}
+			class={['text-on-surface-variant', draft.kind === 'toggle' && 'ps-7.5']}
 		>
-			{text.description}
+			<bdi>{text.description}</bdi>
 		</p>
 	{/if}
 	{#if error}<p id="{id}-error" class="text-error">{error}</p>{/if}

@@ -4,6 +4,7 @@
 	import Inbox from '@lucide/svelte/icons/inbox';
 	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import Callout from '#lib/components/ui/Callout.svelte';
+	import { isolate } from '#lib/format.ts';
 	import {
 		shippedEntry,
 		STATUS_NOTICES,
@@ -31,7 +32,9 @@
 	{@const shipped = notice.shipped_in ? shippedEntry(notice.shipped_in) : undefined}
 	<Callout
 		icon={CircleCheck}
-		title={STATUS_NOTICES[notice.status as keyof typeof STATUS_NOTICES]({ title: notice.title })}
+		title={STATUS_NOTICES[notice.status as keyof typeof STATUS_NOTICES]({
+			title: isolate(notice.title),
+		})}
 	>
 		{#if shipped}<p class="mt-1">
 				{m.notice_shipped_in({ release: shipped.label })}
@@ -40,7 +43,7 @@
 	</Callout>
 {/each}
 {#each commented as request (request.id)}
-	<Callout icon={MessageSquare} title={m.notice_comments({ title: request.title })}>
+	<Callout icon={MessageSquare} title={m.notice_comments({ title: isolate(request.title) })}>
 		<p class="mt-1">
 			<a href="?id={request.id}" class="text-primary hover:underline">{m.notice_read()}</a>
 		</p>

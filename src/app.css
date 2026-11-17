@@ -200,10 +200,10 @@
 	--animate-indeterminate: indeterminate 1.4s var(--ease-emphasized) infinite;
 	@keyframes indeterminate {
 		from {
-			translate: -100% 0;
+			translate: calc(-100% * var(--inline-sign)) 0;
 		}
 		to {
-			translate: 300% 0;
+			translate: calc(300% * var(--inline-sign)) 0;
 		}
 	}
 
@@ -257,6 +257,7 @@
 
 @layer base {
 	:root {
+		--inline-sign: 1;
 		color-scheme: dark;
 		scrollbar-color: var(--color-outline-variant) transparent;
 		/* The design is laid out with Inter's text cut at every size, so large type keeps its width. */
@@ -284,6 +285,23 @@
 	h2,
 	h3 {
 		text-wrap: balance;
+	}
+
+	:root[dir='rtl'] {
+		--inline-sign: -1;
+	}
+
+	/* Arabic script joins its letters, and spacing them apart breaks the joins. */
+	:where(:lang(ar), :lang(fa), :lang(ur)) {
+		letter-spacing: 0 !important;
+	}
+
+	/* Urdu is set in Nastaliq, whose letters rise and fall far past a Latin line. */
+	:root:lang(ur) {
+		line-height: 2;
+	}
+	:where(:lang(ur)) {
+		--tw-leading: 2;
 	}
 }
 
@@ -322,13 +340,13 @@
 .markdown-alert {
 	padding: 0.8rem 1rem;
 	border: 1px solid var(--color-outline-variant);
-	border-left: 3px solid var(--color-primary);
+	border-inline-start: 3px solid var(--color-primary);
 	border-radius: var(--radius-md);
 	background: var(--color-surface-container-low);
 }
 .markdown-alert-warning,
 .markdown-alert-caution {
-	border-left-color: var(--color-warning);
+	border-inline-start-color: var(--color-warning);
 }
 .markdown-alert-title {
 	display: flex;

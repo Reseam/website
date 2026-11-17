@@ -43,12 +43,12 @@
 			<div class="min-w-0 flex-1">
 				<div class="flex flex-wrap items-center gap-2">
 					<Label.Root for="patch-{key}" class="cursor-pointer text-title-medium"
-						>{text.name}</Label.Root
+						><bdi>{text.name}</bdi></Label.Root
 					>
 					{#if patch.compatibility.kind === 'universal'}<Badge>{m.catalog_any_app()}</Badge>{/if}
 				</div>
 				<div id="patch-{key}-about" class="text-body-medium text-on-surface-variant">
-					{#if text.description}<p class="mt-0.5">{text.description}</p>{/if}
+					{#if text.description}<p class="mt-0.5"><bdi>{text.description}</bdi></p>{/if}
 					{#if included}
 						<p class="mt-1 text-body-small">
 							{m.patcher_included_for({
@@ -79,7 +79,7 @@
 			</div>
 		</div>
 		<Collapsible.Content class="collapsible">
-			<div class="mt-3 grid gap-4 rounded-md bg-surface-container p-4 sm:ml-8.5">
+			<div class="mt-3 grid gap-4 rounded-md bg-surface-container p-4 sm:ms-8.5">
 				{#each patch.options as option (option.key)}
 					<OptionField
 						{option}

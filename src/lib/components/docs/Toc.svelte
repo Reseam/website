@@ -29,8 +29,8 @@
 			href="#{heading.id}"
 			aria-current={heading.id === active ? 'location' : undefined}
 			class={[
-				'border-l-2 border-transparent py-0.5 text-on-surface-variant transition-colors hover:text-on-surface aria-[current=location]:border-primary aria-[current=location]:text-on-surface',
-				heading.level === 3 ? 'pl-6' : 'pl-3',
+				'border-s-2 border-transparent py-0.5 text-on-surface-variant transition-colors hover:text-on-surface aria-[current=location]:border-primary aria-[current=location]:text-on-surface',
+				heading.level === 3 ? 'ps-6' : 'ps-3',
 			]}
 		>
 			{heading.text}

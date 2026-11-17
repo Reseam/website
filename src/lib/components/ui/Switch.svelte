@@ -17,6 +17,6 @@
 	{...rest}
 >
 	<Switch.Thumb
-		class="size-4 rounded-full bg-on-surface-variant transition-[translate,background-color] duration-300 ease-spring data-[state=checked]:translate-x-4 data-[state=checked]:bg-on-primary"
+		class="size-4 rounded-full bg-on-surface-variant transition-[translate,background-color] duration-300 ease-spring data-[state=checked]:translate-x-4 rtl:data-[state=checked]:-translate-x-4 data-[state=checked]:bg-on-primary"
 	/>
 </Switch.Root>

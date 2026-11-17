@@ -19,7 +19,7 @@
 
 <div class="grid grid-cols-1 items-start gap-16 xl:grid-cols-[minmax(0,1fr)_15rem]">
 	<article class="grid grid-cols-1 gap-6">
-		<header>
+		<header lang="en" dir="ltr">
 			<p class="text-label-large text-primary">{group?.label}</p>
 			<h1 class="mt-1 text-headline-large sm:text-display-medium">{page.title}</h1>
 		</header>

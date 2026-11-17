@@ -34,8 +34,7 @@
 			class="relative {buttonClass(variant, 'icon')}"
 		>
 			<Icon size={iconSize} />
-			{#if dot}<span
-					class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"
+			{#if dot}<span class="absolute end-2 top-2 size-2 rounded-full bg-primary ring-2 ring-surface"
 				></span>{/if}
 		</svelte:element>
 	{/snippet}

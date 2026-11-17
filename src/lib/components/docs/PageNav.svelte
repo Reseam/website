@@ -15,7 +15,7 @@
 		href={localizeHref(`/docs/${link.slug}/`)}
 		class={[
 			'grid gap-0.5 rounded-lg border border-outline-variant px-4 py-3.5 transition-colors hover:border-primary/40',
-			end && 'col-start-2 text-right',
+			end && 'col-start-2 text-end',
 		]}
 	>
 		<span class="text-body-small text-on-surface-variant">{label}</span>

@@ -35,7 +35,7 @@
 		{id}
 		aria-invalid={invalid || undefined}
 		aria-describedby={describedby}
-		class="field flex items-center justify-between gap-2 text-left data-placeholder:text-on-surface-variant"
+		class="field flex items-center justify-between gap-2 text-start data-placeholder:text-on-surface-variant"
 	>
 		<span class="truncate">{value ? labelOf(value) : placeholder}</span>
 		<ChevronsUpDown size={15} class="shrink-0 text-on-surface-variant" />

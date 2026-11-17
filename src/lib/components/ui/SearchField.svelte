@@ -14,7 +14,7 @@
 		size={size === 'lg' ? 20 : 16}
 		class={[
 			'pointer-events-none absolute top-1/2 -translate-y-1/2 text-on-surface-variant',
-			size === 'lg' ? 'left-5.5' : 'left-3.5',
+			size === 'lg' ? 'start-5.5' : 'start-3.5',
 		]}
 	/>
 	<input
@@ -24,8 +24,8 @@
 		class={[
 			'w-full border text-on-surface transition-colors placeholder:text-on-surface-variant focus:border-primary focus:outline-none',
 			size === 'lg'
-				? 'h-15 rounded-full border-transparent bg-surface-container-low pr-6 pl-14 text-body-large hover:bg-surface-container focus:bg-surface-container-low'
-				: 'h-10 rounded-md border-outline-variant bg-surface pr-3 pl-10 text-body-medium',
+				? 'h-15 rounded-full border-transparent bg-surface-container-low ps-14 pe-6 text-body-large hover:bg-surface-container focus:bg-surface-container-low'
+				: 'h-10 rounded-md border-outline-variant bg-surface ps-10 pe-3 text-body-medium',
 		]}
 	/>
 </label>

@@ -11,7 +11,7 @@
 	const html = $derived(render(text));
 </script>
 
-<div class={['markdown', className]}>{@html html}</div>
+<div class={['markdown', className]} dir="auto">{@html html}</div>
 
 <style>
 	.markdown {
@@ -22,7 +22,7 @@
 	.markdown :global(:where(ul, ol)) {
 		display: grid;
 		gap: 0.25em;
-		padding-left: 1.25em;
+		padding-inline-start: 1.25em;
 	}
 	.markdown :global(ul) {
 		list-style: disc;
@@ -73,14 +73,14 @@
 		overflow-wrap: break-word;
 		border: 1px solid var(--color-outline-variant);
 		padding: 0.4em 0.75em;
-		text-align: left;
+		text-align: start;
 	}
 	.markdown :global(hr) {
 		border-color: var(--color-outline-variant);
 	}
 	.markdown :global(blockquote) {
-		border-left: 2px solid var(--color-outline-variant);
-		padding-left: 0.75em;
+		border-inline-start: 2px solid var(--color-outline-variant);
+		padding-inline-start: 0.75em;
 		color: var(--color-on-surface-variant);
 	}
 </style>

@@ -54,17 +54,17 @@
 					{group.label}
 					<ChevronRight
 						size={14}
-						class="transition-transform duration-200 group-aria-expanded:rotate-90"
+						class="transition-transform duration-200 group-aria-expanded:rotate-90 rtl:-scale-x-100 rtl:group-aria-expanded:-rotate-90"
 					/>
 				</Collapsible.Trigger>
 				<Collapsible.Content class="collapsible">
 					{#each group.sections as section (section.label)}
 						{#if section.label !== 'Guide'}
-							<p class="mt-3 mb-1 ml-3 text-label-large text-on-surface-variant">
+							<p class="ms-3 mt-3 mb-1 text-label-large text-on-surface-variant">
 								{section.label}
 							</p>
 						{/if}
-						<ul class="ml-3 grid gap-px border-l border-outline-variant pb-2 pl-2">
+						<ul class="ms-3 grid gap-px border-s border-outline-variant ps-2 pb-2">
 							{#each section.pages as link (link.slug)}
 								<li>
 									<a
@@ -89,7 +89,7 @@
 {/snippet}
 
 <div
-	class="hidden lg:sticky lg:top-6 lg:block lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:pr-2 lg:[scrollbar-width:thin]"
+	class="hidden lg:sticky lg:top-6 lg:block lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:pe-2 lg:[scrollbar-width:thin]"
 >
 	{@render links()}
 </div>

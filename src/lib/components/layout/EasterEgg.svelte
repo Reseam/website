@@ -27,7 +27,7 @@
 			<img {...screenshot} class="h-auto w-full rounded-xl border border-outline-variant" />
 		{/each}
 		<Button href={next.href} variant="outline" size="lg" class="mt-4 justify-self-start"
-			>{next.label} <ArrowRight size={17} /></Button
+			>{next.label} <ArrowRight size={17} class="rtl:-scale-x-100" /></Button
 		>
 	</div>
 </div>

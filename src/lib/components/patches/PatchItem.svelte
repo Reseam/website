@@ -11,11 +11,11 @@
 
 <li class="grid gap-1 px-5 py-4 sm:px-6">
 	<div class="flex flex-wrap items-center gap-2.5">
-		<h3 class="text-title-medium">{patch.text.name}</h3>
+		<h3 class="text-title-medium"><bdi>{patch.text.name}</bdi></h3>
 		{#if !patch.enabled_by_default}<Badge>{m.catalog_optional()}</Badge>{/if}
 	</div>
 	{#if patch.text.description}<p class="max-w-[90ch] text-body-medium text-on-surface-variant">
-			{patch.text.description}
+			<bdi>{patch.text.description}</bdi>
 		</p>{/if}
 	<Collapsible.Root>
 		<div
