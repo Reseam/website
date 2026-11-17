@@ -7,7 +7,7 @@
       "dependencies": {
         "@internationalized/date": "^3.12.4",
         "@lucide/svelte": "^1.51.0",
-        "@reseam/browser": "0.41.0",
+        "@reseam/browser": "0.42.0",
         "bits-ui": "^2.19.5",
       },
       "devDependencies": {
@@ -139,7 +139,7 @@
 
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
-    "@reseam/browser": ["@reseam/browser@0.41.0", "https://git.reseam.app/api/packages/reseam/npm/%40reseam%2Fbrowser/-/0.41.0/browser-0.41.0.tgz", { "dependencies": { "@bjorn3/browser_wasi_shim": "0.4.2", "lossless-json": "4.3.0" } }, "sha512-9lYh9VjtQFXyi7wIyYdajYTG8c6pQyUjlymIH7GcZOul765+1B/u088We/5fLVjxOU4gOkX8AlkELa3zfhDwCw=="],
+    "@reseam/browser": ["@reseam/browser@0.42.0", "https://git.reseam.app/api/packages/reseam/npm/%40reseam%2Fbrowser/-/0.42.0/browser-0.42.0.tgz", { "dependencies": { "@bjorn3/browser_wasi_shim": "0.4.2", "lossless-json": "4.3.0" } }, "sha512-Kb2txYCnL4EF0Fk5tQiTPeOC8pW/oBBC3PUERULAiUXTJqAQ+8O5y+0L981DFbArVpX4A4uiEHIe+vFzg3j1zQ=="],
 
     "@rolldown/binding-android-arm-eabi": ["@rolldown/binding-android-arm-eabi@1.2.12", "", { "os": "android", "cpu": "arm" }, "sha512-dB/a1214qKfHMXCpgqR4OZT+jS4kTyEXbQGJPqzobt5EwH5rX080pxE37alt3RzvR1bf1Yz/yGqRfrYAxuPw0A=="],
 
