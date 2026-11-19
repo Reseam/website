@@ -1,10 +1,18 @@
 export type Change = { app: string | null; text: string };
 export type NoteSection = { kind: ChangeKind; changes: Change[] };
-export type ReleaseNotes = { sections: NoteSection[]; prose: string; engine: string | null };
+export type Media = { name: string; url: string; video: boolean };
+export type ReleaseNotes = {
+	sections: NoteSection[];
+	prose: string;
+	engine: string | null;
+	media: Media[];
+};
 
 const CHANGE_KINDS = ['feat', 'fix', 'perf'] as const;
 type ChangeKind = (typeof CHANGE_KINDS)[number];
 const CONVENTIONAL = /^\s*[-*+]\s+(\w+)(?:\(([^)]+)\))?!?:\s+(.+)$/;
+const MEDIA = /^\s*!\[([^\]]*)\]\((https:\/\/[^\s()]+)\)\s*$/;
+const VIDEO = /\.(mp4|webm)$/i;
 const ENGINE = /^\s*[-*+]\s+build:\s+require engine\s+(\S+)/m;
 const APP_NAMES: Record<string, string> = {
 	youtube: 'YouTube',
@@ -26,12 +34,19 @@ export function scopeName(scope: string) {
 /**
  * Release notes for people using the apps: `- type(scope): text` commit lines become New, Fixed and Faster,
  * by app, the same way Reseam Manager shows them. Build, style and other internal commits are left out,
- * except the engine a release needs. Lines that are not commits stay as written.
+ * except the engine a release needs. A Markdown image on a line of its own is the release's media, which
+ * `reseam release` lists first. Other lines stay as written.
  */
 export function parseNotes(description: string): ReleaseNotes {
 	const sections = new Map<ChangeKind, Change[]>();
 	const prose: string[] = [];
+	const media: Media[] = [];
 	for (const line of description.split('\n')) {
+		const shown = MEDIA.exec(line);
+		if (shown) {
+			media.push({ name: shown[1], url: shown[2], video: VIDEO.test(shown[2]) });
+			continue;
+		}
 		const match = CONVENTIONAL.exec(line);
 		if (!match) {
 			prose.push(line);
@@ -54,5 +69,6 @@ export function parseNotes(description: string): ReleaseNotes {
 		})),
 		prose: prose.join('\n').trim(),
 		engine: ENGINE.exec(description)?.[1] ?? null,
+		media,
 	};
 }

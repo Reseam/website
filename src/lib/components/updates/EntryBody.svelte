@@ -11,5 +11,5 @@
 		<Markdown text={entry.announcement.content} class="max-w-[72ch] text-article text-on-surface" />
 	{/if}
 {:else}
-	<ReleaseNotes notes={entry.notes} />
+	<ReleaseNotes notes={entry.notes} embedMedia />
 {/if}

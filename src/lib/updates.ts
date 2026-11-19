@@ -86,4 +86,4 @@ export function summary(entry: UpdateEntry) {
 }
 
 export const hasChanges = (entry: ReleaseEntry) =>
-	entry.notes.sections.length > 0 || entry.notes.prose.length > 0;
+	entry.notes.sections.length > 0 || entry.notes.prose.length > 0 || entry.notes.media.length > 0;
