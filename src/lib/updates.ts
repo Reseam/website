@@ -1,5 +1,5 @@
 import { fetchAnnouncements, fetchManagerIndex, fetchPatchesIndex } from '#lib/api.ts';
-import { parseNotes, type ReleaseNotes } from '#lib/notes.ts';
+import { mediaOf, parseNotes, type ReleaseNotes } from '#lib/notes.ts';
 import type { ReleaseIndex } from '@reseam/browser';
 import type { Announcement } from '#lib/types.ts';
 import { m } from '#lib/paraglide/messages.js';
@@ -78,7 +78,7 @@ export const entryPath = (entry: Pick<UpdateEntry, 'kind' | 'key'>) =>
 	localizeHref(`/updates/${entry.kind}/${entry.key}/`);
 
 export function summary(entry: UpdateEntry) {
-	if (entry.kind === 'news') return entry.announcement.content ?? '';
+	if (entry.kind === 'news') return mediaOf(entry.announcement.content ?? '').text;
 	const changes = entry.notes.sections
 		.flatMap((section) => section.changes)
 		.map((change) => (change.app ? `${change.app}: ${change.text}` : change.text));

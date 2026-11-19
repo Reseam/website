@@ -31,6 +31,18 @@ export function scopeName(scope: string) {
 	);
 }
 
+/** A Markdown image on a line of its own is media, as release notes and announcements carry it; the rest is text. */
+export function mediaOf(text: string): { media: Media[]; text: string } {
+	const media: Media[] = [];
+	const rest: string[] = [];
+	for (const line of text.split('\n')) {
+		const shown = MEDIA.exec(line);
+		if (shown) media.push({ name: shown[1], url: shown[2], video: VIDEO.test(shown[2]) });
+		else rest.push(line);
+	}
+	return { media, text: rest.join('\n').trim() };
+}
+
 /**
  * Release notes for people using the apps: `- type(scope): text` commit lines become New, Fixed and Faster,
  * by app, the same way Reseam Manager shows them. Build, style and other internal commits are left out,
@@ -40,13 +52,8 @@ export function scopeName(scope: string) {
 export function parseNotes(description: string): ReleaseNotes {
 	const sections = new Map<ChangeKind, Change[]>();
 	const prose: string[] = [];
-	const media: Media[] = [];
-	for (const line of description.split('\n')) {
-		const shown = MEDIA.exec(line);
-		if (shown) {
-			media.push({ name: shown[1], url: shown[2], video: VIDEO.test(shown[2]) });
-			continue;
-		}
+	const { media, text } = mediaOf(description);
+	for (const line of text.split('\n')) {
 		const match = CONVENTIONAL.exec(line);
 		if (!match) {
 			prose.push(line);
